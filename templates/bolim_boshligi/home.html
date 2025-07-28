@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QO'QON DAVLAT UNIVERSITETI</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Asosiy css -->
+    <link href="{% static 'asosiy/css/home.css' %}" rel="stylesheet">
+
+</head>
+<body>
+    
+
+    <!-- Navbar -->
+    {% include 'prorektor/navbar.html' %}
+
+    <!-- Saidbar -->
+    {% include 'prorektor/saidbar.html' %}
+
+   
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid">
+            
+
+            <h1>Prorektor</h1>
+
+
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-users text-primary me-2"></i> Foydalanuvchilar</h5>
+                            <p class="card-text">Tizimdagi foydalanuvchilarni boshqarish</p>
+                            <a href="#" class="btn btn-primary">Kirish</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-book text-success me-2"></i> Kurslar</h5>
+                            <p class="card-text">O'quv kurslarini boshqarish</p>
+                            <a href="#" class="btn btn-success">Kirish</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-chart-bar text-info me-2"></i> Hisobotlar</h5>
+                            <p class="card-text">Tizim hisobotlarini ko'rish</p>
+                            <a href="#" class="btn btn-info">Kirish</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- HOME JS -->
+    <script src="{% static 'asosiy/js/bootstrap.bundle.min.js' %}"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Sidebar toggle functionality
+            $('#sidebarToggle').click(function() {
+                $('#sidebar').toggleClass('collapsed');
+                $('#mainContent').toggleClass('expanded');
+                
+                // For mobile view
+                if ($(window).width() < 992) {
+                    $('#sidebar').toggleClass('show');
+                }
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            $(document).click(function(e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('#sidebar').length && !$(e.target).is('#sidebarToggle')) {
+                        $('#sidebar').removeClass('show');
+                    }
+                }
+            });
+            
+            // Prevent closing when clicking inside sidebar
+            $('#sidebar').click(function(e) {
+                e.stopPropagation();
+            });
+            
+            // Active menu item highlight
+            $('.sidebar-menu a').click(function() {
+                $('.sidebar-menu a').removeClass('active');
+                $(this).addClass('active');
+            });
+            
+            // Tooltip for collapsed sidebar items
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+</body>
+</html>

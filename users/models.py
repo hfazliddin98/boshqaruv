@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from users.choices import UserRoleChoice
+from users.choices import RoleChoice
 
 
 class AsosiyModel(models.Model):
@@ -21,10 +21,10 @@ class Bolim(AsosiyModel):
 
 
 class Users(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable = False)
     sharif = models.CharField(max_length=255, blank=True)
-    role = models.CharField(max_length=30, choices=UserRoleChoice.choices)
-    bolim = models.ForeignKey(Bolim, on_delete=models.CASCADE, blank=True, null=True)
-    bolim_boshligi = models.BooleanField(default=False)
+    role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.HODIM)
+    bolim = models.ForeignKey(Bolim, on_delete=models.PROTECT, blank=True, null=True)
     parol = models.CharField(max_length=255, blank=True)
 
     def __str__(self):

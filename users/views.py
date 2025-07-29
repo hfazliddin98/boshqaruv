@@ -13,6 +13,10 @@ def home(request):
     if request.user.role == RoleChoice.ADMIN:
         return redirect('admin_home')
     
+    # rektor
+    if request.user.role == RoleChoice.REKTOR:
+        return redirect('rektor_home')
+
     # prorektor
     if request.user.role == RoleChoice.PROREKTOR:
         return redirect('prorektor_home')
@@ -63,6 +67,24 @@ def rektor_home(request):
     context = {}
     return render(request, 'rektor/home.html', context)
 
+@csrf_exempt
+def rektor_prorektorlar(request):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if not request.user.role == RoleChoice.REKTOR:
+        return redirect('kirish')
+
+    prorektor_data = Users.objects.filter(role=RoleChoice.PROREKTOR)
+
+    context = {
+        "prorektor_data":prorektor_data
+    }
+    return render(request, 'rektor/rektor_prorektorlar.html', context)
+
+
+
+
 # Prorektor
 
 @csrf_exempt
@@ -77,19 +99,34 @@ def prorektor_home(request):
     return render(request, 'prorektor/home.html', context)
 
 @csrf_exempt
-def prorektor_bolim_rahbarlar(request):
+def prorektor_bolim_boshliqlar(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
     
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
     
-    rahbar_data = Users.objects.filter(role=RoleChoice.BOLIM_BOSHLIGI)
+    boshliq_data = Users.objects.filter(role=RoleChoice.BOLIM_BOSHLIGI)
     
     context = {
-        "rahbar_data":rahbar_data
+        "boshliq_data":boshliq_data
     }
-    return render(request, 'prorektor/bolim_rahbarlar.html', context)
+    return render(request, 'prorektor/prorektor_bolim_boshliqlar.html', context)
+
+@csrf_exempt
+def prorektor_dekanlar(request):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+    
+    if not request.user.role == RoleChoice.PROREKTOR:
+        return redirect('kirish')
+    
+    boshliq_data = Users.objects.filter(role=RoleChoice.DEKAN)
+    
+    context = {
+        "boshliq_data":boshliq_data
+    }
+    return render(request, 'prorektor/prorektor_dekanlar.html', context)
 
 # Bolim boshligi
 

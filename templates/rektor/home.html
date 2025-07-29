@@ -195,7 +195,7 @@
                 <i class="fas fa-bars"></i>
             </button>
 
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="{% url 'home' %}">
                 <img src="{% static 'asosiy/images/logo.png' %}" alt="Logo" height="30" class="me-2">
                 <span class="d-none d-sm-inline">QO'QON DAVLAT UNIVERSITETI</span>
                 <span class="d-sm-none">QDU</span>
@@ -227,15 +227,15 @@
         <div class="sidebar-inner">
             <ul class="sidebar-menu">
                 <li>
-                    <a href="#" class="active">
+                    <a href="{% url 'home' %}" class="active">
                         <i class="fas fa-home"></i>
                         <span class="sidebar-text">Bosh sahifa</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'prorektor_bolim_rahbarlar' %}">
+                    <a href="{% url 'rektor_prorektorlar' %}">
                         <i class="fas fa-users"></i>
-                        <span class="sidebar-text">Rahbarlar</span>
+                        <span class="sidebar-text">Prorektorlar</span>
                     </a>
                 </li>
                 <li>

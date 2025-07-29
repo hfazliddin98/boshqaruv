@@ -1,13 +1,14 @@
 from django.db import models
 
 
-class StatusChoice(models.TextChoices):
-    ADMIN = ('admin', 'admin')
-    PROREKTOR = ('prorektor', 'prorektor')
-    RAHBAR = ('rahbar', 'rahbar')
-    HODIM = ('hodim', 'hodim')
-
 class XolatChoice(models.TextChoices):
+    SHOSHILINCH = ('Shoshilinch', 'Shoshilinch')
+    ORTA = ('O`rta', 'O`rta')
+    ODDIY = ('Oddiy', 'Oddiy')
+
+
+class StatusChoice(models.TextChoices):
+    YUBORILDI = ('Yuborildi', 'Yuborildi')
     BAJARILDI = ('Bajarildi', 'Bajarildi')
     BAJARILMADI = ('Bajarilmadi', 'Bajarilmadi')
     KECHIKDI = ('Kechikdi', 'Kechikdi')

@@ -1,7 +1,8 @@
 from django.urls import path
 from users.views import home, kirish
+from users.views import rektor_home, rektor_prorektorlar
+from users.views import prorektor_home, prorektor_bolim_boshliqlar, prorektor_dekanlar
 from users.views import admin_home, bolim_boshligi_home, hodim_home
-from users.views import prorektor_home, prorektor_bolim_rahbarlar
 
 
 urlpatterns = [
@@ -13,8 +14,13 @@ urlpatterns = [
     path('bolim_boshligi_home/', bolim_boshligi_home, name='bolim_boshligi_home'),
     path('hodim_home/', hodim_home, name='hodim_home'),
 
+    # rektor
+    path('rektor_home/', rektor_home, name='rektor_home'),
+    path('rektor_prorektorlar/', rektor_prorektorlar, name='rektor_prorektorlar'),
+
     # prorektor
     path('prorektor_home/', prorektor_home, name='prorektor_home'),
-    path('prorektor_bolim_rahbarlar/', prorektor_bolim_rahbarlar, name='prorektor_bolim_rahbarlar'),
+    path('prorektor_bolim_boshliqlar/', prorektor_bolim_boshliqlar, name='prorektor_bolim_boshliqlar'),
+    path('prorektor_dekanlar/', prorektor_dekanlar, name='prorektor_dekanlar'),
 
 ]

@@ -195,7 +195,7 @@
                 <i class="fas fa-bars"></i>
             </button>
 
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="{% url 'home' %}">
                 <img src="{% static 'asosiy/images/logo.png' %}" alt="Logo" height="30" class="me-2">
                 <span class="d-none d-sm-inline">QO'QON DAVLAT UNIVERSITETI</span>
                 <span class="d-sm-none">QDU</span>
@@ -227,15 +227,21 @@
         <div class="sidebar-inner">
             <ul class="sidebar-menu">
                 <li>
-                    <a href="#" class="active">
+                    <a href="{% url 'home' %}" class="active">
                         <i class="fas fa-home"></i>
                         <span class="sidebar-text">Bosh sahifa</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'prorektor_bolim_rahbarlar' %}">
+                    <a href="{% url 'prorektor_bolim_boshliqlar' %}">
                         <i class="fas fa-users"></i>
-                        <span class="sidebar-text">Rahbarlar</span>
+                        <span class="sidebar-text">Bo`lim boshliqlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'prorektor_dekanlar' %}">
+                        <i class="fas fa-users"></i>
+                        <span class="sidebar-text">Dekanlar</span>
                     </a>
                 </li>
                 <li>
@@ -264,13 +270,37 @@
 
             <div class="row">
                 <!-- Users Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-primary shadow h-100 py-2">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Rahbarlar</div>
+                                        Bo`lim boshliqlar</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">245</div>
+                                    <p class="mt-2 mb-0 text-muted text-sm">
+                                        Jami bo`limga tegishli rahbarlar
+                                    </p>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-primary">
+                                        <i class="fas fa-users text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Dekanlar</div>
                                     <div class="h5 mb-0 font-weight-bold text-gray-800">245</div>
                                     <p class="mt-2 mb-0 text-muted text-sm">
                                         Jami bo`limga tegishli rahbarlar
@@ -288,7 +318,7 @@
                 </div>
 
                 <!-- Tasks Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-success shadow h-100 py-2">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
@@ -312,7 +342,7 @@
                 </div>
 
                 <!-- Reports Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-info shadow h-100 py-2">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">

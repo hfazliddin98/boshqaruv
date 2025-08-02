@@ -215,7 +215,9 @@
                             </div>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Chiqish</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'chiqish' %}"><i class="fas fa-sign-out-alt me-2"></i> Chiqish</a>
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -239,7 +241,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="{% url 'rektor_topshiriq' %}">
                         <i class="fas fa-book"></i>
                         <span class="sidebar-text">Topshiriqlar</span>
                     </a>
@@ -270,10 +272,10 @@
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Rahbarlar</div>
+                                        Prorektorlar</div>
                                     <div class="h5 mb-0 font-weight-bold text-gray-800">245</div>
                                     <p class="mt-2 mb-0 text-muted text-sm">
-                                        Jami bo`limga tegishli rahbarlar
+                                        Jami bo`limga tegishli prorektorlar
                                     </p>
                                 </div>
                                 <div class="col-auto">

@@ -1,88 +1,130 @@
-from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
+from multiprocessing import context
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.db.models import Q
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger, EmptyPage
+from django.http import HttpResponse
+from urllib3 import request
 from users.choices import RoleChoice
 from users.models import Users
-from topshiriq.models import RektorTopishiriq, RektorTopishiriqFile
-from topshiriq.forms import RektorTopishiriqForm
+from topshiriq.models import RektorTopshiriq, RektorTopshiriqFile
+from topshiriq.forms import RektorTopshiriqCreateForm, RektorTopshiriqUpdateForm
+from topshiriq.choices import StatusChoice
 
 
 # rektor
 
 @csrf_exempt
-def rektor_topishiriq(request):
+def rektor_topshiriq(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
     
     if not request.user.role == RoleChoice.REKTOR:
         return redirect('kirish')
-    
-    rektor_topishiriqlar = RektorTopishiriq.objects.filter(rektor_user=request.user)
 
-    return render(request, 'rektor/rektor_topishiriq.html', {'rektor_topishiriqlar': rektor_topishiriqlar})
+    current_xolat = request.GET.get('xolat', '')
+
+    rektor_topshiriq_data = RektorTopshiriq.objects.all()
+    if current_xolat:
+        rektor_topshiriq_data = rektor_topshiriq_data.filter(xolat=current_xolat)
+
+    context = {
+        'rektor_topshiriq_data': rektor_topshiriq_data,
+        'status_choices': StatusChoice.choices,
+        'current_xolat': current_xolat,
+    }
+    return render(request, 'rektor/rektor_topshiriqlar.html', context)
+
+
 
 @csrf_exempt
-def rektor_topishiriq_create(request):
-    if not request.user.is_authenticated:
+def rektor_topshiriq_create(request):
+    if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
-    
-    if not request.user.role == RoleChoice.REKTOR:
-        return redirect('kirish')
-    
+
     if request.method == 'POST':
-        form = RektorTopishiriqForm(request.POST, request.FILES)
+        form = RektorTopshiriqCreateForm(request.POST)
         if form.is_valid():
-            rektor_topishiriq = form.save(commit=False)
-            rektor_topishiriq.rektor_user = request.user
-            rektor_topishiriq.save()
+            topshiriq = form.save(commit=False)
+            topshiriq.yaratuvchi_user = request.user
+            topshiriq.status = StatusChoice.YUBORILDI
+            topshiriq.save()
 
+            # Fayllarni bog‘laymiz
             for f in request.FILES.getlist('files'):
-                RektorTopishiriqFile.objects.create(rektor_topishiriq=rektor_topishiriq, file=f)
+                RektorTopshiriqFile.objects.create(rektor_topshiriq=topshiriq, file=f)
 
-            return redirect('rektor_topishiriq_detail', pk=rektor_topishiriq.pk)
-
+            return redirect('rektor_topshiriq')
     else:
-        form = RektorTopishiriqForm()
+        form = RektorTopshiriqCreateForm()
 
-    return render(request, 'rektor/rektor_topishiriq_create.html', {'form': form})
+    return render(request, 'rektor/rektor_topshiriq_create.html', {'form': form})
 
-@csrf_exempt
-def rektor_topishiriq_update(request, pk):
+
+@csrf_protect
+def rektor_topshiriq_update(request, pk):
     if not request.user.is_authenticated:
         return redirect('kirish')
-    
-    if not request.user.role == RoleChoice.REKTOR:
+
+    if request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
-    rektor_topishiriq = RektorTopishiriq.objects.get(pk=pk)
+    rektor_topshiriq = get_object_or_404(RektorTopshiriq, pk=pk)
+    attached_files = rektor_topshiriq.rektor_topshiriq_files.all()
 
     if request.method == 'POST':
-        form = RektorTopishiriqForm(request.POST, request.FILES, instance=rektor_topishiriq)
+        form = RektorTopshiriqUpdateForm(request.POST, request.FILES, instance=rektor_topshiriq)
         if form.is_valid():
             form.save()
-            return redirect('rektor_topishiriq_detail', pk=rektor_topishiriq.pk)
+            new_files = request.FILES.getlist('files')
+            for file in new_files:
+                RektorTopshiriqFile.objects.create(rektor_topshiriq=rektor_topshiriq, file=file)
+            return redirect('rektor_topshiriq')
     else:
-        form = RektorTopishiriqForm(instance=rektor_topishiriq)
+        form = RektorTopshiriqUpdateForm(request.POST, request.FILES, instance=rektor_topshiriq)
 
-    return render(request, 'rektor/topishiriq_update.html', {'form': form, 'rektor_topishiriq': rektor_topishiriq})
-    
- 
+    context = {
+        'form': form,
+        'rektor_topshiriq': rektor_topshiriq,
+        'attached_files': attached_files
+    }
+    return render(request, 'rektor/rektor_topshiriq_update.html', context)
+
+
+@csrf_exempt
+def rektor_topshiriq_file_delete(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if not request.user.role == RoleChoice.REKTOR:
+        return redirect('kirish')
+
+    rektor_topshiriq_file = get_object_or_404(RektorTopshiriqFile, pk=pk)
+    rektor_topshiriq_file.delete()
+    return redirect('rektor_topshiriq_update', pk=rektor_topshiriq_file.rektor_topshiriq.pk)
+
 
 # prorektor
 
 @csrf_exempt
-def prorektor_topishiriq(request):
+def prorektor_topshiriq(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
     
-    topshiriq_data = RektorTopishiriq.objects.filter(rektor_user=request.user)
+    topshiriq_data = RektorTopshiriq.objects.filter(rektor_user=request.user)
 
-    return render(request, 'prorektor/prorektor_topishiriq.html', {'topshiriq_data': topshiriq_data})
+    context = {
+        'topshiriq_data': topshiriq_data
+    }
+    return render(request, 'prorektor/prorektor_topshiriq.html', context)
 
 @csrf_exempt
-def prorektor_topishiriq_create(request):
+def prorektor_topshiriq_create(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
@@ -90,38 +132,45 @@ def prorektor_topishiriq_create(request):
         return redirect('kirish')
     
     if request.method == 'POST':
-        form = RektorTopishiriqForm(request.POST, request.FILES)
+        form = RektorTopshiriqCreateForm(request.POST, request.FILES)
         if form.is_valid():
             prorektor_topishiriq = form.save(commit=False)
             prorektor_topishiriq.prorektor_user = request.user
             prorektor_topishiriq.save()
 
             for f in request.FILES.getlist('files'):
-                RektorTopishiriqFile.objects.create(rektor_topishiriq=prorektor_topishiriq, file=f)
+                RektorTopshiriqFile.objects.create(rektor_topishiriq=prorektor_topishiriq, file=f)
 
             return redirect('prorektor_topishiriq_detail', pk=prorektor_topishiriq.pk)
 
     else:
-        form = RektorTopishiriqForm()
+        form = RektorTopshiriqCreateForm()
 
-    return render(request, 'prorektor/prorektor_topishiriq_create.html', {'form': form})
+    context = {
+        'form': form
+    }
+    return render(request, 'prorektor/prorektor_topishiriq_create.html', context)
 
 @csrf_exempt
-def prorektor_topishiriq_update(request, pk):
+def prorektor_topshiriq_update(request, pk):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
 
-    prorektor_topishiriq = RektorTopishiriq.objects.get(pk=pk)
+    prorektor_topishiriq = RektorTopshiriq.objects.get(pk=pk)
 
     if request.method == 'POST':
-        form = RektorTopishiriqForm(request.POST, request.FILES, instance=prorektor_topishiriq)
+        form = RektorTopshiriqCreateForm(request.POST, request.FILES, instance=prorektor_topishiriq)
         if form.is_valid():
             form.save()
             return redirect('prorektor_topishiriq_detail', pk=prorektor_topishiriq.pk)
     else:
-        form = RektorTopishiriqForm(instance=prorektor_topishiriq)
+        form = RektorTopshiriqCreateForm(instance=prorektor_topishiriq)
 
-    return render(request, 'prorektor/topishiriq_update.html', {'form': form, 'prorektor_topishiriq': prorektor_topishiriq})
+    context = {
+        'form': form,
+        'prorektor_topishiriq': prorektor_topishiriq
+    }
+    return render(request, 'prorektor/topishiriq_update.html', context)

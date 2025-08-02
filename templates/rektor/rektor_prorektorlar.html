@@ -218,7 +218,9 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Chiqish</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'chiqish' %}"><i class="fas fa-sign-out-alt me-2"></i> Chiqish</a>
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -230,15 +232,15 @@
         <div class="sidebar-inner">
             <ul class="sidebar-menu">
                 <li>
-                    <a href="#">
+                    <a href="{% url 'home' %}">
                         <i class="fas fa-home"></i>
                         <span class="sidebar-text">Bosh sahifa</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'prorektor_bolim_rahbarlar' %}" class="active">
+                    <a href="{% url 'rektor_prorektorlar' %}" class="active">
                         <i class="fas fa-users"></i>
-                        <span class="sidebar-text">Rahbarlar</span>
+                        <span class="sidebar-text">Prorektorlar</span>
                     </a>
                 </li>
                 <li>
@@ -261,15 +263,15 @@
     <main class="main-content" id="mainContent">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0 text-gray-800">Bo`lim rahbarlari</h1>
-                <a href="#" class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i> Yangi rahbar qo'shish
+                <h1 class="h3 mb-0 text-gray-800">Prorektorlar</h1>
+                <a href="{% url 'rektor_prorektor_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Yangi prorektor qo'shish
                 </a>
             </div>
 
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Rahbarlar ro'yxati</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Prorektorlar ro'yxati</h6>
                     <div class="input-group" style="width: 300px;">
                         <input type="text" class="form-control" placeholder="Qidirish...">
                         <button class="btn btn-outline-secondary" type="button">
@@ -278,7 +280,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="height: 70vh;">
                         <table class="table table-bordered table-hover" width="100%" cellspacing="0">
                             <thead class="table-light">
                                 <tr>
@@ -293,57 +295,30 @@
                                 </tr>
                             </thead>
                             <tbody>
+
+                                {% for prorektor in prorektor_data %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>Ali</td>
-                                    <td>Valiyev</td>
-                                    <td>ali.valiyev</td>
-                                    <td>ali.valiyev</td>
-                                    <td><span class="badge bg-primary">Super admin</span></td>
-                                    <td><span class="badge bg-success">Faol</span></td>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ prorektor.username }}</td>
+                                    <td>{{ prorektor.first_name }}</td>
+                                    <td>{{ prorektor.last_name }}</td>
+                                    <td>{{ prorektor.bolim }}</td>
+                                    <td><span class="badge bg-primary">{{ prorektor.role }}</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-warning" title="Tahrirlash">
+                                        {% if prorektor.is_active %}
+                                        <span class="badge bg-success">Faol</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Faol emas</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'rektor_prorektor_update' prorektor.pk %}"
+                                            class="btn btn-sm btn-warning" title="Tahrirlash">
                                             <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger ms-1" title="O'chirish">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Gulnora</td>
-                                    <td>Rahimova</td>
-                                    <td>gulnora.r</td>
-                                    <td>gulnora.r</td>
-                                    <td><span class="badge bg-info">Admin</span></td>
-                                    <td><span class="badge bg-success">Faol</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning" title="Tahrirlash">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger ms-1" title="O'chirish">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Jasur</td>
-                                    <td>Qodirov</td>
-                                    <td>jasur.q</td>
-                                    <td>jasur.q</td>
-                                    <td><span class="badge bg-secondary">Moderator</span></td>
-                                    <td><span class="badge bg-warning text-dark">Nofaol</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning" title="Tahrirlash">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger ms-1" title="O'chirish">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>

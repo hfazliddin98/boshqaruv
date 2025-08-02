@@ -8,6 +8,7 @@ django-jazzmin
 coreschema
 dj-rest-auth
 django-bootstrap5
+crispy-bootstrap5
 django-cors-headers
 django-filter
 djangorestframework

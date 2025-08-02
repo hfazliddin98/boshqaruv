@@ -28,9 +28,8 @@ urlpatterns = [
    path('haker/', admin.site.urls),
    path('api/token/', TokenObtainPairView.as_view(), name='token'),
    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-#    path('ombor/', include('ombor.urls')),
    path('', include('users.urls')),
-  
+   path('topshiriq/', include('topshiriq.urls')),
 
    # swagger
    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

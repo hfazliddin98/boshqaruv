@@ -48,9 +48,15 @@ INSTALLED_APPS = [
     'fontawesomefree',
     "django_bootstrap5",
 
+    "crispy_forms",
+    "crispy_bootstrap5",
+
     # men qoshgan app
     'users',
+    'topshiriq',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -198,7 +204,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# Crispy Forms sozlamalari
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR / "backup"}

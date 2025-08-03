@@ -325,6 +325,8 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Sarlavha</th>
+                                        <th>Bajaruvchi</th>
+                                        <th>Status</th>
                                         <th>Holati</th>
                                         <th>Sana</th>
                                         <th class="text-end">Amallar</th>
@@ -333,29 +335,23 @@
                                 <tbody>
                                     {% for task in rektor_topshiriq_data %}
                                     <tr>
-                                        <td>{{ task.id }}</td>
-                                        <td>{{ task.title }}</td>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ task.title|truncatewords:3|capfirst }}</td>
+                                        <td>{{ task.bajaruvchi_user.get_full_name }}</td>
                                         <td>
-                                            {% if task.status == 'Yangi' %}
-                                            <span class="badge bg-secondary">{{ task.status }}</span>
-                                            {% elif task.status == 'Bajarilmoqda' %}
-                                            <span class="badge bg-primary">{{ task.status }}</span>
-                                            {% elif task.status == 'Tekshirilmoqda' %}
-                                            <span class="badge bg-warning text-dark">{{ task.status }}</span>
-                                            {% elif task.status == 'Tasdiqlangan' %}
-                                            <span class="badge bg-success">{{ task.status }}</span>
-                                            {% elif task.status == 'Rad etilgan' %}
-                                            <span class="badge bg-danger">{{ task.status }}</span>
-                                            {% else %}
-                                            <span class="badge bg-light text-dark">{{ task.status }}</span>
-                                            {% endif %}
+                                            {{ task.status }}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if task.xolat == 'Shoshilinch' %}danger{% elif task.xolat == 'O`rta' %}warning{% else %}success{% endif %}">
+                                                {{ task.get_xolat_display }}
+                                            </span>
                                         </td>
                                         <td>{{ task.created_at|date:"d.m.Y" }}</td>
                                         <td class="text-end">
                                             <a href="{% url 'rektor_topshiriq_update' task.pk %}" class="btn btn-sm btn-outline-secondary">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="#" class="btn btn-sm btn-outline-danger">
+                                            <a href="{% url 'rektor_topshiriq_delete_message' task.pk %}" class="btn btn-sm btn-outline-danger">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </td>

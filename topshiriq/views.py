@@ -92,18 +92,57 @@ def rektor_topshiriq_update(request, pk):
     }
     return render(request, 'rektor/rektor_topshiriq_update.html', context)
 
-
 @csrf_exempt
 def rektor_topshiriq_file_delete(request, pk):
     if not request.user.is_authenticated:
         return redirect('kirish')
-
-    if not request.user.role == RoleChoice.REKTOR:
+    
+    if request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
     rektor_topshiriq_file = get_object_or_404(RektorTopshiriqFile, pk=pk)
+
+    # Faylni media papkadan ham o‘chirish
+    if rektor_topshiriq_file.file:
+        rektor_topshiriq_file.file.delete(save=False)
+
+    # Bazadan yozuvni o‘chirish
+    rektor_pk = rektor_topshiriq_file.rektor_topshiriq.pk
     rektor_topshiriq_file.delete()
-    return redirect('rektor_topshiriq_update', pk=rektor_topshiriq_file.rektor_topshiriq.pk)
+
+    return redirect('rektor_topshiriq_update', pk=rektor_pk)
+
+@csrf_exempt
+def rektor_topshiriq_delete_message(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.REKTOR:
+        return redirect('kirish')
+
+    rektor_topshiriq = get_object_or_404(RektorTopshiriq, pk=pk)
+
+    return render(request, 'rektor/rektor_topshiriq_delete_message.html', {'rektor_topshiriq': rektor_topshiriq})
+
+@csrf_exempt
+def rektor_topshiriq_delete(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.REKTOR:
+        return redirect('kirish')
+
+    rektor_topshiriq = get_object_or_404(RektorTopshiriq, pk=pk)
+
+    # Fayllarni o‘chirish
+    for file in rektor_topshiriq.rektor_topshiriq_files.all():
+        file.file.delete(save=False)
+        file.delete()
+
+    # Topshiriqni o‘chirish
+    rektor_topshiriq.delete()
+
+    return redirect('rektor_topshiriq')
 
 
 # prorektor

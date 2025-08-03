@@ -24,3 +24,21 @@ class RektorTopshiriqFile(models.Model):
 
     def __str__(self):
         return self.file.name
+
+
+class RektorTopshiriqJavob(models.Model):
+    rektor_topshiriq = models.ForeignKey(RektorTopshiriq, on_delete=models.CASCADE, related_name='rektor_topshiriq_javob_files')
+    sender = models.ForeignKey(Users, on_delete=models.PROTECT)
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Javob #{self.pk} - {self.rektor_topshiriq.title}"
+    
+
+class RektorTopshiriqJavobFile(models.Model):
+    rektor_topshiriq_javob = models.ForeignKey(RektorTopshiriqJavob, on_delete=models.CASCADE, related_name='rektor_topshiriq_javob_files')
+    file = models.FileField(upload_to='rektor_topshiriq_javob_files/')
+
+    def __str__(self):
+        return self.file.name

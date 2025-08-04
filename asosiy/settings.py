@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-myu_p#$3n-hi-j@tsdea-z=^*_mk225prioxc_8usxkkrfmr%y
 # DEBUG = True
 DEBUG = False
 
-DOMEN = 'grant.kokandsu.uz'
+DOMEN = 'boshqaruv.kspi.uz'
 LOCAL_DOMEN = '127.0.0.1'
 
 ALLOWED_HOSTS = ['.kokanddeveloper.uz', DOMEN, 'localhost', LOCAL_DOMEN]

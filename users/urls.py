@@ -1,7 +1,9 @@
 from django.urls import path
 from users.views import home, kirish, chiqish
 from users.views import rektor_home, rektor_prorektorlar, rektor_prorektor_update, rektor_prorektor_create
-from users.views import prorektor_home, prorektor_bolim_boshliqlar, prorektor_dekanlar
+from users.views import prorektor_home
+from users.views import prorektor_bolim_boshliqlar, prorektor_bolim_boshliq_create, prorektor_bolim_boshliq_update
+from users.views import prorektor_dekanlar, prorektor_dekan_create, prorektor_dekan_update
 from users.views import admin_home, bolim_boshligi_home, hodim_home
 
 
@@ -24,6 +26,10 @@ urlpatterns = [
     # prorektor
     path('prorektor_home/', prorektor_home, name='prorektor_home'),
     path('prorektor_bolim_boshliqlar/', prorektor_bolim_boshliqlar, name='prorektor_bolim_boshliqlar'),
+    path('prorektor_bolim_boshliq_create/', prorektor_bolim_boshliq_create, name='prorektor_bolim_boshliq_create'),
+    path('prorektor_bolim_boshliq_update/<str:pk>/', prorektor_bolim_boshliq_update, name='prorektor_bolim_boshliq_update'),
     path('prorektor_dekanlar/', prorektor_dekanlar, name='prorektor_dekanlar'),
+    path('prorektor_dekan_create/', prorektor_dekan_create, name='prorektor_dekan_create'),
+    path('prorektor_dekan_update/<str:pk>/', prorektor_dekan_update, name='prorektor_dekan_update'),
 
 ]

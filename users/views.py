@@ -185,19 +185,113 @@ def prorektor_bolim_boshliqlar(request):
     return render(request, 'prorektor/prorektor_bolim_boshliqlar.html', context)
 
 @csrf_exempt
+def prorektor_bolim_boshliq_create(request):    
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if not request.user.role == RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    if request.method == "POST":
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            form.save(role=RoleChoice.BOLIM_BOSHLIGI)
+            return redirect('prorektor_bolim_boshliqlar')
+    else:
+        form = UserCreateForm()
+
+    return render(request, 'prorektor/prorektor_bolim_boshliq_create.html', {"form": form})
+
+@csrf_exempt
+def prorektor_bolim_boshliq_update(request, pk):    
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if not request.user.role == RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    try:
+        bolim_boshliq = Users.objects.get(pk=pk, role=RoleChoice.BOLIM_BOSHLIGI)
+    except Users.DoesNotExist:
+        raise Http404("Bolim boshligi topilmadi")
+
+    if request.method == "POST":
+        form = UserUpdateForm(request.POST, instance=bolim_boshliq)
+        if form.is_valid():
+            form.save()
+            return redirect('prorektor_bolim_boshliqlar')
+    else:
+        form = UserUpdateForm(instance=bolim_boshliq)
+
+    context = {
+        "form": form,
+        "bolim_boshliq": bolim_boshliq 
+    }
+    return render(request, 'prorektor/prorektor_bolim_boshliq_update.html', context)
+
+
+@csrf_exempt
 def prorektor_dekanlar(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
-    
+
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
-    
-    boshliq_data = Users.objects.filter(role=RoleChoice.DEKAN)
-    
+
+    dekan_data = Users.objects.filter(role=RoleChoice.DEKAN)
+
     context = {
-        "boshliq_data":boshliq_data
+        "dekan_data":dekan_data
     }
     return render(request, 'prorektor/prorektor_dekanlar.html', context)
+
+
+@csrf_exempt
+def prorektor_dekan_create(request):   
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if not request.user.role == RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    if request.method == "POST":
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            form.save(role=RoleChoice.DEKAN)
+            return redirect('prorektor_dekanlar')
+    else:
+        form = UserCreateForm()
+
+    return render(request, 'prorektor/prorektor_dekan_create.html', {"form": form})
+
+@csrf_exempt
+def prorektor_dekan_update(request, pk):    
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if not request.user.role == RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    try:
+        dekan = Users.objects.get(pk=pk, role=RoleChoice.DEKAN)
+    except Users.DoesNotExist:
+        raise Http404("Dekan topilmadi")
+
+    if request.method == "POST":
+        form = UserUpdateForm(request.POST, instance=dekan)
+        if form.is_valid():
+            form.save()
+            return redirect('prorektor_dekanlar')
+    else:
+        form = UserUpdateForm(instance=dekan)
+
+    context = {
+        "form": form,
+        "dekan": dekan 
+    }
+    return render(request, 'prorektor/prorektor_dekan_update.html', context)
+
+
 
 # Bolim boshligi
 

@@ -20,5 +20,4 @@ urlpatterns = [
     path('prorektor_topshiriq_create/', prorektor_topshiriq_create, name='prorektor_topshiriq_create'),
     path('prorektor_topshiriq_update/<str:pk>/', prorektor_topshiriq_update, name='prorektor_topshiriq_update'),
 
-
 ]

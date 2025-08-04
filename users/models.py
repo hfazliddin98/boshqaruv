@@ -6,7 +6,7 @@ from users.choices import RoleChoice
 
 
 class AsosiyModel(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable = False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateField(auto_now_add = True)
     updated_at = models.DateField(auto_now = True)
     is_active = models.BooleanField(default=True)
@@ -23,7 +23,7 @@ class Bolim(AsosiyModel):
 
 
 class Users(AbstractUser):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable = False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sharif = models.CharField(max_length=255, blank=True)
     role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.HODIM)
     bolim = models.ForeignKey(Bolim, on_delete=models.PROTECT, blank=True, null=True)

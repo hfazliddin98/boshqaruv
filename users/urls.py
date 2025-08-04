@@ -19,7 +19,7 @@ urlpatterns = [
     path('rektor_home/', rektor_home, name='rektor_home'),
     path('rektor_prorektorlar/', rektor_prorektorlar, name='rektor_prorektorlar'),
     path('rektor_prorektor_create/', rektor_prorektor_create, name='rektor_prorektor_create'),
-    path('rektor_prorektor_update/<str:pk>/', rektor_prorektor_update, name='rektor_prorektor_update'),
+    path('rektor_prorektor_update/<uuid:pk>/', rektor_prorektor_update, name='rektor_prorektor_update'),
 
     # prorektor
     path('prorektor_home/', prorektor_home, name='prorektor_home'),

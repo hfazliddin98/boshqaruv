@@ -1,0 +1,39 @@
+{% with url_name=request.resolver_match.url_name %}
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'home' %}" class="{% if url_name == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span class="sidebar-text">Bosh sahifa</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'prorektor_bolim_boshliqlar' %}" class="{% if url_name == 'prorektor_bolim_boshliqlar' %}active{% endif %}">
+                    <i class="fas fa-user-tie"></i>
+                    <span class="sidebar-text">Bo‘lim boshliqlari</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'prorektor_dekanlar' %}" class="{% if url_name == 'prorektor_dekanlar' %}active{% endif %}">
+                    <i class="fas fa-user-graduate"></i>
+                    <span class="sidebar-text">Dekanlar</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="">
+                    <i class="fas fa-book"></i>
+                    <span class="sidebar-text">Topshiriqlar</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="sidebar-text">Hisobotlar</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endwith %}

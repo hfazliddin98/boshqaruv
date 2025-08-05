@@ -1,3 +1,4 @@
+/* === Asosiy ranglar va o'lchamlar === */
 :root {
     --primary-color: #0d6efd;
     --secondary-color: #0b5ed7;
@@ -6,6 +7,7 @@
     --navbar-height: 60px;
 }
 
+/* === Body va Navbar === */
 body {
     font-family: 'Roboto', sans-serif;
     padding-top: var(--navbar-height);
@@ -13,7 +15,6 @@ body {
     transition: margin-left 0.3s;
 }
 
-/* Navbar Styles */
 .navbar {
     height: var(--navbar-height);
     background-color: white;
@@ -30,7 +31,7 @@ body {
     color: var(--primary-color);
 }
 
-/* Sidebar Styles */
+/* === Sidebar === */
 .sidebar {
     width: var(--sidebar-width);
     height: calc(100vh - var(--navbar-height));
@@ -58,6 +59,7 @@ body {
 .sidebar-menu {
     list-style: none;
     padding: 1rem 0;
+    margin: 0;
 }
 
 .sidebar-menu li {
@@ -98,8 +100,7 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-
-/* Main Content */
+/* === Main Content === */
 .main-content {
     margin-left: var(--sidebar-width);
     padding: 2rem;
@@ -111,7 +112,7 @@ body {
     margin-left: var(--sidebar-collapsed-width);
 }
 
-/* Toggle Button */
+/* === Toggle Button === */
 .sidebar-toggle {
     background: none;
     border: none;
@@ -121,7 +122,40 @@ body {
     margin-right: 1rem;
 }
 
-/* Responsive */
+/* === Card Styles === */
+.icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 3.5rem;
+    width: 3.5rem;
+    border-radius: 100%;
+    font-size: 1.5rem;
+}
+
+.card {
+    border-radius: 0.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+/* === Responsive === */
 @media (max-width: 992px) {
     .sidebar {
         left: calc(-1 * var(--sidebar-width));

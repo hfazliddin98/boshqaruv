@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from users.choices import RoleChoice
 from users.models import Users
 from users.forms import UserUpdateForm, UserCreateForm, KirishForm
+from users.forms import BolimBoshliqCreateForm, BolimBoshliqUpdateForm, DekanCreateForm, DekanUpdateForm
 
 
 @csrf_exempt
@@ -44,7 +45,6 @@ def chiqish(request):
     return redirect('kirish')
 
 
-
 def kirish(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -69,7 +69,6 @@ def kirish(request):
 
 # Admin
 
-@csrf_exempt
 def admin_home(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -82,7 +81,6 @@ def admin_home(request):
 
 # Rektor
 
-@csrf_exempt
 def rektor_home(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -93,7 +91,6 @@ def rektor_home(request):
     context = {}
     return render(request, 'rektor/home.html', context)
 
-@csrf_exempt
 def rektor_prorektorlar(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -109,7 +106,6 @@ def rektor_prorektorlar(request):
     return render(request, 'rektor/rektor_prorektorlar.html', context)
 
 
-@csrf_exempt
 def rektor_prorektor_create(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -127,7 +123,6 @@ def rektor_prorektor_create(request):
     return render(request, 'rektor/rektor_prorektor_create.html', {"form": form})
 
 
-@csrf_exempt
 def rektor_prorektor_update(request, pk):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -154,11 +149,8 @@ def rektor_prorektor_update(request, pk):
     }
     return render(request, 'rektor/rektor_prorektor_update.html', context)
 
-
-
 # Prorektor
 
-@csrf_exempt
 def prorektor_home(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -166,10 +158,23 @@ def prorektor_home(request):
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
     
-    context = {}
+    bolim_boshliqlar_soni = Users.objects.filter(role=RoleChoice.BOLIM_BOSHLIGI).count()
+    dekanlar_soni = Users.objects.filter(role=RoleChoice.DEKAN).count()
+    # Agar topshiriq va hisobot modellari bo‘lsa, ularni ham qo‘shing:
+    # topshiriqlar_soni = Topshiriq.objects.count()
+    # hisobotlar_soni = Hisobot.objects.count()
+    # Hozircha statik qiymat:
+    topshiriqlar_soni = 48
+    hisobotlar_soni = 12
+
+    context = {
+        "bolim_boshliqlar_soni": bolim_boshliqlar_soni,
+        "dekanlar_soni": dekanlar_soni,
+        "topshiriqlar_soni": topshiriqlar_soni,
+        "hisobotlar_soni": hisobotlar_soni,
+    }
     return render(request, 'prorektor/home.html', context)
 
-@csrf_exempt
 def prorektor_bolim_boshliqlar(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -184,29 +189,32 @@ def prorektor_bolim_boshliqlar(request):
     }
     return render(request, 'prorektor/prorektor_bolim_boshliqlar.html', context)
 
-@csrf_exempt
 def prorektor_bolim_boshliq_create(request):    
     if not request.user.is_authenticated:
         return redirect('kirish')
-
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
 
     if request.method == "POST":
-        form = UserCreateForm(request.POST)
+        form = BolimBoshliqCreateForm(request.POST)
         if form.is_valid():
-            form.save(role=RoleChoice.BOLIM_BOSHLIGI)
+            form.save()
             return redirect('prorektor_bolim_boshliqlar')
+        else:
+            # Form xatoliklarini terminalga chiqarish va foydalanuvchiga ko‘rsatish
+            print(form.errors)
+            from django.contrib import messages
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{form.fields[field].label}: {error}")
     else:
-        form = UserCreateForm()
+        form = BolimBoshliqCreateForm()
 
     return render(request, 'prorektor/prorektor_bolim_boshliq_create.html', {"form": form})
 
-@csrf_exempt
 def prorektor_bolim_boshliq_update(request, pk):    
     if not request.user.is_authenticated:
         return redirect('kirish')
-
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
 
@@ -216,12 +224,12 @@ def prorektor_bolim_boshliq_update(request, pk):
         raise Http404("Bolim boshligi topilmadi")
 
     if request.method == "POST":
-        form = UserUpdateForm(request.POST, instance=bolim_boshliq)
+        form = BolimBoshliqUpdateForm(request.POST, instance=bolim_boshliq)
         if form.is_valid():
             form.save()
             return redirect('prorektor_bolim_boshliqlar')
     else:
-        form = UserUpdateForm(instance=bolim_boshliq)
+        form = BolimBoshliqUpdateForm(instance=bolim_boshliq)
 
     context = {
         "form": form,
@@ -230,7 +238,6 @@ def prorektor_bolim_boshliq_update(request, pk):
     return render(request, 'prorektor/prorektor_bolim_boshliq_update.html', context)
 
 
-@csrf_exempt
 def prorektor_dekanlar(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -246,29 +253,25 @@ def prorektor_dekanlar(request):
     return render(request, 'prorektor/prorektor_dekanlar.html', context)
 
 
-@csrf_exempt
 def prorektor_dekan_create(request):   
     if not request.user.is_authenticated:
         return redirect('kirish')
-
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
 
     if request.method == "POST":
-        form = UserCreateForm(request.POST)
+        form = DekanCreateForm(request.POST)
         if form.is_valid():
-            form.save(role=RoleChoice.DEKAN)
+            form.save()
             return redirect('prorektor_dekanlar')
     else:
-        form = UserCreateForm()
+        form = DekanCreateForm()
 
     return render(request, 'prorektor/prorektor_dekan_create.html', {"form": form})
 
-@csrf_exempt
 def prorektor_dekan_update(request, pk):    
     if not request.user.is_authenticated:
         return redirect('kirish')
-
     if not request.user.role == RoleChoice.PROREKTOR:
         return redirect('kirish')
 
@@ -278,12 +281,12 @@ def prorektor_dekan_update(request, pk):
         raise Http404("Dekan topilmadi")
 
     if request.method == "POST":
-        form = UserUpdateForm(request.POST, instance=dekan)
+        form = DekanUpdateForm(request.POST, instance=dekan)
         if form.is_valid():
             form.save()
             return redirect('prorektor_dekanlar')
     else:
-        form = UserUpdateForm(instance=dekan)
+        form = DekanUpdateForm(instance=dekan)
 
     context = {
         "form": form,
@@ -291,11 +294,8 @@ def prorektor_dekan_update(request, pk):
     }
     return render(request, 'prorektor/prorektor_dekan_update.html', context)
 
-
-
 # Bolim boshligi
 
-@csrf_exempt
 def bolim_boshligi_home(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -307,7 +307,6 @@ def bolim_boshligi_home(request):
 
 # Dekan
 
-@csrf_exempt
 def dekan_home(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
@@ -320,7 +319,6 @@ def dekan_home(request):
 
 # Hodim
 
-@csrf_exempt
 def hodim_home(request):
     if not request.user.is_authenticated:
         return redirect('kirish')

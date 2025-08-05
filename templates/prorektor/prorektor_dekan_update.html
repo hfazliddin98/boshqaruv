@@ -1,0 +1,175 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QO'QON DAVLAT UNIVERSITETI</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Asosiy css -->
+    <link href="{% static 'asosiy/prorektor/main.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar -->
+    {% include "prorektor/navbar.html" %}
+
+    <!-- Sidebar -->
+    {% include "prorektor/sidebar.html" %}
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-10">
+                    <div class="card border-0 shadow-lg overflow-hidden">
+                        <!-- Header -->
+                        <div class="card-header bg-primary text-white py-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h4 class="mb-0">
+                                    <i class="fas fa-user-edit me-2"></i>
+                                    Dekanni tahrirlash
+                                </h4>
+                            </div>
+                        </div>
+
+                        <!-- Form -->
+                        <div class="card-body p-4 p-md-5">
+                            {% if messages %}
+                            <div class="mb-4">
+                                {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <form method="post" class="needs-validation" novalidate>
+                                {% csrf_token %}
+
+                                <!-- Username Field -->
+                                <div class="mb-3">
+                                    <label for="id_username" class="form-label">Foydalanuvchi nomi <span class="text-danger">*</span></label>
+                                    <input type="text" name="username" value="{{ form.username.value|default_if_none:'' }}"
+                                        class="form-control form-control-sm {% if form.username.errors %}is-invalid{% endif %}"
+                                        id="id_username" required>
+                                    {% if form.username.errors %}
+                                    <div class="invalid-feedback">{{ form.username.errors.0 }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Foydalanuvchi nomi unikal bo'lishi kerak</small>
+                                </div>
+
+                                <!-- Name Fields -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="id_first_name" class="form-label">Ism <span class="text-danger">*</span></label>
+                                        <input type="text" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}"
+                                            class="form-control form-control-sm {% if form.first_name.errors %}is-invalid{% endif %}"
+                                            id="id_first_name" required>
+                                        {% if form.first_name.errors %}
+                                        <div class="invalid-feedback">{{ form.first_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="id_last_name" class="form-label">Familiya <span class="text-danger">*</span></label>
+                                        <input type="text" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}"
+                                            class="form-control form-control-sm {% if form.last_name.errors %}is-invalid{% endif %}"
+                                            id="id_last_name" required>
+                                        {% if form.last_name.errors %}
+                                        <div class="invalid-feedback">{{ form.last_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Fakultet maydoni -->
+                                <div class="mb-3">
+                                    <label for="id_fakultet" class="form-label">Fakultet <span class="text-danger">*</span></label>
+                                    <select name="fakultet" class="form-select form-select-sm {% if form.fakultet.errors %}is-invalid{% endif %}" id="id_fakultet" required>
+                                        {% for value, label in form.fakultet.field.choices %}
+                                        <option value="{{ value }}" {% if form.fakultet.value == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if form.fakultet.errors %}
+                                    <div class="invalid-feedback">{{ form.fakultet.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Parol maydonlari -->
+                                <div class="mb-3">
+                                    <label for="id_password1" class="form-label">Yangi parol</label>
+                                    <div class="input-group">
+                                        <input type="password" name="password1"
+                                            class="form-control form-control-sm {% if form.password1.errors %}is-invalid{% endif %}"
+                                            value="{% if dekan.parol %}{{ dekan.parol }}{% endif %}"
+                                            id="id_password1">
+                                        <button class="btn btn-outline-secondary toggle-password" type="button">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        {% if form.password1.errors %}
+                                        <div class="invalid-feedback">{{ form.password1.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <small class="form-text text-muted">Kamida 8 ta belgidan iborat bo'lishi kerak</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_password2" class="form-label">Parolni tasdiqlang</label>
+                                    <div class="input-group">
+                                        <input type="password" name="password2"
+                                            class="form-control form-control-sm {% if form.password2.errors %}is-invalid{% endif %}"
+                                            value="{% if dekan.parol %}{{ dekan.parol }}{% endif %}"
+                                            id="id_password2">
+                                        <button class="btn btn-outline-secondary toggle-password" type="button">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        {% if form.password2.errors %}
+                                        <div class="invalid-feedback">{{ form.password2.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <small class="form-text text-muted">Parolni qayta kiriting</small>
+                                </div>
+
+                                <!-- Active Status -->
+                                <div class="mb-3 form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="id_is_active"
+                                        {% if form.is_active.value %}checked{% endif %}>
+                                    <label class="form-check-label" for="id_is_active">Aktiv foydalanuvchi</label>
+                                    {% if form.is_active.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.is_active.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                                    <a href="{% url 'prorektor_dekanlar' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i> Ortga
+                                    </a>
+                                    <div>
+                                        <button type="submit" class="btn btn-primary px-4">
+                                            <i class="fas fa-save me-2"></i> Saqlash
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'asosiy/prorektor/main.js' %}"></script>
+</body>
+
+</html>

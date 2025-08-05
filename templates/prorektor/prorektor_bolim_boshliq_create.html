@@ -13,308 +13,15 @@
     <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
     <!-- Asosiy css -->
-    <style>
-        :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #0b5ed7;
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-            --navbar-height: 60px;
-            --transition-time: 0.3s;
-        }
-
-        /* Base Styles */
-        body {
-            font-family: 'Roboto', sans-serif;
-            padding-top: var(--navbar-height);
-            background-color: #f8f9fa;
-            transition: margin-left var(--transition-time);
-        }
-
-        /* Navbar */
-        .navbar {
-            height: var(--navbar-height);
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1030;
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: calc(100vh - var(--navbar-height));
-            position: fixed;
-            left: 0;
-            top: var(--navbar-height);
-            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            transition: all var(--transition-time);
-            z-index: 1020;
-            overflow-y: auto;
-        }
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-        .sidebar.collapsed .sidebar-text,
-        .sidebar.collapsed .menu-header {
-            display: none;
-        }
-        .sidebar-menu {
-            list-style: none;
-            padding: 1rem 0;
-            margin: 0;
-        }
-        .sidebar-menu li {
-            position: relative;
-            white-space: nowrap;
-        }
-        .sidebar-menu a {
-            color: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            text-decoration: none;
-            transition: all var(--transition-time);
-            border-left: 3px solid transparent;
-        }
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left: 3px solid white;
-            color: white;
-        }
-        .sidebar-menu i {
-            width: 24px;
-            text-align: center;
-            margin-right: 12px;
-            font-size: 1.1rem;
-        }
-        .menu-header {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            padding: 1rem 1.5rem 0.5rem;
-            margin-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-            transition: margin-left var(--transition-time);
-            min-height: calc(100vh - var(--navbar-height));
-            background-color: #f8f9fa;
-        }
-        .main-content.expanded {
-            margin-left: var(--sidebar-collapsed-width);
-        }
-
-        /* Toggle Button */
-        .sidebar-toggle {
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            color: var(--primary-color);
-            cursor: pointer;
-            margin-right: 1rem;
-        }
-
-        /* Cards */
-        .card {
-            border-radius: 0.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
-        }
-        .card-header {
-            border-bottom: none;
-            background-color: var(--primary-color);
-            color: white;
-        }
-        .icon-circle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 3.5rem;
-            width: 3.5rem;
-            border-radius: 100%;
-            font-size: 1.5rem;
-        }
-
-        /* Form Elements */
-        .form-control,
-        .form-select {
-            border-radius: 0.375rem;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ced4da;
-            transition: all 0.2s;
-            font-size: 1rem;
-        }
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #86b7fe;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: #495057;
-        }
-
-        /* Buttons */
-        .btn {
-            border-radius: 0.375rem;
-            transition: all 0.2s;
-            font-weight: 500;
-            padding: 0.75rem 1.5rem;
-        }
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            border-color: #0a58ca;
-            transform: translateY(-2px);
-        }
-        .btn-outline-secondary {
-            border: 1px solid #ced4da;
-        }
-        .btn-outline-secondary:hover {
-            background-color: #f8f9fa;
-            transform: translateY(-2px);
-        }
-
-        /* Validation & Help Text */
-        .invalid-feedback {
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        .form-text {
-            font-size: 0.875rem;
-            color: #6c757d;
-            margin-top: 0.25rem;
-        }
-
-        /* Form Switch */
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        /* Alerts */
-        .alert {
-            border-radius: 0.375rem;
-        }
-
-        /* Border Utilities */
-        .border-left-primary { border-left: 0.25rem solid #4e73df !important; }
-        .border-left-success { border-left: 0.25rem solid #1cc88a !important; }
-        .border-left-info { border-left: 0.25rem solid #36b9cc !important; }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .sidebar {
-                left: calc(-1 * var(--sidebar-width));
-            }
-            .sidebar.show {
-                left: 0;
-            }
-            .main-content {
-                margin-left: 0;
-            }
-        }
-        @media (max-width: 768px) {
-            .card-body {
-                padding: 1.5rem !important;
-            }
-            .form-control,
-            .form-select {
-                padding: 0.5rem 0.75rem;
-            }
-        }
-    </style>
+    <link href="{% static 'asosiy/prorektor/main.css' %}" rel="stylesheet">
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand navbar-light">
-        <div class="container-fluid">
-            <button class="sidebar-toggle" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'asosiy/images/logo.png' %}" alt="Logo" height="30" class="me-2">
-                <span class="d-none d-sm-inline">QO'QON DAVLAT UNIVERSITETI</span>
-                <span class="d-sm-none">QDU</span>
-            </a>
-
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i>
-                        <span class="d-none d-sm-inline">{{ user.first_name }} {{ user.last_name }}</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <div class="dropdown-header px-3 py-2">
-                                <h6 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
-                                <small class="text-muted d-block">Prorektor</small>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'chiqish' %}"><i class="fas fa-sign-out-alt me-2"></i> Chiqish</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    {% include "prorektor/navbar.html" %}
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-inner">
-            <ul class="sidebar-menu">
-                <li>
-                    <a href="{% url 'home' %}">
-                        <i class="fas fa-home"></i>
-                        <span class="sidebar-text">Bosh sahifa</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'rektor_prorektorlar' %}" class="active">
-                        <i class="fas fa-users"></i>
-                        <span class="sidebar-text">Prorektorlar</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-book"></i>
-                        <span class="sidebar-text">Topshiriqlar</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-chart-bar"></i>
-                        <span class="sidebar-text">Hisobotlar</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    {% include "prorektor/sidebar.html" %}
 
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
@@ -327,7 +34,7 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <h4 class="mb-0">
                                     <i class="fas fa-user-edit me-2"></i>
-                                    Yangi prorektor yaratish
+                                   Yangi bo'lim boshlig'i qo'shish
                                 </h4>
                             </div>
                         </div>
@@ -351,7 +58,7 @@
                                 <!-- Username Field -->
                                 <div class="mb-4">
                                     <label for="id_username" class="form-label">Foydalanuvchi nomi <span class="text-danger">*</span></label>
-                                    <input type="text" name="username" value="{{ form.username.value|default_if_none:'' }}"
+                                    <input type="text" name="username"
                                         class="form-control {% if form.username.errors %}is-invalid{% endif %}"
                                         id="id_username" required>
                                     {% if form.username.errors %}
@@ -364,7 +71,7 @@
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-6">
                                         <label for="id_first_name" class="form-label">Ism <span class="text-danger">*</span></label>
-                                        <input type="text" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}"
+                                        <input type="text" name="first_name"
                                             class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
                                             id="id_first_name" required>
                                         {% if form.first_name.errors %}
@@ -373,7 +80,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="id_last_name" class="form-label">Familiya <span class="text-danger">*</span></label>
-                                        <input type="text" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}"
+                                        <input type="text" name="last_name"
                                             class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
                                             id="id_last_name" required>
                                         {% if form.last_name.errors %}
@@ -401,7 +108,7 @@
                                     <div class="input-group">
                                         <input type="password" name="password1"
                                             class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
-                                            id="id_password1" value="{{ prorektor.parol|default_if_none:'' }}">
+                                            id="id_password1">
                                         <button class="btn btn-outline-secondary toggle-password" type="button">
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -417,7 +124,7 @@
                                     <div class="input-group">
                                         <input type="password" name="password2"
                                             class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
-                                            id="id_password2" value="{{ prorektor.parol|default_if_none:'' }}">
+                                            id="id_password2">
                                         <button class="btn btn-outline-secondary toggle-password" type="button">
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -428,11 +135,9 @@
                                     <small class="form-text text-muted">Parolni qayta kiriting</small>
                                 </div>
 
-                                <!-- Active Status -->
+                                <!-- Active Status uchun ModelForm maydonidan foydalanish -->
                                 <div class="mb-4 form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="is_active" id="id_is_active"
-                                        {% if form.is_active.value %}checked{% endif %}>
-                                    <label class="form-check-label" for="id_is_active">Aktiv foydalanuvchi</label>
+                                    {{ form.is_active }} {{ form.is_active.label_tag }}
                                     {% if form.is_active.errors %}
                                     <div class="invalid-feedback d-block">{{ form.is_active.errors.0 }}</div>
                                     {% endif %}
@@ -460,52 +165,6 @@
     <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Sidebar toggle
-            $('#sidebarToggle').click(function () {
-                $('#sidebar').toggleClass('collapsed');
-                $('#mainContent').toggleClass('expanded');
-                if ($(window).width() < 992) {
-                    $('#sidebar').toggleClass('show');
-                }
-            });
-
-            // Close sidebar when clicking outside on mobile
-            $(document).click(function (e) {
-                if ($(window).width() < 992) {
-                    if (!$(e.target).closest('#sidebar').length && !$(e.target).is('#sidebarToggle')) {
-                        $('#sidebar').removeClass('show');
-                    }
-                }
-            });
-
-            // Prevent closing when clicking inside sidebar
-            $('#sidebar').click(function (e) {
-                e.stopPropagation();
-            });
-
-            // Active menu item
-            $('.sidebar-menu a').click(function () {
-                $('.sidebar-menu a').removeClass('active');
-                $(this).addClass('active');
-            });
-
-            // Password toggle
-            document.querySelectorAll('.toggle-password').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    const input = this.previousElementSibling;
-                    const icon = this.querySelector('i');
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        icon.classList.replace('fa-eye', 'fa-eye-slash');
-                    } else {
-                        input.type = 'password';
-                        icon.classList.replace('fa-eye-slash', 'fa-eye');
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="{% static 'asosiy/prorektor/main.js' %}"></script>
 </body>
 </html>

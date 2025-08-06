@@ -6,30 +6,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QO'QON DAVLAT UNIVERSITETI</title>
-
-    <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
-    <!-- Asosiy css -->
     <link href="{% static 'asosiy/prorektor/main.css' %}" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Navbar -->
     {% include "prorektor/navbar.html" %}
-
-    <!-- Sidebar -->
     {% include "prorektor/sidebar.html" %}
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0 text-gray-800">Tizimga hush kelibsiz !!!</h1>
                 <small class="text-muted">{% now "j F Y" %}</small>
             </div>
-
             <div class="row">
                 <!-- Bo'lim boshliqlar Card -->
                 <div class="col-xl-3 col-md-6 mb-4">
@@ -54,7 +45,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Dekanlar Card -->
                 <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-primary shadow h-100 py-2">
@@ -70,7 +60,7 @@
                                 </div>
                                 <div class="col-auto">
                                     <div class="icon-circle bg-primary">
-                                        <i class="fas fa-users text-white"></i>
+                                        <i class="fas fa-user-graduate text-white"></i>
                                     </div>
                                 </div>
                             </div>
@@ -78,18 +68,17 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Topshiriqlar Card -->
+                <!-- Rektor topshiriqlari Card -->
                 <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-success shadow h-100 py-2">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Topshiriqlar</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ topshiriqlar_soni }}</div>
+                                        Rektor topshiriqlari</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ rektor_topshiriqlar_soni }}</div>
                                     <p class="mt-2 mb-0 text-muted text-sm">
-                                        Jami yaratilgan topshiriqlar
+                                        Jami rektor topshiriqlari
                                     </p>
                                 </div>
                                 <div class="col-auto">
@@ -98,11 +87,56 @@
                                     </div>
                                 </div>
                             </div>
-                            <a href="#" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            <a href="{% url 'prorektor_rektor_topshiriq_list' %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
                 </div>
-
+                <!-- Bo'lim topshiriqlari Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Bo‘lim topshiriqlari</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_topshiriqlar_soni }}</div>
+                                    <p class="mt-2 mb-0 text-muted text-sm">
+                                        Jami bo‘lim topshiriqlari
+                                    </p>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-warning">
+                                        <i class="fas fa-tasks text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="{% url 'prorektor_bolim_topshiriq_list' %}" class="btn btn-sm btn-warning mt-3 d-block text-white">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dekan topshiriqlari Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                        Dekan topshiriqlari</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dekan_topshiriqlar_soni }}</div>
+                                    <p class="mt-2 mb-0 text-muted text-sm">
+                                        Jami dekan topshiriqlari
+                                    </p>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-danger">
+                                        <i class="fas fa-tasks text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="{% url 'prorektor_dekan_topshiriq_list' %}" class="btn btn-sm btn-danger mt-3 d-block text-white">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
                 <!-- Hisobotlar Card -->
                 <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-info shadow h-100 py-2">
@@ -129,8 +163,6 @@
             </div>
         </div>
     </main>
-
-    <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'asosiy/prorektor/main.js' %}"></script>

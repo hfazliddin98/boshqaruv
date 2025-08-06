@@ -6,23 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QO'QON DAVLAT UNIVERSITETI</title>
-
-    <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
-    <!-- Asosiy css -->
     <link href="{% static 'asosiy/prorektor/main.css' %}" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Navbar -->
     {% include "prorektor/navbar.html" %}
-
-    <!-- Sidebar -->
     {% include "prorektor/sidebar.html" %}
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -44,7 +36,7 @@
                 </div>
                 <div class="card-body" style="height: 70vh;">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" width="100%" cellspacing="0" id="dataTable">
+                        <table class="table table-bordered table-hover align-middle" width="100%" cellspacing="0" id="dataTable">
                             <thead class="table-light">
                                 <tr>
                                     <th width="5%">#</th>
@@ -72,13 +64,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if dekan.is_superuser %}
-                                            <span class="badge bg-primary">Super admin</span>
-                                        {% elif dekan.is_staff %}
-                                            <span class="badge bg-info">Admin</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">Dekan</span>
-                                        {% endif %}
+                                        <span class="badge bg-primary text-white">Dekan</span>
                                     </td>
                                     <td>
                                         {% if dekan.is_active %}
@@ -88,8 +74,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'prorektor_dekan_update' dekan.id %}" class="btn btn-sm btn-warning btn-action"
-                                            title="Tahrirlash">
+                                        <a href="{% url 'prorektor_dekan_update' dekan.id %}" class="btn btn-sm btn-warning btn-action" title="Tahrirlash">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </td>
@@ -103,23 +88,19 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Pagination -->
                 <div class="card-footer d-flex justify-content-between align-items-center">
                     <div class="text-muted">
                         Jami: <span id="totalRecords">{{ dekan_data|length }}</span> ta yozuv
                     </div>
-                    <!-- Agar pagination kerak bo'lsa, bu joyda pagination kodini qo'shing -->
+                    <!-- Pagination joyi, agar kerak bo‘lsa -->
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'asosiy/prorektor/main.js' %}"></script>
-        
 </body>
 
 </html>

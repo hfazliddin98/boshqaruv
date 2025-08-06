@@ -9,8 +9,8 @@ from django.http import HttpResponse
 from urllib3 import request
 from users.choices import RoleChoice
 from users.models import Users
-from topshiriq.models import RektorTopshiriq, RektorTopshiriqFile
-from topshiriq.forms import RektorTopshiriqCreateForm, RektorTopshiriqUpdateForm
+from topshiriq.models import RektorTopshiriq, RektorTopshiriqFile, RektorTopshiriqJavob, ProrektorBolimTopshiriq, ProrektorBolimTopshiriqFile, ProrektorDekanTopshiriq, ProrektorDekanTopshiriqFile
+from topshiriq.forms import RektorTopshiriqCreateForm, RektorTopshiriqUpdateForm, ProrektorBolimTopshiriqForm, ProrektorDekanTopshiriqForm
 from topshiriq.choices import StatusChoice
 
 
@@ -147,6 +147,100 @@ def rektor_topshiriq_delete(request, pk):
 
 # prorektor
 
+
+@csrf_exempt
+def prorektor_rektor_topshiriq_list(request):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    topshiriq_data = RektorTopshiriq.objects.filter(bajaruvchi_user=request.user)
+
+    context = {
+        'topshiriq_data': topshiriq_data
+    }
+    return render(request, 'prorektor/rektor/topshiriq_list.html', context)
+
+    
+
+
+@csrf_exempt
+def prorektor_rektor_topshiriq_javob_create(request, pk):
+    """
+    Prorektor rektor topshirig'iga javob yozadi va fayl biriktiradi.
+    """
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    rektor_topshiriq = get_object_or_404(RektorTopshiriq, pk=pk)
+
+    from topshiriq.forms import RektorTopshiriqJavobForm
+    from topshiriq.models import RektorTopshiriqJavobFile
+
+    # Mavjud javob fayllari (agar kerak bo'lsa)
+    attached_files = RektorTopshiriqJavobFile.objects.filter(rektor_topshiriq_javob__rektor_topshiriq=rektor_topshiriq, rektor_topshiriq_javob__bajaruvchi_user=request.user)
+
+    if request.method == 'POST':
+        form = RektorTopshiriqJavobForm(request.POST, request.FILES)
+        if form.is_valid():
+            javob = form.save(commit=False)
+            javob.rektor_topshiriq = rektor_topshiriq
+            javob.bajaruvchi_user = request.user
+            javob.save()
+            # Fayllarni biriktirish
+            for f in request.FILES.getlist('files'):
+                RektorTopshiriqJavobFile.objects.create(rektor_topshiriq_javob=javob, file=f)
+            return redirect('prorektor_rektor_topshiriq_list')
+    else:
+        form = RektorTopshiriqJavobForm()
+
+    context = {
+        'form': form,
+        'rektor_topshiriq': rektor_topshiriq,
+        'attached_files': attached_files
+    }
+    return render(request, 'prorektor/rektor/topshiriq_javob_create.html', context)
+
+
+
+
+@csrf_exempt
+def prorektor_rektor_topshiriq_javob_update(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    prorektor_topshiriq = get_object_or_404(RektorTopshiriq, pk=pk)
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '')
+        body = request.POST.get('body', '')
+        izoh = request.POST.get('izoh', '')
+
+        RektorTopshiriqJavob.objects.create(
+            rektor_topshiriq=prorektor_topshiriq,
+            bajaruvchi_user=request.user,
+            title=title,
+            body=body,
+            izoh=izoh
+        )
+        return redirect('prorektor_topishiriq_detail', pk=prorektor_topshiriq.pk)
+
+    context = {
+        'prorektor_topshiriq': prorektor_topshiriq
+    }
+    return render(request, 'prorektor/prorektor_topshiriq_javob_create.html', context)
+
+
+
+
 @csrf_exempt
 def prorektor_topshiriq(request):
     if not request.user.is_authenticated:
@@ -178,7 +272,7 @@ def prorektor_topshiriq_create(request):
             prorektor_topishiriq.save()
 
             for f in request.FILES.getlist('files'):
-                RektorTopshiriqFile.objects.create(rektor_topishiriq=prorektor_topishiriq, file=f)
+                RektorTopshiriqFile.objects.create(rektor_topshiriq=prorektor_topishiriq, file=f)
 
             return redirect('prorektor_topishiriq_detail', pk=prorektor_topishiriq.pk)
 
@@ -204,6 +298,7 @@ def prorektor_topshiriq_update(request, pk):
         form = RektorTopshiriqCreateForm(request.POST, request.FILES, instance=prorektor_topishiriq)
         if form.is_valid():
             form.save()
+
             return redirect('prorektor_topishiriq_detail', pk=prorektor_topishiriq.pk)
     else:
         form = RektorTopshiriqCreateForm(instance=prorektor_topishiriq)
@@ -213,3 +308,161 @@ def prorektor_topshiriq_update(request, pk):
         'prorektor_topishiriq': prorektor_topishiriq
     }
     return render(request, 'prorektor/topishiriq_update.html', context)
+
+
+@csrf_exempt
+def prorektor_bolim_topshiriq_list(request):
+    """
+    Prorektor uchun bo‘lim boshliqlariga yuborilgan topshiriqlar ro‘yxati.
+    """
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    topshiriq_data = ProrektorBolimTopshiriq.objects.all().order_by('-created_at')
+
+    context = {
+        'topshiriq_data': topshiriq_data
+    }
+    return render(request, 'prorektor/prorektor_bolim_topshiriq_list.html', context)
+
+
+@csrf_exempt
+def prorektor_bolim_topshiriq_create(request):
+    """
+    Prorektor tomonidan bo‘lim boshlig‘iga yangi topshiriq yaratish.
+    """
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    if request.method == 'POST':
+        form = ProrektorBolimTopshiriqForm(request.POST, request.FILES)
+        if form.is_valid():
+            topshiriq = form.save(commit=False)
+            topshiriq.yaratuvchi_user = request.user
+            topshiriq.save()
+            # Fayllarni saqlash
+            for f in request.FILES.getlist('files'):
+                ProrektorBolimTopshiriqFile.objects.create(prorektor_bolim_topshiriq=topshiriq, file=f)
+            return redirect('prorektor_bolim_topshiriq_list')
+    else:
+        form = ProrektorBolimTopshiriqForm()
+
+    return render(request, 'prorektor/prorektor_bolim_topshiriq_create.html', {'form': form})
+
+
+@csrf_exempt
+def prorektor_bolim_topshiriq_update(request, pk):
+    """
+    Prorektor tomonidan bo‘lim boshlig‘iga yuborilgan topshiriqni tahrirlash.
+    """
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    topshiriq = get_object_or_404(ProrektorBolimTopshiriq, pk=pk)
+    attached_files = topshiriq.prorektor_bolim_topshiriq_files.all()
+
+    if request.method == 'POST':
+        form = ProrektorBolimTopshiriqForm(request.POST, request.FILES, instance=topshiriq)
+        if form.is_valid():
+            form.save()
+            # Yangi fayllarni qo'shish
+            for f in request.FILES.getlist('files'):
+                ProrektorBolimTopshiriqFile.objects.create(prorektor_bolim_topshiriq=topshiriq, file=f)
+            return redirect('prorektor_bolim_topshiriq_list')
+    else:
+        form = ProrektorBolimTopshiriqForm(instance=topshiriq)
+
+    context = {
+        'form': form,
+        'topshiriq': topshiriq,
+        'attached_files': attached_files
+    }
+    return render(request, 'prorektor/prorektor_bolim_topshiriq_update.html', context)
+
+
+@csrf_exempt
+def prorektor_dekan_topshiriq_list(request):
+    """
+    Prorektor uchun dekanlarga yuborilgan topshiriqlar ro‘yxati.
+    """
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    topshiriq_data = ProrektorDekanTopshiriq.objects.all().order_by('-created_at')
+
+    context = {
+        'topshiriq_data': topshiriq_data
+    }
+    return render(request, 'prorektor/prorektor_dekan_topshiriq_list.html', context)
+
+
+@csrf_exempt
+def prorektor_dekan_topshiriq_create(request):
+    """
+    Prorektor tomonidan dekanlarga yangi topshiriq yaratish.
+    """
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    if request.method == 'POST':
+        form = ProrektorDekanTopshiriqForm(request.POST, request.FILES)
+        if form.is_valid():
+            topshiriq = form.save(commit=False)
+            topshiriq.yaratuvchi_user = request.user
+            topshiriq.save()
+            # Fayllarni saqlash
+            for f in request.FILES.getlist('files'):
+                ProrektorDekanTopshiriqFile.objects.create(prorektor_dekan_topshiriq=topshiriq, file=f)
+            return redirect('prorektor_dekan_topshiriq_list')
+    else:
+        form = ProrektorDekanTopshiriqForm()
+
+    return render(request, 'prorektor/prorektor_dekan_topshiriq_create.html', {'form': form})
+
+
+@csrf_exempt
+def prorektor_dekan_topshiriq_update(request, pk):
+    """
+    Prorektor tomonidan dekanlarga yuborilgan topshiriqni tahrirlash.
+    """
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.PROREKTOR:
+        return redirect('kirish')
+
+    topshiriq = get_object_or_404(ProrektorDekanTopshiriq, pk=pk)
+    attached_files = topshiriq.prorektor_dekan_topshiriq_files.all()
+
+    if request.method == 'POST':
+        form = ProrektorDekanTopshiriqForm(request.POST, request.FILES, instance=topshiriq)
+        if form.is_valid():
+            form.save()
+            # Yangi fayllarni qo'shish
+            for f in request.FILES.getlist('files'):
+                ProrektorDekanTopshiriqFile.objects.create(prorektor_dekan_topshiriq=topshiriq, file=f)
+            return redirect('prorektor_dekan_topshiriq_list')
+    else:
+        form = ProrektorDekanTopshiriqForm(instance=topshiriq)
+
+    context = {
+        'form': form,
+        'topshiriq': topshiriq,
+        'attached_files': attached_files
+    }
+    return render(request, 'prorektor/prorektor_dekan_topshiriq_update.html', context)

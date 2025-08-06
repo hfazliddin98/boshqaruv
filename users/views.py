@@ -8,6 +8,7 @@ from users.choices import RoleChoice
 from users.models import Users
 from users.forms import UserUpdateForm, UserCreateForm, KirishForm
 from users.forms import BolimBoshliqCreateForm, BolimBoshliqUpdateForm, DekanCreateForm, DekanUpdateForm
+from topshiriq.models import RektorTopshiriq  # va boshqa kerakli modellaringizni import qiling
 
 
 @csrf_exempt
@@ -160,17 +161,22 @@ def prorektor_home(request):
     
     bolim_boshliqlar_soni = Users.objects.filter(role=RoleChoice.BOLIM_BOSHLIGI).count()
     dekanlar_soni = Users.objects.filter(role=RoleChoice.DEKAN).count()
-    # Agar topshiriq va hisobot modellari bo‘lsa, ularni ham qo‘shing:
-    # topshiriqlar_soni = Topshiriq.objects.count()
+
+    # Topshiriqlar soni (rektor, bo‘lim, dekan uchun)
+    rektor_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.PROREKTOR).count()
+    bolim_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.BOLIM_BOSHLIGI).count()
+    dekan_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.DEKAN).count()
+
+    # Hisobotlar soni (agar model bo‘lsa)
     # hisobotlar_soni = Hisobot.objects.count()
-    # Hozircha statik qiymat:
-    topshiriqlar_soni = 48
-    hisobotlar_soni = 12
+    hisobotlar_soni = 12  # vaqtincha
 
     context = {
         "bolim_boshliqlar_soni": bolim_boshliqlar_soni,
         "dekanlar_soni": dekanlar_soni,
-        "topshiriqlar_soni": topshiriqlar_soni,
+        "rektor_topshiriqlar_soni": rektor_topshiriqlar_soni,
+        "bolim_topshiriqlar_soni": bolim_topshiriqlar_soni,
+        "dekan_topshiriqlar_soni": dekan_topshiriqlar_soni,
         "hisobotlar_soni": hisobotlar_soni,
     }
     return render(request, 'prorektor/home.html', context)

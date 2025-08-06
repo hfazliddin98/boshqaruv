@@ -22,9 +22,21 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="">
+                <a href="{% url 'prorektor_rektor_topshiriq_list' %}" class="{% if url_name == 'prorektor_rektor_topshiriq_list' %}active{% endif %}">
                     <i class="fas fa-book"></i>
-                    <span class="sidebar-text">Topshiriqlar</span>
+                    <span class="sidebar-text">Rektor topshiriqlari</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'prorektor_bolim_topshiriq_list' %}" class="{% if url_name == 'prorektor_bolim_topshiriq_list' %}active{% endif %}">
+                    <i class="fas fa-tasks"></i>
+                    <span class="sidebar-text">Bo‘lim topshiriqlari</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'prorektor_dekan_topshiriq_list' %}" class="{% if url_name == 'prorektor_dekan_topshiriq_list' %}active{% endif %}">
+                    <i class="fas fa-tasks"></i>
+                    <span class="sidebar-text">Dekanat topshiriqlari</span>
                 </a>
             </li>
             <li>

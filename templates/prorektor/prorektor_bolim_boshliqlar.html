@@ -6,27 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QO'QON DAVLAT UNIVERSITETI</title>
-
-    <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
-    <!-- Asosiy css -->
     <link href="{% static 'asosiy/prorektor/main.css' %}" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Navbar -->
     {% include "prorektor/navbar.html" %}
-
-    <!-- Sidebar -->
     {% include "prorektor/sidebar.html" %}
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0 text-gray-800">Bo`lim rahbarlari</h1>
+                <h1 class="h3 mb-0 text-gray-800">Bo‘lim rahbarlari</h1>
                 <a href="{% url 'prorektor_bolim_boshliq_create' %}" class="btn btn-primary">
                     <i class="fas fa-plus me-1"></i> Yangi rahbar qo'shish
                 </a>
@@ -44,14 +36,14 @@
                 </div>
                 <div class="card-body" style="height: 70vh;">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" width="100%" cellspacing="0" id="dataTable">
+                        <table class="table table-bordered table-hover align-middle" width="100%" cellspacing="0" id="dataTable">
                             <thead class="table-light">
                                 <tr>
                                     <th width="5%">#</th>
                                     <th width="15%">Foydalanuvchi nomi</th>
                                     <th width="15%">Ism</th>
                                     <th width="15%">Familiya</th>
-                                    <th width="20%">Bo`lim</th>
+                                    <th width="20%">Bo‘lim</th>
                                     <th width="10%">Roli</th>
                                     <th width="10%">Holati</th>
                                     <th width="10%">Amallar</th>
@@ -78,8 +70,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'prorektor_bolim_boshliq_update' boshliq.id %}" class="btn btn-sm btn-warning btn-action"
-                                            title="Tahrirlash">
+                                        <a href="{% url 'prorektor_bolim_boshliq_update' boshliq.id %}" class="btn btn-sm btn-warning btn-action" title="Tahrirlash">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </td>
@@ -93,39 +84,18 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Pagination -->
                 <div class="card-footer d-flex justify-content-between align-items-center">
                     <div class="text-muted">
                         Jami: <span id="totalRecords">{{ boshliq_data|length }}</span> ta yozuv
                     </div>
-                    <!-- Agar pagination kerak bo'lsa, bu joyda pagination kodini qo'shing -->
+                    <!-- Pagination joyi, agar kerak bo‘lsa -->
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'asosiy/prorektor/main.js' %}"></script>
-    <script>
-        // Qidiruv funksiyasi
-        $(document).ready(function () {
-            $('#searchButton').click(function() {
-                const searchText = $('#searchInput').val().toLowerCase();
-                $('#dataTable tbody tr').each(function() {
-                    const rowText = $(this).text().toLowerCase();
-                    $(this).toggle(rowText.includes(searchText));
-                });
-            });
-            $('#searchInput').keypress(function(e) {
-                if (e.which === 13) {
-                    $('#searchButton').click();
-                }
-            });
-        });
-    </script>
 </body>
-
 </html>

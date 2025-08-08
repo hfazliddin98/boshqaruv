@@ -14,8 +14,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-myu_p#$3n-hi-j@tsdea-z=^*_mk225prioxc_8usxkkrfmr%y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 DOMEN = 'boshqaruv.kspi.uz'
 LOCAL_DOMEN = '127.0.0.1'
@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     # men qoshgan app
     'users',
     'topshiriq',
+    'rektor',
+    'prorektor',
 ]
 
 
@@ -137,24 +139,24 @@ SIMPLE_JWT = {
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'boshqaruv',
-        'USER': 'ali',
-        'PASSWORD': 'Hfazliddin98',
-        'HOST': 'localhost',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'boshqaruv',
+#         'USER': 'ali',
+#         'PASSWORD': 'Hfazliddin98',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
 
 
 # Password validation

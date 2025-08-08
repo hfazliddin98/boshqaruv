@@ -7,8 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from users.choices import RoleChoice
 from users.models import Users
 from users.forms import UserUpdateForm, UserCreateForm, KirishForm
-from users.forms import BolimBoshliqCreateForm, BolimBoshliqUpdateForm, DekanCreateForm, DekanUpdateForm
-from topshiriq.models import RektorTopshiriq  # va boshqa kerakli modellaringizni import qiling
+# from users.forms import BolimBoshliqCreateForm, BolimBoshliqUpdateForm, DekanCreateForm, DekanUpdateForm
+# from topshiriq.models import RektorTopshiriq  # va boshqa kerakli modellaringizni import qiling
 
 
 @csrf_exempt
@@ -68,269 +68,269 @@ def kirish(request):
     }
     return render(request, 'asosiy/kirish.html', context)
 
-# Admin
+# # Admin
 
-def admin_home(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
+# def admin_home(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
     
-    if not request.user.role == RoleChoice.ADMIN:
-        return redirect('kirish')
+#     if not request.user.role == RoleChoice.ADMIN:
+#         return redirect('kirish')
     
-    context = {}
-    return render(request, 'admin/home.html', context)
+#     context = {}
+#     return render(request, 'admin/home.html', context)
 
-# Rektor
+# # Rektor
 
-def rektor_home(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
+# def rektor_home(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
     
-    if not request.user.role == RoleChoice.REKTOR:
-        return redirect('kirish')
+#     if not request.user.role == RoleChoice.REKTOR:
+#         return redirect('kirish')
     
-    context = {}
-    return render(request, 'rektor/home.html', context)
+#     context = {}
+#     return render(request, 'rektor/home.html', context)
 
-def rektor_prorektorlar(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
+# def rektor_prorektorlar(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
 
-    if not request.user.role == RoleChoice.REKTOR:
-        return redirect('kirish')
+#     if not request.user.role == RoleChoice.REKTOR:
+#         return redirect('kirish')
 
-    prorektor_data = Users.objects.filter(role=RoleChoice.PROREKTOR)
+#     prorektor_data = Users.objects.filter(role=RoleChoice.PROREKTOR)
 
-    context = {
-        "prorektor_data":prorektor_data
-    }
-    return render(request, 'rektor/rektor_prorektorlar.html', context)
-
-
-def rektor_prorektor_create(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    if not request.user.role == RoleChoice.REKTOR:
-        return redirect('kirish')
-
-    if request.method == "POST":
-        form = UserCreateForm(request.POST)
-        if form.is_valid():
-            form.save(role=RoleChoice.PROREKTOR)
-            return redirect('rektor_prorektorlar')
-    else:
-        form = UserCreateForm()
-
-    return render(request, 'rektor/rektor_prorektor_create.html', {"form": form})
+#     context = {
+#         "prorektor_data":prorektor_data
+#     }
+#     return render(request, 'rektor/rektor_prorektorlar.html', context)
 
 
-def rektor_prorektor_update(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
+# def rektor_prorektor_create(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
+#     if not request.user.role == RoleChoice.REKTOR:
+#         return redirect('kirish')
 
-    if not request.user.role == RoleChoice.REKTOR:
-        return redirect('kirish')
+#     if request.method == "POST":
+#         form = UserCreateForm(request.POST)
+#         if form.is_valid():
+#             form.save(role=RoleChoice.PROREKTOR)
+#             return redirect('rektor_prorektorlar')
+#     else:
+#         form = UserCreateForm()
 
-    try:
-        prorektor = Users.objects.get(pk=pk, role=RoleChoice.PROREKTOR)
-    except Users.DoesNotExist:
-        raise Http404("Prorektor topilmadi")
+#     return render(request, 'rektor/rektor_prorektor_create.html', {"form": form})
 
-    if request.method == "POST":
-        form = UserUpdateForm(request.POST, instance=prorektor)
-        if form.is_valid():
-            form.save()
-            return redirect('rektor_prorektorlar')
-    else:
-        form = UserUpdateForm(instance=prorektor)
 
-    context = {
-        "form": form,
-        "prorektor": prorektor 
-    }
-    return render(request, 'rektor/rektor_prorektor_update.html', context)
+# def rektor_prorektor_update(request, pk):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
 
-# Prorektor
+#     if not request.user.role == RoleChoice.REKTOR:
+#         return redirect('kirish')
 
-def prorektor_home(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
+#     try:
+#         prorektor = Users.objects.get(pk=pk, role=RoleChoice.PROREKTOR)
+#     except Users.DoesNotExist:
+#         raise Http404("Prorektor topilmadi")
+
+#     if request.method == "POST":
+#         form = UserUpdateForm(request.POST, instance=prorektor)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('rektor_prorektorlar')
+#     else:
+#         form = UserUpdateForm(instance=prorektor)
+
+#     context = {
+#         "form": form,
+#         "prorektor": prorektor 
+#     }
+#     return render(request, 'rektor/rektor_prorektor_update.html', context)
+
+# # Prorektor
+
+# def prorektor_home(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
     
-    if not request.user.role == RoleChoice.PROREKTOR:
-        return redirect('kirish')
+#     if not request.user.role == RoleChoice.PROREKTOR:
+#         return redirect('kirish')
     
-    bolim_boshliqlar_soni = Users.objects.filter(role=RoleChoice.BOLIM_BOSHLIGI).count()
-    dekanlar_soni = Users.objects.filter(role=RoleChoice.DEKAN).count()
+#     bolim_boshliqlar_soni = Users.objects.filter(role=RoleChoice.BOLIM_BOSHLIGI).count()
+#     dekanlar_soni = Users.objects.filter(role=RoleChoice.DEKAN).count()
 
-    # Topshiriqlar soni (rektor, bo‘lim, dekan uchun)
-    rektor_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.PROREKTOR).count()
-    bolim_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.BOLIM_BOSHLIGI).count()
-    dekan_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.DEKAN).count()
+#     # Topshiriqlar soni (rektor, bo‘lim, dekan uchun)
+#     rektor_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.PROREKTOR).count()
+#     bolim_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.BOLIM_BOSHLIGI).count()
+#     dekan_topshiriqlar_soni = RektorTopshiriq.objects.filter(bajaruvchi_user__role=RoleChoice.DEKAN).count()
 
-    # Hisobotlar soni (agar model bo‘lsa)
-    # hisobotlar_soni = Hisobot.objects.count()
-    hisobotlar_soni = 12  # vaqtincha
+#     # Hisobotlar soni (agar model bo‘lsa)
+#     # hisobotlar_soni = Hisobot.objects.count()
+#     hisobotlar_soni = 12  # vaqtincha
 
-    context = {
-        "bolim_boshliqlar_soni": bolim_boshliqlar_soni,
-        "dekanlar_soni": dekanlar_soni,
-        "rektor_topshiriqlar_soni": rektor_topshiriqlar_soni,
-        "bolim_topshiriqlar_soni": bolim_topshiriqlar_soni,
-        "dekan_topshiriqlar_soni": dekan_topshiriqlar_soni,
-        "hisobotlar_soni": hisobotlar_soni,
-    }
-    return render(request, 'prorektor/home.html', context)
+#     context = {
+#         "bolim_boshliqlar_soni": bolim_boshliqlar_soni,
+#         "dekanlar_soni": dekanlar_soni,
+#         "rektor_topshiriqlar_soni": rektor_topshiriqlar_soni,
+#         "bolim_topshiriqlar_soni": bolim_topshiriqlar_soni,
+#         "dekan_topshiriqlar_soni": dekan_topshiriqlar_soni,
+#         "hisobotlar_soni": hisobotlar_soni,
+#     }
+#     return render(request, 'prorektor/home.html', context)
 
-def prorektor_bolim_boshliqlar(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
+# def prorektor_bolim_boshliqlar(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
     
-    if not request.user.role == RoleChoice.PROREKTOR:
-        return redirect('kirish')
+#     if not request.user.role == RoleChoice.PROREKTOR:
+#         return redirect('kirish')
     
-    boshliq_data = Users.objects.filter(role=RoleChoice.BOLIM_BOSHLIGI)
+#     boshliq_data = Users.objects.filter(role=RoleChoice.BOLIM_BOSHLIGI)
     
-    context = {
-        "boshliq_data":boshliq_data
-    }
-    return render(request, 'prorektor/prorektor_bolim_boshliqlar.html', context)
+#     context = {
+#         "boshliq_data":boshliq_data
+#     }
+#     return render(request, 'prorektor/prorektor_bolim_boshliqlar.html', context)
 
-def prorektor_bolim_boshliq_create(request):    
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    if not request.user.role == RoleChoice.PROREKTOR:
-        return redirect('kirish')
+# def prorektor_bolim_boshliq_create(request):    
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
+#     if not request.user.role == RoleChoice.PROREKTOR:
+#         return redirect('kirish')
 
-    if request.method == "POST":
-        form = BolimBoshliqCreateForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('prorektor_bolim_boshliqlar')
-        else:
-            # Form xatoliklarini terminalga chiqarish va foydalanuvchiga ko‘rsatish
-            print(form.errors)
-            from django.contrib import messages
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{form.fields[field].label}: {error}")
-    else:
-        form = BolimBoshliqCreateForm()
+#     if request.method == "POST":
+#         form = BolimBoshliqCreateForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('prorektor_bolim_boshliqlar')
+#         else:
+#             # Form xatoliklarini terminalga chiqarish va foydalanuvchiga ko‘rsatish
+#             print(form.errors)
+#             from django.contrib import messages
+#             for field, errors in form.errors.items():
+#                 for error in errors:
+#                     messages.error(request, f"{form.fields[field].label}: {error}")
+#     else:
+#         form = BolimBoshliqCreateForm()
 
-    return render(request, 'prorektor/prorektor_bolim_boshliq_create.html', {"form": form})
+#     return render(request, 'prorektor/prorektor_bolim_boshliq_create.html', {"form": form})
 
-def prorektor_bolim_boshliq_update(request, pk):    
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    if not request.user.role == RoleChoice.PROREKTOR:
-        return redirect('kirish')
+# def prorektor_bolim_boshliq_update(request, pk):    
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
+#     if not request.user.role == RoleChoice.PROREKTOR:
+#         return redirect('kirish')
 
-    try:
-        bolim_boshliq = Users.objects.get(pk=pk, role=RoleChoice.BOLIM_BOSHLIGI)
-    except Users.DoesNotExist:
-        raise Http404("Bolim boshligi topilmadi")
+#     try:
+#         bolim_boshliq = Users.objects.get(pk=pk, role=RoleChoice.BOLIM_BOSHLIGI)
+#     except Users.DoesNotExist:
+#         raise Http404("Bolim boshligi topilmadi")
 
-    if request.method == "POST":
-        form = BolimBoshliqUpdateForm(request.POST, instance=bolim_boshliq)
-        if form.is_valid():
-            form.save()
-            return redirect('prorektor_bolim_boshliqlar')
-    else:
-        form = BolimBoshliqUpdateForm(instance=bolim_boshliq)
+#     if request.method == "POST":
+#         form = BolimBoshliqUpdateForm(request.POST, instance=bolim_boshliq)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('prorektor_bolim_boshliqlar')
+#     else:
+#         form = BolimBoshliqUpdateForm(instance=bolim_boshliq)
 
-    context = {
-        "form": form,
-        "bolim_boshliq": bolim_boshliq 
-    }
-    return render(request, 'prorektor/prorektor_bolim_boshliq_update.html', context)
-
-
-def prorektor_dekanlar(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-
-    if not request.user.role == RoleChoice.PROREKTOR:
-        return redirect('kirish')
-
-    dekan_data = Users.objects.filter(role=RoleChoice.DEKAN)
-
-    context = {
-        "dekan_data":dekan_data
-    }
-    return render(request, 'prorektor/prorektor_dekanlar.html', context)
+#     context = {
+#         "form": form,
+#         "bolim_boshliq": bolim_boshliq 
+#     }
+#     return render(request, 'prorektor/prorektor_bolim_boshliq_update.html', context)
 
 
-def prorektor_dekan_create(request):   
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    if not request.user.role == RoleChoice.PROREKTOR:
-        return redirect('kirish')
+# def prorektor_dekanlar(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
 
-    if request.method == "POST":
-        form = DekanCreateForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('prorektor_dekanlar')
-    else:
-        form = DekanCreateForm()
+#     if not request.user.role == RoleChoice.PROREKTOR:
+#         return redirect('kirish')
 
-    return render(request, 'prorektor/prorektor_dekan_create.html', {"form": form})
+#     dekan_data = Users.objects.filter(role=RoleChoice.DEKAN)
 
-def prorektor_dekan_update(request, pk):    
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    if not request.user.role == RoleChoice.PROREKTOR:
-        return redirect('kirish')
-
-    try:
-        dekan = Users.objects.get(pk=pk, role=RoleChoice.DEKAN)
-    except Users.DoesNotExist:
-        raise Http404("Dekan topilmadi")
-
-    if request.method == "POST":
-        form = DekanUpdateForm(request.POST, instance=dekan)
-        if form.is_valid():
-            form.save()
-            return redirect('prorektor_dekanlar')
-    else:
-        form = DekanUpdateForm(instance=dekan)
-
-    context = {
-        "form": form,
-        "dekan": dekan 
-    }
-    return render(request, 'prorektor/prorektor_dekan_update.html', context)
-
-# Bolim boshligi
-
-def bolim_boshligi_home(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    if not request.user.role == RoleChoice.BOLIM_BOSHLIGI:
-        return redirect('kirish')
-
-    context = {}
-    return render(request, 'bolim_boshligi/home.html', context)
-
-# Dekan
-
-def dekan_home(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    if not request.user.role == RoleChoice.DEKAN:
-        return redirect('kirish')
-
-    context = {}
-    return render(request, 'dekan/home.html', context)
+#     context = {
+#         "dekan_data":dekan_data
+#     }
+#     return render(request, 'prorektor/prorektor_dekanlar.html', context)
 
 
-# Hodim
+# def prorektor_dekan_create(request):   
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
+#     if not request.user.role == RoleChoice.PROREKTOR:
+#         return redirect('kirish')
 
-def hodim_home(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
+#     if request.method == "POST":
+#         form = DekanCreateForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('prorektor_dekanlar')
+#     else:
+#         form = DekanCreateForm()
+
+#     return render(request, 'prorektor/prorektor_dekan_create.html', {"form": form})
+
+# def prorektor_dekan_update(request, pk):    
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
+#     if not request.user.role == RoleChoice.PROREKTOR:
+#         return redirect('kirish')
+
+#     try:
+#         dekan = Users.objects.get(pk=pk, role=RoleChoice.DEKAN)
+#     except Users.DoesNotExist:
+#         raise Http404("Dekan topilmadi")
+
+#     if request.method == "POST":
+#         form = DekanUpdateForm(request.POST, instance=dekan)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('prorektor_dekanlar')
+#     else:
+#         form = DekanUpdateForm(instance=dekan)
+
+#     context = {
+#         "form": form,
+#         "dekan": dekan 
+#     }
+#     return render(request, 'prorektor/prorektor_dekan_update.html', context)
+
+# # Bolim boshligi
+
+# def bolim_boshligi_home(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
+#     if not request.user.role == RoleChoice.BOLIM_BOSHLIGI:
+#         return redirect('kirish')
+
+#     context = {}
+#     return render(request, 'bolim_boshligi/home.html', context)
+
+# # Dekan
+
+# def dekan_home(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
+#     if not request.user.role == RoleChoice.DEKAN:
+#         return redirect('kirish')
+
+#     context = {}
+#     return render(request, 'dekan/home.html', context)
+
+
+# # Hodim
+
+# def hodim_home(request):
+#     if not request.user.is_authenticated:
+#         return redirect('kirish')
     
-    if not request.user.role == RoleChoice.HODIM:
-        return redirect('kirish')
+#     if not request.user.role == RoleChoice.HODIM:
+#         return redirect('kirish')
     
-    context = {}
-    return render(request, 'hodim/home.html', context)
+#     context = {}
+#     return render(request, 'hodim/home.html', context)

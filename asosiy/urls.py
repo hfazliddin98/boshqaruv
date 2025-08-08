@@ -28,6 +28,7 @@ urlpatterns = [
    path('api/token/', TokenObtainPairView.as_view(), name='token'),
    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
    path('', include('users.urls')),
+   path('rektor/', include('rektor.urls')),
    path('topshiriq/', include('topshiriq.urls')),
 
    # swagger

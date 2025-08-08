@@ -1,0 +1,28 @@
+{% with url_name=request.resolver_match.url_name %}
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'home' %}" class="{% if url_name == 'rektor_home' or url_name == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span class="sidebar-text">Bosh sahifa</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'prorektor_list' %}" class="{% if url_name == 'prorektor_list' %}active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span class="sidebar-text">Prorektorlar</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'topshiriq_list' %}" class="{% if url_name == 'topshiriq_list' %}active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    <span class="sidebar-text">Topshiriqlar</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+{% endwith %}

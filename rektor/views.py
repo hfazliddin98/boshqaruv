@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib import messages
@@ -6,50 +5,48 @@ from django.http import Http404
 
 # User models
 from users.models import Users
-from users.forms import UserCreateForm, UserUpdateForm
 from users.choices import RoleChoice
 
-# Topshiriq models
-from rektor.models import RektorTopshiriq, RektorTopshiriqFile
-from rektor.choices import StatusChoice, XolatChoice
+# Use unified models and choices
+from topshiriq.models import Topshiriq, TopshiriqFile
+from topshiriq.choices import StatusChoice, XolatChoice, TopshiriqType, ROLE_TO_TOPSHIRIQ_TYPE
 
-# Forms
-from rektor.forms import RektorTopshiriqCreateForm, RektorTopshiriqUpdateForm
+# Use unified forms (see forms below)
+from users.forms import UserCreateForm, UserUpdateForm
+from topshiriq.forms import TopshiriqCreateForm, TopshiriqUpdateForm
+
+
 
 
 def rektor_home(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
-    
-    if not request.user.role == RoleChoice.REKTOR:
+    if request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
     
-    context = {}
+    prorektor_count = Users.objects.filter(role=RoleChoice.PROREKTOR).count()
+    topshiriq_count = Topshiriq.objects.filter(yaratuvchi_user=request.user).count()
+    
+    context = {
+        'user': request.user,
+        'prorektor_count': prorektor_count,
+        'topshiriq_count': topshiriq_count
+    }
     return render(request, 'rektor/home.html', context)
 
-
-# Prorektorlar ro'yxati
 
 def prorektor_list(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
-
-    if not request.user.role == RoleChoice.REKTOR:
+    if request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
     prorektor_data = Users.objects.filter(role=RoleChoice.PROREKTOR)
-
-    context = {
-        "prorektor_data":prorektor_data
-    }
-    return render(request, 'rektor/admin/prorektor_list.html', context)
-
+    return render(request, 'rektor/admin/prorektor_list.html', {"prorektor_data": prorektor_data})
 
 
 def prorektor_create(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    if not request.user.role == RoleChoice.REKTOR:
+    if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
     if request.method == "POST":
@@ -60,17 +57,11 @@ def prorektor_create(request):
     else:
         form = UserCreateForm()
 
-    context = {
-        "form": form
-    }
-    return render(request, 'rektor/admin/prorektor_create.html', context)
+    return render(request, 'rektor/admin/prorektor_create.html', {"form": form})
 
 
 def prorektor_update(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-
-    if not request.user.role == RoleChoice.REKTOR:
+    if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
     try:
@@ -86,26 +77,16 @@ def prorektor_update(request, pk):
     else:
         form = UserUpdateForm(instance=prorektor)
 
-    context = {
-        "form": form,
-        "prorektor": prorektor 
-    }
-    return render(request, 'rektor/admin/prorektor_update.html', context)
+    return render(request, 'rektor/admin/prorektor_update.html', {"form": form, "prorektor": prorektor})
 
-
-# Topshiriqlar ro'yxati
 
 @csrf_exempt
 def topshiriq_list(request):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    
-    if not request.user.role == RoleChoice.REKTOR:
+    if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
     current_xolat = request.GET.get('xolat', '')
-
-    topshiriq_data = RektorTopshiriq.objects.all()
+    topshiriq_data = Topshiriq.objects.all()
     if current_xolat:
         topshiriq_data = topshiriq_data.filter(xolat=current_xolat)
 
@@ -117,115 +98,108 @@ def topshiriq_list(request):
     return render(request, 'rektor/topshiriq/topshiriq_list.html', context)
 
 
-
 @csrf_exempt
 def topshiriq_create(request):
     if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
     if request.method == 'POST':
-        form = RektorTopshiriqCreateForm(request.POST)
+        form = TopshiriqCreateForm(request.POST)
+        # Show only Prorektors in the dropdown
+        form.fields['bajaruvchi_user'].queryset = Users.objects.filter(role=RoleChoice.PROREKTOR)
         if form.is_valid():
             topshiriq = form.save(commit=False)
             topshiriq.yaratuvchi_user = request.user
             topshiriq.status = StatusChoice.YUBORILDI
+            topshiriq.topshiriq_type = ROLE_TO_TOPSHIRIQ_TYPE.get(
+                request.user.role, TopshiriqType.XODIM
+            )
             topshiriq.save()
-
-            # Fayllarni bog'laymiz - to'g'ri maydon nomi bilan
             for f in request.FILES.getlist('files'):
-                RektorTopshiriqFile.objects.create(rektor_topshiriq=topshiriq, file=f)
-
+                TopshiriqFile.objects.create(topshiriq=topshiriq, file=f)
+            messages.success(request, "Topshiriq yaratildi.")
             return redirect('topshiriq_list')
     else:
-        form = RektorTopshiriqCreateForm()
+        form = TopshiriqCreateForm()
+        # Show only Prorektors in the dropdown
+        form.fields['bajaruvchi_user'].queryset = Users.objects.filter(role=RoleChoice.PROREKTOR)
 
     return render(request, 'rektor/topshiriq/topshiriq_create.html', {'form': form})
 
 
 @csrf_protect
 def topshiriq_update(request, pk):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
-    if request.user.role != RoleChoice.REKTOR:
-        return redirect('kirish')
-
-    topshiriq = get_object_or_404(RektorTopshiriq, pk=pk)
-    # To'g'ri related_name dan foydalanish
-    attached_files = topshiriq.rektor_topshiriq_files.all()
+    topshiriq = get_object_or_404(Topshiriq, pk=pk)
+    attached_files = topshiriq.files.all()
 
     if request.method == 'POST':
-        form = RektorTopshiriqUpdateForm(request.POST, request.FILES, instance=topshiriq)
+        form = TopshiriqUpdateForm(request.POST, request.FILES, instance=topshiriq)
+        # Show only Prorektors in the dropdown
+        form.fields['bajaruvchi_user'].queryset = Users.objects.filter(role=RoleChoice.PROREKTOR)
         if form.is_valid():
-            form.save()
-            new_files = request.FILES.getlist('files')
-            for file in new_files:
-                # To'g'ri maydon nomi bilan
-                RektorTopshiriqFile.objects.create(rektor_topshiriq=topshiriq, file=file)
+            obj = form.save(commit=False)
+            obj.topshiriq_type = ROLE_TO_TOPSHIRIQ_TYPE.get(
+                request.user.role, obj.topshiriq_type or TopshiriqType.XODIM
+            )
+            obj.save()
+            for file in request.FILES.getlist('files'):
+                TopshiriqFile.objects.create(topshiriq=obj, file=file)
+            messages.success(request, "Topshiriq yangilandi.")
             return redirect('topshiriq_list')
     else:
-        form = RektorTopshiriqUpdateForm(instance=topshiriq)
+        form = TopshiriqUpdateForm(instance=topshiriq)
+        # Show only Prorektors in the dropdown
+        form.fields['bajaruvchi_user'].queryset = Users.objects.filter(role=RoleChoice.PROREKTOR)
 
     context = {
         'form': form,
         'topshiriq': topshiriq,
+        'rektor_topshiriq': topshiriq,
         'attached_files': attached_files
     }
     return render(request, 'rektor/topshiriq/topshiriq_update.html', context)
 
+
 @csrf_exempt
 def topshiriq_file_delete(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('kirish')
-    
-    if request.user.role != RoleChoice.REKTOR:
+    if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
-    topshiriq_file = get_object_or_404(RektorTopshiriqFile, pk=pk)
+    topshiriq_file = get_object_or_404(TopshiriqFile, pk=pk)
 
-    # Faylni media papkadan ham o'chirish
     if topshiriq_file.file:
         topshiriq_file.file.delete(save=False)
 
-    # Bazadan yozuvni o'chirish - to'g'ri maydon nomi bilan
-    pk = topshiriq_file.rektor_topshiriq.pk
+    parent_pk = topshiriq_file.topshiriq.pk
     topshiriq_file.delete()
 
-    return redirect('topshiriq_update', pk=pk)
+    return redirect('topshiriq_update', pk=parent_pk)
+
 
 @csrf_exempt
 def topshiriq_delete_message(request, pk):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
-    if request.user.role != RoleChoice.REKTOR:
-        return redirect('kirish')
+    rektor_topshiriq = get_object_or_404(Topshiriq, pk=pk)
+    return render(request, 'rektor/topshiriq/topshiriq_delete_message.html', {'rektor_topshiriq': rektor_topshiriq})
 
-    rektor_topshiriq = get_object_or_404(RektorTopshiriq, pk=pk)
-
-    context = {
-        'rektor_topshiriq': rektor_topshiriq
-    }
-    return render(request, 'rektor/topshiriq/topshiriq_delete_message.html', context)
 
 @csrf_exempt
 def topshiriq_delete(request, pk):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or request.user.role != RoleChoice.REKTOR:
         return redirect('kirish')
 
-    if request.user.role != RoleChoice.REKTOR:
-        return redirect('kirish')
+    topshiriq = get_object_or_404(Topshiriq, pk=pk)
 
-    topshiriq = get_object_or_404(RektorTopshiriq, pk=pk)
+    for f in topshiriq.files.all():
+        f.file.delete(save=False)
+        f.delete()
 
-    # Fayllarni o'chirish - to'g'ri related_name bilan
-    for file in topshiriq.rektor_topshiriq_files.all():
-        file.file.delete(save=False)
-        file.delete()
-
-    # Topshiriqni o'chirish
     topshiriq.delete()
-
     return redirect('topshiriq_list')
 
 

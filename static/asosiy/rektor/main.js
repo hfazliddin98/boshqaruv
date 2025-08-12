@@ -575,3 +575,37 @@ window.addEventListener('beforeunload', function() {
 window.addEventListener('popstate', function() {
     window.location.href = document.querySelector('.btn-cancel').href;
 });
+
+$(function () {
+    // Ensure only one handler is active
+    $('#sidebarToggle').off('click');
+
+    function toggleSidebar() {
+        const isMobile = $(window).width() < 992;
+        if (isMobile) {
+            $('#sidebar').toggleClass('show');
+        } else {
+            $('#sidebar').toggleClass('collapsed');
+            $('#mainContent').toggleClass('expanded');
+        }
+    }
+
+    $('#sidebarToggle').on('click', function (e) {
+        e.preventDefault();
+        toggleSidebar();
+    });
+
+    // Close off-canvas on outside click (mobile)
+    $(document).on('click', function (e) {
+        if ($(window).width() < 992 && !$(e.target).closest('#sidebar, #sidebarToggle').length) {
+            $('#sidebar').removeClass('show');
+        }
+    });
+
+    // Normalize on resize
+    $(window).on('resize', function () {
+        if ($(this).width() >= 992) {
+            $('#sidebar').removeClass('show');
+        }
+    });
+});

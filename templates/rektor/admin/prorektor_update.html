@@ -7,29 +7,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QO'QON DAVLAT UNIVERSITETI - Prorektor Tahrirlash</title>
-
-    <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
-    <!-- Main CSS -->
     <link href="{% static 'asosiy/rektor/main.css' %}" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Navbar -->
     {% include "rektor/navbar.html" %}
-
-    <!-- Sidebar -->
     {% include "rektor/sidebar.html" %}
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div class="container py-5">
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-xl-10">
                     <div class="card border-0 shadow-lg overflow-hidden">
-                        <!-- Header -->
                         <div class="card-header bg-primary text-white py-3">
                             <div class="d-flex align-items-center justify-content-between">
                                 <h4 class="mb-0">
@@ -39,7 +30,6 @@
                             </div>
                         </div>
 
-                        <!-- Form -->
                         <div class="card-body p-4 p-md-5">
                             {% if messages %}
                             <div class="mb-4">
@@ -107,24 +97,27 @@
                                     </div>
                                 </div>
 
-                                <!-- Department Field -->
+                                <!-- Lavozim Field (renamed from Bo'lim) -->
                                 <div class="mb-4">
-                                    <label for="id_bolim" class="form-label">
-                                        Bo'lim <span class="text-danger">*</span>
+                                    <label for="id_lavozim" class="form-label">
+                                        Lavozim <span class="text-danger">*</span>
                                     </label>
-                                    <select name="bolim" 
-                                            class="form-select {% if form.bolim.errors %}is-invalid{% endif %}" 
-                                            id="id_bolim" 
+                                    <select name="lavozim" 
+                                            class="form-select {% if form.lavozim.errors %}is-invalid{% endif %}" 
+                                            id="id_lavozim" 
                                             required>
-                                        <option value="">Bo'limni tanlang</option>
-                                        {% for value, label in form.bolim.field.choices %}
-                                        <option value="{{ value }}" {% if form.bolim.value == value %}selected{% endif %}>
-                                            {{ label }}
+                                        {% for value, label in form.lavozim.field.choices %}
+                                        <option value="{{ value }}" {% if form.lavozim.value == value %}selected{% endif %}>
+                                            {% if value %}
+                                                {{ label }}
+                                            {% else %}
+                                               Lavozimni tanlang
+                                            {% endif %}
                                         </option>
                                         {% endfor %}
                                     </select>
-                                    {% if form.bolim.errors %}
-                                    <div class="invalid-feedback">{{ form.bolim.errors.0 }}</div>
+                                    {% if form.lavozim.errors %}
+                                    <div class="invalid-feedback">{{ form.lavozim.errors.0 }}</div>
                                     {% endif %}
                                 </div>
 
@@ -186,7 +179,6 @@
                                     {% endif %}
                                 </div>
 
-                                <!-- Buttons -->
                                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
                                     <a href="{% url 'prorektor_list' %}" class="btn btn-outline-secondary">
                                         <i class="fas fa-arrow-left me-2"></i> Ortga
@@ -205,18 +197,15 @@
         </div>
     </main>
 
-    <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'asosiy/rektor/main.js' %}"></script>
     
     <script>
         $(document).ready(function () {
-            // Password toggle functionality
             $('.toggle-password').on('click', function () {
                 const input = $(this).prev('input');
                 const icon = $(this).find('i');
-                
                 if (input.attr('type') === 'password') {
                     input.attr('type', 'text');
                     icon.removeClass('fa-eye').addClass('fa-eye-slash');
@@ -226,12 +215,9 @@
                 }
             });
 
-            // Form validation
             $('form').on('submit', function(e) {
                 const password1 = $('#id_password1').val();
                 const password2 = $('#id_password2').val();
-                
-                // Only validate if either password field has content
                 if (password1 || password2) {
                     if (password1 !== password2) {
                         e.preventDefault();
@@ -242,12 +228,10 @@
                 }
             });
 
-            // Clear validation errors on input
             $('.form-control, .form-select').on('input change', function() {
                 $(this).removeClass('is-invalid');
             });
 
-            // Password field synchronization
             $('#id_password1').on('input', function() {
                 const password2Field = $('#id_password2');
                 if (!$(this).val()) {

@@ -1,0 +1,109 @@
+:root {
+    --surface: #ffffff;
+    --border: rgba(0, 0, 0, 0.08);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --muted: #6c757d;
+    --accent: #4f46e5; /* indigo-600 */
+}
+
+html, body {
+    background: #ffffff;
+}
+
+.page-wrap {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(79, 70, 229, 0.06), transparent 60%),
+        radial-gradient(1000px 500px at 110% 10%, rgba(79, 70, 229, 0.04), transparent 60%),
+        #ffffff;
+}
+
+.card-modern {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.card-modern .card-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+}
+
+.card-modern .card-body {
+    padding: 24px;
+}
+
+.accent-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    margin: 0;
+}
+
+.list-group-modern .list-group-item {
+    border: none;
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.list-group-modern .list-group-item + .list-group-item {
+    border-top: 1px solid var(--border);
+}
+
+.label {
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.value {
+    font-weight: 600;
+    text-align: right;
+}
+
+.muted {
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.btn-danger {
+    box-shadow: 0 8px 16px rgba(220, 53, 69, 0.15);
+}
+
+.alert-modern {
+    background: #fff6e5;
+    border: 1px solid #ffe7b3;
+    color: #8a6d3b;
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+
+.badge.rounded-pill {
+    font-weight: 600;
+    padding: 0.45rem 0.75rem;
+}

@@ -1,5 +1,7 @@
 from django import forms
 from prorektor.models import ProrektorTopshiriq, ProrektorTopshiriqJavob, ProrektorTopshiriqJavobFile
+from users.forms import BolimBoshliqCreateForm
+from users.models import Users
 
 
 
@@ -41,3 +43,4 @@ class ProrektorTopshiriqJavobForm(forms.ModelForm):
             'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': "Javob matni"}),
         }
 
+        

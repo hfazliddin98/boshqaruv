@@ -10,31 +10,31 @@
                 </a>
             </li>
             <li>
-                <a href="{% url 'prorektor_bolim_boshliqlar' %}" class="{% if url_name == 'prorektor_bolim_boshliqlar' %}active{% endif %}">
+                <a href="{% url 'bolim_rahbar_list' %}" class="{% if url_name == 'bolim_rahbar_list ' %}active{% endif %}">
                     <i class="fas fa-user-tie"></i>
                     <span class="sidebar-text">Bo‘lim boshliqlari</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'prorektor_dekanlar' %}" class="{% if url_name == 'prorektor_dekanlar' %}active{% endif %}">
+                <a href="{% url 'dekan_list' %}" class="{% if url_name == 'dekan_list' %}active{% endif %}">
                     <i class="fas fa-user-graduate"></i>
                     <span class="sidebar-text">Dekanlar</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'prorektor_rektor_topshiriq_list' %}" class="{% if url_name == 'prorektor_rektor_topshiriq_list' %}active{% endif %}">
+                <a href="{% url 'rektor_topshiriq_list' %}" class="{% if url_name == 'rektor_topshiriq_list' %}active{% endif %}">
                     <i class="fas fa-book"></i>
                     <span class="sidebar-text">Rektor topshiriqlari</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'prorektor_bolim_topshiriq_list' %}" class="{% if url_name == 'prorektor_bolim_topshiriq_list' %}active{% endif %}">
+                <a href="{% url 'topshiriq_list' RoleChoice.DEKAN.value %}" class="{% if url_name == 'bolim_rahbar_topshiriq_list' %}active{% endif %}">
                     <i class="fas fa-tasks"></i>
                     <span class="sidebar-text">Bo‘lim topshiriqlari</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'prorektor_dekan_topshiriq_list' %}" class="{% if url_name == 'prorektor_dekan_topshiriq_list' %}active{% endif %}">
+                <a href="{% url 'dekan_topshiriq_list' %}" class="{% if url_name == 'dekan_topshiriq_list' %}active{% endif %}">
                     <i class="fas fa-tasks"></i>
                     <span class="sidebar-text">Dekanat topshiriqlari</span>
                 </a>

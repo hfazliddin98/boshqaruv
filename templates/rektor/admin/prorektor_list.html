@@ -51,7 +51,7 @@
                                     <th>Foydalanuvchi nomi</th>
                                     <th>Ism</th>
                                     <th>Familiya</th>
-                                    <th>Bo'lim</th>
+                                    <th>Lavozim</th>
                                     <th>Roli</th>
                                     <th>Holati</th>
                                     <th>Amallar</th>
@@ -64,7 +64,7 @@
                                     <td>{{ prorektor.username }}</td>
                                     <td>{{ prorektor.first_name }}</td>
                                     <td>{{ prorektor.last_name }}</td>
-                                    <td>{{ prorektor.bolim|default:"-" }}</td>
+                                    <td>{{ prorektor.lavozim|default:"-" }}</td>
                                     <td><span class="badge bg-primary">{{ prorektor.get_role_display }}</span></td>
                                     <td>
                                         {% if prorektor.is_active %}

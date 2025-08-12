@@ -16,7 +16,7 @@ class Topshiriq(AsosiyModel):
     boshlanish_vaqti = models.DateTimeField(null=True, blank=True)
     tugash_vaqti = models.DateTimeField(null=True, blank=True)
     bajarilgan_vaqti = models.DateTimeField(null=True, blank=True)
-    javob_yuborildi = models.BooleanField(default=False)
+    javob_yuborildi = models.BooleanField(default=False)  # add this line
     izoh = models.TextField(blank=True)
 
     def __str__(self):
@@ -60,4 +60,3 @@ class TopshiriqJavobFile(AsosiyModel):
     def __str__(self):
         return self.file.name
 
-    

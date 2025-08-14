@@ -1,0 +1,125 @@
+{% load static %}
+{% now "Y-m-d" as today %}
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topshiriqni O'chirish - QO'QON DAVLAT UNIVERSITETI</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Main CSS -->
+    <link href="{% static 'asosiy/topshiriq/delete.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="page-wrap">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+                    <div class="card card-modern">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <i class="fas fa-exclamation-triangle text-danger"></i>
+                                <h1 class="title">Topshiriqni O'chirish</h1>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-modern d-flex align-items-center mb-4" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <div>
+                                    <strong>Diqqat!</strong> Ushbu topshiriqni o‘chirishni tasdiqlang. Bu amalni qaytarib bo‘lmaydi.
+                                </div>
+                            </div>
+
+                            <ul class="list-group list-group-modern mb-4">
+                                <li class="list-group-item">
+                                    <span class="label"><i class="fas fa-heading"></i>Topshiriq nomi</span>
+                                    <span class="value">{{ topshiriq.title|truncatewords:10 }}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="label"><i class="fas fa-user-tie"></i>Bajaruvchi</span>
+                                    <span class="value">
+                                        {{ topshiriq.bajaruvchi_user.get_full_name|default:"Noma'lum" }}
+                                        <small class="muted d-block">{{ topshiriq.bajaruvchi_user.get_role_display|default:"" }}</small>
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="label"><i class="fas fa-flag"></i>Muhimligi</span>
+                                    <span class="value">
+                                        <span class="badge rounded-pill
+                                            {% if topshiriq.xolat == 'Shoshilinch' %} bg-danger
+                                            {% elif topshiriq.xolat == 'O`rta' %} bg-warning text-dark
+                                            {% else %} bg-success
+                                            {% endif %}">
+                                            {{ topshiriq.get_xolat_display }}
+                                        </span>
+                                    </span>
+                                </li>
+
+                                {% if topshiriq.boshlanish_vaqti %}
+                                <li class="list-group-item">
+                                    <span class="label"><i class="fas fa-calendar-alt"></i>Boshlanish</span>
+                                    <span class="value">
+                                        {{ topshiriq.boshlanish_vaqti|date:"d.m.Y" }}
+                                        {% with topshiriq.boshlanish_vaqti|time:"H:i" as b_time %}
+                                            {% if b_time != "00:00" %}
+                                                <span class="muted ms-1">{{ b_time }}</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </span>
+                                </li>
+                                {% endif %}
+
+                                {% if topshiriq.tugash_vaqti %}
+                                <li class="list-group-item">
+                                    <span class="label"><i class="fas fa-calendar-check"></i>Tugash</span>
+                                    <span class="value">
+                                        {{ topshiriq.tugash_vaqti|date:"d.m.Y" }}
+                                        {% with topshiriq.tugash_vaqti|time:"H:i" as t_time %}
+                                            {% if t_time != "00:00" %}
+                                                <span class="muted ms-1">{{ t_time }}</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                        {% if topshiriq.tugash_vaqti|date:'Y-m-d' < today %}
+                                            <small class="text-danger d-block">
+                                                <i class="fas fa-exclamation-circle me-1"></i>Muddati o'tgan
+                                            </small>
+                                        {% endif %}
+                                    </span>
+                                </li>
+                                {% endif %}
+
+                                {% if topshiriq.created_at %}
+                                <li class="list-group-item">
+                                    <span class="label"><i class="fas fa-clock"></i>Yaratilgan</span>
+                                    <span class="value">{{ topshiriq.created_at|date:"d.m.Y" }}</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+
+                            <div class="btn-row">
+                                <a href="{% url 'topshiriq_delete' target_role topshiriq.id %}"
+                                   class="btn btn-danger px-4"
+                                   onclick="return confirm('Rostdan ham bu topshiriqni o\'chirmoqchimisiz?')">
+                                    <i class="fas fa-trash-alt me-2"></i>Ha, O'chirish
+                                </a>
+                                <a href="{% url 'topshiriq_list' target_role %}" class="btn btn-outline-secondary px-4">
+                                    <i class="fas fa-arrow-left me-2"></i>Bekor qilish
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    </div>
+</body>
+
+</html>

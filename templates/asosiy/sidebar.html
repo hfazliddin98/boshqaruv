@@ -1,19 +1,157 @@
-<div class="position-sticky pt-3">
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link text-white" href="#">
-                <i class="fas fa-home me-2"></i> Dashboard
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="#">
-                <i class="fas fa-file-alt me-2"></i> Reports
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="#">
-                <i class="fas fa-users me-2"></i> Users
-            </a>
-        </li>
-    </ul>
+{% with url_name=request.resolver_match.url_name %}
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'home' %}" class="{% if url_name == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span class="sidebar-text">Bosh sahifa</span>
+                </a>
+            </li>
+
+            {% if request.user.role == RoleChoice.REKTOR.value %}
+                <li>
+                    <a href="{% url 'user_list' RoleChoice.PROREKTOR.value %}" class="{% if url_name == 'user_list' %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span class="sidebar-text">Prorektorlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.PROREKTOR.value %}" class="{% if url_name == 'rektor_topshiriq_list' %}active{% endif %}">
+                        <i class="fas fa-book"></i>
+                        <span class="sidebar-text">Topshiriqlar</span>
+                    </a>
+                </li>
+            {% elif request.user.role == RoleChoice.PROREKTOR.value %}
+                <li>
+                    <a href="{% url 'user_list' RoleChoice.BOLIM_RAHBARI.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.BOLIM_RAHBARI.value %}active{% endif %}">
+                        <i class="fas fa-user-tie"></i>
+                        <span class="sidebar-text">Bo‘lim boshliqlari</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'user_list' RoleChoice.DEKAN.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.DEKAN.value %}active{% endif %}">
+                        <i class="fas fa-user-graduate"></i>
+                        <span class="sidebar-text">Dekanlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="">
+                        <i class="fas fa-book"></i>
+                        <span class="sidebar-text">Rektor topshiriqlari</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_RAHBARI.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.BOLIM_RAHBARI.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Bo‘lim topshiriqlari</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.DEKAN.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.DEKAN.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Dekanat topshiriqlari</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="sidebar-text">Hisobotlar</span>
+                    </a>
+                </li>
+            {% elif request.user.role == RoleChoice.BOLIM_RAHBARI.value %}
+                <li>
+                    <a href="{% url 'user_list' RoleChoice.BOLIM_BOSHLIGI.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.BOLIM_BOSHLIGI.value %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span class="sidebar-text">Bo‘lim boshliqlari</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_BOSHLIGI.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.BOLIM_BOSHLIGI.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Bo‘lim topshiriqlari</span>
+                    </a>
+                </li>
+            {% elif request.user.role == RoleChoice.BOLIM_BOSHLIGI.value %}
+                <li>
+                    <a href="{% url 'user_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-user"></i>
+                        <span class="sidebar-text">Hodimlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Hodim topshiriqlari</span>
+                    </a>
+                </li>
+            {% elif request.user.role == RoleChoice.DEKAN.value %}
+                <li>
+                    <a href="{% url 'user_list' RoleChoice.KAFEDRA_MUDIRI.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.KAFEDRA_MUDIRI.value %}active{% endif %}">
+                        <i class="fas fa-user-tie"></i>
+                        <span class="sidebar-text">Kafedra mudirlari</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'user_list' RoleChoice.ZAM_DEKAN.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.ZAM_DEKAN.value %}active{% endif %}">
+                        <i class="fas fa-user"></i>
+                        <span class="sidebar-text">Zam. dekanlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.KAFEDRA_MUDIRI.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.KAFEDRA_MUDIRI.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Kafedra topshiriqlari</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.ZAM_DEKAN.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.ZAM_DEKAN.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Zam. dekan topshiriqlari</span>
+                    </a>
+                </li>
+            {% elif request.user.role == RoleChoice.KAFEDRA_MUDIRI.value %}     
+               <li>
+                    <a href="{% url 'user_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-user"></i>
+                        <span class="sidebar-text">Hodimlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Hodim topshiriqlari</span>
+                    </a>
+                </li>
+            {% elif request.user.role == RoleChoice.ZAM_DEKAN.value %}
+               <li>
+                    <a href="{% url 'user_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-user"></i>
+                        <span class="sidebar-text">Hodimlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Hodim topshiriqlari</span>
+                    </a>
+                </li>
+            {% elif request.user.role == RoleChoice.HODIM.value %}
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Topshiriqlar</span>
+                    </a>
+                </li>
+            {% elif request.user.role == RoleChoice.TYUTOR.value %}
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.TYUTOR.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.TYUTOR.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Topshiriqlar</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
 </div>
+{% endwith %}

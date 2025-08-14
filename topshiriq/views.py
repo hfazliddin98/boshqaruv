@@ -3,19 +3,8 @@ from django.http import HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from .models import Topshiriq, TopshiriqFile
 from .forms import TopshiriqForm
-from users.choices import RoleChoice
+from topshiriq.choices import RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP
 
-# Kim kimga topshiriq bera oladi mapping
-allowed_map = {
-    RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
-    RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
-    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
-    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
-    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
-    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
-    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
-    # Yana kerakli rollarni qo‘shing
-}
 
 def topshiriq_home(request):
     if not request.user.is_authenticated:
@@ -31,11 +20,12 @@ def topshiriq_list(request, target_role):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
-    allowed_roles = allowed_map.get(request.user.role, [])
+    allowed_roles = ALLOWED_TOPSHIRIQ_MAP.get(request.user.role, [])
     if target_role not in allowed_roles:
         return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchiga topshiriqlarini ko‘ra olmaysiz.")
 
-    topshiriq_data = Topshiriq.objects.filter(yaratuvchi_user=request.user)
+    # Faqat target_role roldagi bajaruvchilarga berilgan topshiriqlarni ko‘rsatish
+    topshiriq_data = Topshiriq.objects.select_related('bajaruvchi_user').filter(bajaruvchi_user__role=target_role)
 
     context = {
         'topshiriq_data': topshiriq_data,
@@ -51,10 +41,10 @@ def topshiriq_create(request, target_role):
         return redirect('kirish')
 
     # Ruxsat tekshirish — kim kimga topshiriq bera oladi
-    if request.user.role not in allowed_map.keys():
+    if request.user.role not in ALLOWED_TOPSHIRIQ_MAP.keys():
         return HttpResponseForbidden("Siz topshiriq bera olmaysiz.")
 
-    if target_role not in allowed_map[request.user.role]:
+    if target_role not in ALLOWED_TOPSHIRIQ_MAP[request.user.role]:
         return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchiga topshiriq bera olmaysiz.")
 
     # POST so‘rovni tekshirish
@@ -112,7 +102,7 @@ def topshiriq_update(request, target_role, pk):
                 TopshiriqFile.objects.create(topshiriq=topshiriq, file=f)
             return redirect('topshiriq_list', target_role=target_role)
     else:
-        form = TopshiriqForm(instance=topshiriq, user=request.user, target_role=target_role_enum)
+        form = TopshiriqForm(instance=topshiriq, user=request.user, target_role=target_role)
 
     context = {
         'form': form,
@@ -144,13 +134,13 @@ def topshiriq_delete_message(request, target_role, pk):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
-    rektor_topshiriq = get_object_or_404(Topshiriq, pk=pk)
+    topshiriq = get_object_or_404(Topshiriq, pk=pk)
     context = {
-        'rektor_topshiriq': rektor_topshiriq,
+        'topshiriq': topshiriq,
         'RoleChoice': RoleChoice,
         'target_role': target_role,
     }
-    return render(request, 'rektor/topshiriq/topshiriq_delete_message.html', context)
+    return render(request, 'topshiriq/topshiriq_delete_message.html', context)
 
 
 @csrf_exempt

@@ -1,19 +1,14 @@
 from django.contrib import admin
-from users.models import Users, Bolim, Fakultet, Lavozim
+from users.models import Users, Struktura
 
 
 @admin.register(Users)
 class UsersAdmin(admin.ModelAdmin):
-    list_display = ['id', 'username', 'last_name', 'first_name', 'role', 'bolim', 'is_active']
+    list_display = ['id', 'username', 'last_name', 'first_name', 'role', 'is_active']
 
-@admin.register(Bolim)
-class BolimAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name']
 
-@admin.register(Fakultet)
-class FakultetAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name']
+@admin.register(Struktura)
+class StrukturaAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'birlik_turi', 'role']
 
-@admin.register(Lavozim)
-class LavozimAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name']   
+

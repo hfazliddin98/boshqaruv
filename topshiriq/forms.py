@@ -24,6 +24,10 @@ class TopshiriqUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.instance and self.instance.boshlanish_vaqti:
+            self.initial['boshlanish_vaqti'] = self.instance.boshlanish_vaqti.strftime('%Y-%m-%dT%H:%M')
+        if self.instance and self.instance.tugash_vaqti:
+            self.initial['tugash_vaqti'] = self.instance.tugash_vaqti.strftime('%Y-%m-%dT%H:%M')
         # Add bootstrap class to other fields
         for k, f in self.fields.items():
             if 'class' not in f.widget.attrs:

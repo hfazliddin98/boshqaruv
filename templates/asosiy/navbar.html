@@ -1,154 +1,39 @@
 {% load static %}
-<!-- File: asosiy/navbar.html -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm fixed-top">
+<nav class="navbar navbar-expand navbar-light">
     <div class="container-fluid">
-        <!-- Sidebar Toggle Button -->
-        <button class="navbar-toggler me-2" type="button" id="sidebarToggle">
+        <button class="sidebar-toggle" id="sidebarToggle">
             <i class="fas fa-bars"></i>
         </button>
 
-        <!-- Brand Logo & Name -->
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-            <img src="{% static 'asosiy/images/logo.png' %}" alt="QDU Logo" height="40" class="d-inline-block align-top me-2">
-            <span class="d-none d-lg-inline">QO'QON DAVLAT UNIVERSITETI</span>
-            <span class="d-lg-none">QDU</span>
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'asosiy/images/logo.png' %}" alt="Logo" height="30" class="me-2">
+            <span class="d-none d-sm-inline">QO'QON DAVLAT UNIVERSITETI</span>
+            <span class="d-sm-none">QDU</span>
         </a>
 
-        <!-- Main Navbar Content -->
-        <div class="collapse navbar-collapse" id="mainNavbar">
-            <!-- Left-aligned Navigation -->
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'home' %}">
-                        <i class="fas fa-home me-1"></i> Bosh Sahifa
-                    </a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-book-open me-1"></i> Ta'lim
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-list-ul me-2"></i> Kurslar</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-calendar-alt me-2"></i> Dars Jadvali</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-alt me-2"></i> O'quv Rejalari</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-newspaper me-1"></i> Yangiliklar
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Right-aligned Navigation -->
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-bell"></i>
-                        <span class="position-absolute top-10 start-90 translate-middle badge rounded-pill bg-danger">
-                            3
-                        </span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><h6 class="dropdown-header">Bildirishnomalar</h6></li>
-                        <li><a class="dropdown-item" href="#">Yangi xabar</a></li>
-                        <li><a class="dropdown-item" href="#">Tizim yangilanishi</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Barchasini ko'rish</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                        <img src="{% static 'asosiy/images/user-avatar.png' %}" alt="User" class="rounded-circle me-2" width="32" height="32">
-                        <span class="d-none d-md-inline">Foydalanuvchi</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profil</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Sozlamalar</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Chiqish</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Mobile Toggle Button -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-            <i class="fas fa-ellipsis-v"></i>
-        </button>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                    data-bs-toggle="dropdown">
+                    <i class="fas fa-user-circle me-1"></i>
+                    <span class="d-none d-sm-inline">{{ user.first_name }} {{ user.last_name }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <div class="dropdown-header px-3 py-2">
+                            <h6 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
+                            <small class="text-muted d-block">Prorektor</small>
+                        </div>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'chiqish' %}"><i class="fas fa-sign-out-alt me-2"></i>
+                            Chiqish</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
     </div>
 </nav>
-
-<style>
-    .navbar {
-        padding: 0.5rem 1rem;
-        transition: all 0.3s ease;
-        z-index: 1030;
-    }
-    
-    .navbar-brand {
-        font-weight: 600;
-        font-size: 1.1rem;
-    }
-    
-    .nav-link {
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    
-    .nav-link:hover {
-        transform: translateY(-2px);
-    }
-    
-    .dropdown-menu {
-        border: none;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        margin-top: 5px;
-    }
-    
-    .dropdown-item {
-        padding: 0.5rem 1.5rem;
-        transition: all 0.2s;
-    }
-    
-    .dropdown-item:hover {
-        background-color: #f8f9fa;
-        transform: translateX(5px);
-    }
-    
-    .badge {
-        font-size: 0.6rem;
-        padding: 0.2em 0.4em;
-    }
-    
-    @media (max-width: 992px) {
-        .navbar-collapse {
-            background-color: var(--bs-primary);
-            padding: 1rem;
-            margin-top: 0.5rem;
-            border-radius: 0 0 8px 8px;
-        }
-    }
-</style>
-
-<script>
-    // Add active class to current nav item
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentUrl = window.location.pathname;
-        const navLinks = document.querySelectorAll('.nav-link');
-        
-        navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentUrl) {
-                link.classList.add('active');
-                // Also activate parent dropdown if exists
-                const dropdown = link.closest('.dropdown');
-                if (dropdown) {
-                    dropdown.querySelector('.dropdown-toggle').classList.add('active');
-                }
-            }
-        });
-    });
-</script>

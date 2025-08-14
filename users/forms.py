@@ -1,9 +1,7 @@
 from django import forms
-from django.contrib.auth.hashers import make_password
-from django.core.exceptions import ValidationError
-from users.models import Lavozim, Users, Bolim, Fakultet
-from users.choices import RoleChoice
-
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from .models import Users, Struktura
+from users.choices import RoleChoice,   ALLOWED_USER_MAP
 
 # --- Foydalanuvchi Kirish ---
 class KirishForm(forms.Form):
@@ -18,346 +16,191 @@ class KirishForm(forms.Form):
         min_length=8
     )
 
-# --- Foydalanuvchi Yaratish ---
-class UserCreateForm(forms.Form):
-    username = forms.CharField(
-        label='Foydalanuvchi nomi',
-        max_length=150,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
+class UserCreateForm(UserCreationForm):
     last_name = forms.CharField(
-        label='Familiya',
-        max_length=150,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Familya'}),
+        label="Familya"
     )
     first_name = forms.CharField(
-        label='Ism',
-        max_length=150,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ism'}),
+        label="Ism"
     )
-    lavozim = forms.ModelChoiceField(
-        label='Lavozim',
-        queryset=Lavozim.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'})
+
+    sharif = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sharif'}),
+        label="Sharif"
+    )
+    role = forms.ChoiceField(
+        choices=[],  # choices bo‘sh, __init__da to‘ldiriladi
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Rol"
+    )
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Foydalanuvchi nomi'}),
+        label="Foydalanuvchi nomi"
+    )
+    password1 = forms.CharField(
+        label="Parol",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Parol'}),
+        min_length=8,
+        required=True,
+        error_messages={
+            'required': "Parolni kiriting",
+            'min_length': "Parol kamida 8 ta belgidan iborat bo‘lishi kerak!"
+        }
+    )
+    password2 = forms.CharField(
+        label="Parolni tasdiqlang",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Parolni tasdiqlang'}),
+        min_length=8,
+        required=True,
+        error_messages={
+            'required': "Parolni tasdiqlang",
+            'min_length': "Parol kamida 8 ta belgidan iborat bo‘lishi kerak!"
+        }
+    )
+    is_active = forms.BooleanField(
+        label='Aktiv foydalanuvchi',
+        required=True,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    class Meta:
+        model = Users
+        fields = ('username', 'last_name', 'first_name', 'sharif', 'role', 'struktura', 'is_active', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        target_role = kwargs.pop('target_role', None)
+        super().__init__(*args, **kwargs)
+
+        if target_role:
+            self.fields['role'].choices = [
+                (target_role, dict(Users._meta.get_field('role').choices).get(target_role, target_role))
+            ]
+            self.fields['role'].initial = target_role
+            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
+        else:
+            self.fields['struktura'].queryset = Struktura.objects.all()
+            self.fields['role'].choices = Users._meta.get_field('role').choices
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Parollar mos emas!")
+        if password1 and len(password1) < 8:
+            raise forms.ValidationError("Parol kamida 8 ta belgidan iborat bo‘lishi kerak!")
+        return password2
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        new_password = self.cleaned_data.get("password1")
+        if new_password:
+            user.parol = new_password  # oddiy parol maydoni uchun
+            user.set_password(new_password)  # Django auth uchun
+        if commit:
+            user.save()
+        return user
+    
+    
+
+class UserUpdateForm(UserChangeForm):
+    last_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Familya'}),
+        label="Familya"
+    )
+    first_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ism'}),
+        label="Ism"
+    )
+    sharif = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sharif'}),
+        label="Sharif"
+    )
+    struktura = forms.ModelChoiceField(
+        queryset=Struktura.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Struktura"
+    )
+    role = forms.ChoiceField(
+        choices=[],
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Rol"
     )
     password1 = forms.CharField(
         label='Yangi parol',
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Yangi parol'}),
+        required=True,
         min_length=8
     )
     password2 = forms.CharField(
-        label='Parolni tasdiqlang',
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+        label='Yangi parolni tasdiqlang',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Yangi parolni tasdiqlang'}),
+        required=True,
+        min_length=8
     )
     is_active = forms.BooleanField(
         label='Aktiv foydalanuvchi',
         required=False,
+        initial=True,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
-
-        if not password1 or not password2:
-            raise ValidationError("Ikkala parol maydoni to'ldirilishi shart!")
-
-        if password1 != password2:
-            raise ValidationError("Parollar mos emas!")
-
-        cleaned_data['password'] = make_password(password1)  # haslangan
-        cleaned_data['parol'] = password1  # agar ochiq holatda saqlamoqchi bo‘lsangiz
-        return cleaned_data
-
-    def save(self, role):
-        user = Users.objects.create(
-            username=self.cleaned_data['username'],
-            last_name=self.cleaned_data['last_name'],
-            first_name=self.cleaned_data['first_name'],
-            lavozim=self.cleaned_data['lavozim'],
-            password=self.cleaned_data['password'],  # hashed
-            parol=self.cleaned_data['parol'],        # plain text (xavfsizlikka qarab qaror qabul qiling)
-            is_active=self.cleaned_data['is_active'],
-            role=role
-        )
-        return user
-
-# --- Foydalanuvchi Yangilash ---
-class UserUpdateForm(forms.Form):
-    username = forms.CharField(
-        label='Foydalanuvchi nomi',
-        max_length=150,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    last_name = forms.CharField(
-        label='Familiya',
-        max_length=150,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    first_name = forms.CharField(
-        label='Ism',
-        max_length=150,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    lavozim = forms.ModelChoiceField(
-        label='Lavozim',
-        queryset=Lavozim.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-    password1 = forms.CharField(
-        label='Yangi parol',
-        required=False,
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        min_length=8
-    )
-    password2 = forms.CharField(
-        label='Parolni tasdiqlang',
-        required=False,
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-    is_active = forms.BooleanField(
-        label='Aktiv foydalanuvchi',
-        required=False,
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
-    )
+    class Meta:
+        model = Users
+        fields = ('username', 'last_name', 'first_name', 'sharif', 'role', 'struktura', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
-        user_instance = kwargs.pop('instance', None)
+        target_role = kwargs.pop('target_role', None)
         super().__init__(*args, **kwargs)
 
-        # `lavozim` querysetini to'ldirish
-        self.fields['lavozim'].queryset = Lavozim.objects.all()
 
-        # Agar `instance` mavjud bo'lsa, formani to'ldirib ko'rsatamiz
-        if user_instance:
-            self.fields['username'].initial = user_instance.username
-            self.fields['last_name'].initial = user_instance.last_name
-            self.fields['first_name'].initial = user_instance.first_name
-            self.fields['lavozim'].initial = user_instance.lavozim
-            self.fields['is_active'].initial = user_instance.is_active
 
-        self.instance = user_instance
+        if target_role:
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
+            print(f"Initializing UserUpdateForm with target_role: {target_role}")
+            self.fields['role'].choices = [
+                (target_role, dict(Users._meta.get_field('role').choices).get(target_role, target_role))
+            ]
+            self.fields['role'].initial = target_role
+            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
+        else:
+            self.fields['role'].choices = Users._meta.get_field('role').choices
+            self.fields['struktura'].queryset = Struktura.objects.all()
 
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
         if password1 or password2:
             if password1 != password2:
-                raise ValidationError("Parollar mos emas!")
-
-            # Parolni ochiq saqlamoqchi bo‘lsangiz (masalan: `parol` degan maydonga)
-            cleaned_data['parol'] = password1  # ochiq saqlanadigan maydon (agar mavjud bo‘lsa)
-
-            # Hashlangan parolni tayyorlaymiz
-            cleaned_data['password'] = make_password(password1)
-
-        return cleaned_data
-
-    def save(self):
-        user = self.instance
-        user.username = self.cleaned_data['username']
-        user.last_name = self.cleaned_data['last_name']
-        user.first_name = self.cleaned_data['first_name']
-        user.lavozim = self.cleaned_data['lavozim']
-        user.is_active = self.cleaned_data['is_active']
-        
-        if self.cleaned_data.get('password'):
-            user.password = self.cleaned_data['password']
-        
-        # Agar sizda `parol` degan ochiq maydon bo‘lsa, uni ham saqlang
-        if 'parol' in self.cleaned_data:
-            user.parol = self.cleaned_data['parol']
-        
-        user.save()
-        return user
-
-# --- BO'LIM BOSHLIG'I YARATISH ---
-class BolimBoshliqCreateForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label='Yangi parol',
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        min_length=8
-    )
-    password2 = forms.CharField(
-        label='Parolni tasdiqlang',
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-
-    class Meta:
-        model = Users
-        fields = ['username', 'last_name', 'first_name', 'bolim', 'is_active']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'bolim': forms.Select(attrs={'class': 'form-control'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['bolim'].queryset = Bolim.objects.all()
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
-        if not password1 or not password2:
-            raise ValidationError("Ikkala parol maydoni to'ldirilishi shart!")
-        if password1 != password2:
-            raise ValidationError("Parollar mos emas!")
-        return cleaned_data
+                raise forms.ValidationError("Parollar mos emas!")
+            if password1 and len(password1) < 8:
+                raise forms.ValidationError("Parol kamida 8 ta belgidan iborat bo‘lishi kerak!")
+        return password2
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.role = RoleChoice.BOLIM_BOSHLIGI
-        user.set_password(self.cleaned_data['password1'])
-        user.parol = self.cleaned_data['password1']
-        if commit:
-            user.save()
-        return user
-
-# --- BO'LIM BOSHLIG'I YANGILASH ---
-class BolimBoshliqUpdateForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label='Yangi parol',
-        required=False,
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        min_length=8
-    )
-    password2 = forms.CharField(
-        label='Parolni tasdiqlang',
-        required=False,
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-
-    class Meta:
-        model = Users
-        fields = ['username', 'last_name', 'first_name', 'bolim', 'is_active']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'bolim': forms.Select(attrs={'class': 'form-control'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['bolim'].queryset = Bolim.objects.all()
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
-        if password1 or password2:
-            if password1 != password2:
-                raise ValidationError("Parollar mos emas!")
-        return cleaned_data
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        password1 = self.cleaned_data.get('password1')
-        if password1:
-            user.set_password(password1)
-            user.parol = password1
-        if commit:
-            user.save()
-        return user
-
-# --- DEKAN YARATISH ---
-class DekanCreateForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label='Yangi parol',
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        min_length=8
-    )
-    password2 = forms.CharField(
-        label='Parolni tasdiqlang',
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-
-    class Meta:
-        model = Users
-        fields = ['username', 'last_name', 'first_name', 'fakultet', 'is_active']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'fakultet': forms.Select(attrs={'class': 'form-control'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['fakultet'].queryset = Fakultet.objects.all()
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
-        if not password1 or not password2:
-            raise ValidationError("Ikkala parol maydoni to'ldirilishi shart!")
-        if password1 != password2:
-            raise ValidationError("Parollar mos emas!")
-        return cleaned_data
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.role = RoleChoice.DEKAN
-        user.set_password(self.cleaned_data['password1'])
-        user.parol = self.cleaned_data['password1']
-        if commit:
-            user.save()
-        return user
-
-# --- DEKAN YANGILASH ---
-class DekanUpdateForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label='Yangi parol',
-        required=False,
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        min_length=8
-    )
-    password2 = forms.CharField(
-        label='Parolni tasdiqlang',
-        required=False,
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-
-    class Meta:
-        model = Users
-        fields = ['username', 'last_name', 'first_name', 'fakultet', 'is_active']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'fakultet': forms.Select(attrs={'class': 'form-control'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['fakultet'].queryset = Fakultet.objects.all()
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
-        if password1 or password2:
-            if password1 != password2:
-                raise ValidationError("Parollar mos emas!")
-        return cleaned_data
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        password1 = self.cleaned_data.get('password1')
-        if password1:
-            user.set_password(password1)
-            user.parol = password1
+        new_password = self.cleaned_data.get("password1")
+        if new_password:
+            user.parol = new_password  # oddiy parol maydoni uchun
+            user.set_password(new_password)  # Django auth uchun
         if commit:
             user.save()
         return user

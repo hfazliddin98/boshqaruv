@@ -14,37 +14,35 @@ class AsosiyModel(models.Model):
     class Meta:
         abstract = True
 
-
-class Lavozim(models.Model):
-    name = models.CharField(max_length=30, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Bolim(AsosiyModel):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
     
 
-class Fakultet(AsosiyModel):
+
+class Struktura(AsosiyModel):
     name = models.CharField(max_length=255)
+    birlik_turi = models.CharField(max_length=50)
+    role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.HODIM)
+
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.birlik_turi})"
+
 
 
 class Users(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sharif = models.CharField(max_length=255, blank=True)
+    struktura = models.ForeignKey(Struktura, on_delete=models.SET_NULL, blank=True, null=True)
     role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.HODIM)
-    lavozim = models.ForeignKey(Lavozim, on_delete=models.PROTECT, blank=True, null=True)
-    bolim = models.ForeignKey(Bolim, on_delete=models.PROTECT, blank=True, null=True)
-    fakultet = models.ForeignKey(Fakultet, on_delete=models.PROTECT, blank=True, null=True)
+    yaratgan_user = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_users',
+        verbose_name='Yaratgan foydalanuvchi'
+    )
     parol = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.username
-    
+

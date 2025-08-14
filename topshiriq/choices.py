@@ -29,16 +29,24 @@ class TopshiriqType(models.TextChoices):
     KOMISSIYA = "komissiya", "Komissiya"
 
 
-# Map user roles to unified task type
-ROLE_TO_TOPSHIRIQ_TYPE = {
-    RoleChoice.REKTOR: TopshiriqType.REKTOR,
-    RoleChoice.PROREKTOR: TopshiriqType.PROREKTOR,
-    RoleChoice.BOLIM_BOSHLIGI: TopshiriqType.BOLIM_BOSHLIGI,
-    RoleChoice.DEKAN: TopshiriqType.DEKAN,
-    RoleChoice.ZAM_DEKAN: TopshiriqType.ZAMDEKAN,
-    RoleChoice.KAFEDRA_MUDIRI: TopshiriqType.KAFEDRA_MUDIRI,
-    RoleChoice.TYUTOR: TopshiriqType.TUTOR,
-    RoleChoice.HODIM: TopshiriqType.XODIM,
-    # No direct match; use a sensible default
-    RoleChoice.KOMISSIYA: TopshiriqType.XODIM,
+
+ALLOWED_TOPSHIRIQ_MAP = {
+    RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
+    RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
+    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
+    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
+}
+
+
+ALLOWED_TOPSHIRIQ_JAVOB_MAP = {
+    RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
+    RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
+    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
+    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
 }

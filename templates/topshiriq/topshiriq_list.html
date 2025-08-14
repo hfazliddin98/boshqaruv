@@ -5,22 +5,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QO'QON DAVLAT UNIVERSITETI - Topshiriqlar</title>
+    <title>QO'QON DAVLAT UNIVERSITETI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 
     <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
     <!-- Main CSS -->
-    <link href="{% static 'asosiy/rektor/main.css' %}" rel="stylesheet">
-</head>
+    <link href="{% static 'asosiy/topshiriq/main.css' %}" rel="stylesheet">
 
+</head>
 <body>
     <!-- Navbar -->
-    {% include "topshiriq/navbar.html" %}
+    {% include "asosiy/navbar.html" %}
 
     <!-- Sidebar -->
-    {% include "topshiriq/sidebar.html" %}
+    {% include "asosiy/sidebar.html" %}
 
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
@@ -125,6 +128,11 @@
                                         </td>
                                         <td class="text-end">
                                             <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'topshiriq_update' target_role topshiriq.pk %}" 
+                                                   class="btn btn-outline-success" 
+                                                   title="Baxolash">
+                                                    <i class="fa-solid fa-dna"></i>
+                                                </a>
                                                 <a href="{% url 'topshiriq_update' target_role topshiriq.pk %}" 
                                                    class="btn btn-outline-primary" 
                                                    title="Tahrirlash">

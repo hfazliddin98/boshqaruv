@@ -5,24 +5,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QO'QON DAVLAT UNIVERSITETI - Yangi Topshiriq</title>
+    <title>QO'QON DAVLAT UNIVERSITETI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 
     <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
     <!-- Main CSS -->
-    <link href="{% static 'asosiy/rektor/main.css' %}" rel="stylesheet">
-    <!-- Common Topshiriq CSS -->
-    <link href="{% static 'asosiy/rektor/topshiriq_common.css' %}" rel="stylesheet">
+    <link href="{% static 'asosiy/topshiriq/main.css' %}" rel="stylesheet">
+
 </head>
 
 <body>
     <!-- Navbar -->
-    {% include "topshiriq/navbar.html" %}
+    {% include "asosiy/navbar.html" %}
 
     <!-- Sidebar -->
-    {% include "topshiriq/sidebar.html" %}
+    {% include "asosiy/sidebar.html" %}
 
     <!-- Main Content -->
     <main class="main-content" id="mainContent">

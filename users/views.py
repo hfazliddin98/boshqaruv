@@ -1,51 +1,25 @@
-from django.shortcuts import render, redirect
-from django.http import Http404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404, HttpResponseForbidden
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from users.choices import RoleChoice
+from users.choices import RoleChoice, ALLOWED_USER_MAP
 from users.models import Users
-from users.forms import UserUpdateForm, UserCreateForm, KirishForm
-# from users.forms import BolimBoshliqCreateForm, BolimBoshliqUpdateForm, DekanCreateForm, DekanUpdateForm
-# from topshiriq.models import RektorTopshiriq  # va boshqa kerakli modellaringizni import qiling
+from users.forms import KirishForm, UserCreateForm, UserUpdateForm
 
-
+@login_required
 @csrf_exempt
 def home(request):
-    if request.user.is_authenticated:
-        return redirect('topshiriq_home')
-
-    # # admin
-    # if request.user.role == RoleChoice.ADMIN:
-    #     return redirect('admin_home')
-    
-    # # rektor
-    # if request.user.role == RoleChoice.REKTOR:
-    #     return redirect('rektor_home')
-
-    # # prorektor
-    # if request.user.role == RoleChoice.PROREKTOR:
-    #     return redirect('prorektor_home')
-    
-    # # bolim boshligi
-    # if request.user.role == RoleChoice.BOLIM_BOSHLIGI:
-    #     return redirect('rahbar_home')
-    
-    # # hodim
-    # if request.user.role == RoleChoice.HODIM:
-    #     return redirect('hodim_home')
-
-
-    context = {}
-    return render(request, 'asosiy/home.html', context)
-
+    context = {
+        'RoleChoice': RoleChoice,
+    }
+    return render(request, 'users/home.html', context)
 
 def chiqish(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect('kirish')
-
 
 def kirish(request):
     if request.user.is_authenticated:
@@ -58,7 +32,6 @@ def kirish(request):
             password = form.cleaned_data['password']
             user = Users.objects.filter(username=username).first()
             if user and user.check_password(password):
-                # Foydalanuvchini tizimga kiritish
                 login(request, user)
                 return redirect('home')
             else:
@@ -69,119 +42,72 @@ def kirish(request):
     }
     return render(request, 'asosiy/kirish.html', context)
 
-# # Admin
 
-# def admin_home(request):
-#     if not request.user.is_authenticated:
-#         return redirect('kirish')
-    
-#     if not request.user.role == RoleChoice.ADMIN:
-#         return redirect('kirish')
-    
-#     context = {}
-#     return render(request, 'admin/home.html', context)
+@login_required
+def user_list(request, target_role):
+    allowed_roles = ALLOWED_USER_MAP.get(request.user.role, [])
+    if target_role not in allowed_roles:
+        return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchilarni ko‘ra olmaysiz.")
+    users = Users.objects.filter(role=target_role)
 
-# # Rektor
+    context = {
+        'users': users,
+        'target_role': target_role,
+        'RoleChoice': RoleChoice,
+    }
+    return render(request, 'users/user_list.html', context)
 
-# def rektor_home(request):
-#     if not request.user.is_authenticated:
-#         return redirect('kirish')
-    
-#     if not request.user.role == RoleChoice.REKTOR:
-#         return redirect('kirish')
-    
-#     context = {}
-#     return render(request, 'rektor/home.html', context)
+@login_required
+def user_create(request, target_role):
+    allowed_roles = ALLOWED_USER_MAP.get(request.user.role, [])
+    if target_role not in allowed_roles:
+        return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchi yaratolmaysiz.")
 
-# def rektor_prorektorlar(request):
-#     if not request.user.is_authenticated:
-#         return redirect('kirish')
+    if request.method == 'POST':
+        form = UserCreateForm(request.POST or None, target_role=target_role)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = target_role
+            user.yaratgan_user = request.user
+            user.parol = form.cleaned_data['password1']  # Agar ochiq holatda saqlamoqchi bo‘lsangiz
+            user.set_password(form.cleaned_data['password1'])
+            user.save()
+            return redirect('user_list', target_role=target_role)
+    else:
+        form = UserCreateForm(target_role=target_role)
 
-#     if not request.user.role == RoleChoice.REKTOR:
-#         return redirect('kirish')
+    context = {
+        'form': form,
+        'target_role': target_role,
+        'RoleChoice': RoleChoice,
+    }
+    return render(request, 'users/user_create.html', context)
 
-#     prorektor_data = Users.objects.filter(role=RoleChoice.PROREKTOR)
+@login_required
+def user_update(request, target_role, pk):
+    allowed_roles = ALLOWED_USER_MAP.get(request.user.role, [])
+    if target_role not in allowed_roles:
+        return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchini tahrirlashga ruxsatingiz yo‘q.")
 
-#     context = {
-#         "prorektor_data":prorektor_data
-#     }
-#     return render(request, 'rektor/rektor_prorektorlar.html', context)
+    user = get_object_or_404(Users, pk=pk, role=target_role)
+    if user.yaratgan_user != request.user:
+        return HttpResponseForbidden("Siz faqat o'zingiz yaratgan foydalanuvchini tahrirlashingiz mumkin.")
 
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=user, target_role=target_role)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.parol = form.cleaned_data['password1']  # Agar ochiq holatda saqlamoqchi bo‘lsangiz
+            user.set_password(form.cleaned_data['password1'])
+            form.save()
+            return redirect('user_list', target_role=target_role)
+    else:
+        form = UserUpdateForm(instance=user, target_role=target_role)
 
-# def rektor_prorektor_create(request):
-#     if not request.user.is_authenticated:
-#         return redirect('kirish')
-#     if not request.user.role == RoleChoice.REKTOR:
-#         return redirect('kirish')
-
-#     if request.method == "POST":
-#         form = UserCreateForm(request.POST)
-#         if form.is_valid():
-#             form.save(role=RoleChoice.PROREKTOR)
-#             return redirect('rektor_prorektorlar')
-#     else:
-#         form = UserCreateForm()
-
-#     return render(request, 'rektor/rektor_prorektor_create.html', {"form": form})
-
-
-# def rektor_prorektor_update(request, pk):
-#     if not request.user.is_authenticated:
-#         return redirect('kirish')
-
-#     if not request.user.role == RoleChoice.REKTOR:
-#         return redirect('kirish')
-
-#     try:
-#         prorektor = Users.objects.get(pk=pk, role=RoleChoice.PROREKTOR)
-#     except Users.DoesNotExist:
-#         raise Http404("Prorektor topilmadi")
-
-#     if request.method == "POST":
-#         form = UserUpdateForm(request.POST, instance=prorektor)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('rektor_prorektorlar')
-#     else:
-#         form = UserUpdateForm(instance=prorektor)
-
-#     context = {
-#         "form": form,
-#         "prorektor": prorektor 
-#     }
-#     return render(request, 'rektor/rektor_prorektor_update.html', context)
-
-# # Bolim boshligi
-
-# def bolim_boshligi_home(request):
-#     if not request.user.is_authenticated:
-#         return redirect('kirish')
-#     if not request.user.role == RoleChoice.BOLIM_BOSHLIGI:
-#         return redirect('kirish')
-
-#     context = {}
-#     return render(request, 'bolim_boshligi/home.html', context)
-
-# # Dekan
-
-# def dekan_home(request):
-#     if not request.user.is_authenticated:
-#         return redirect('kirish')
-#     if not request.user.role == RoleChoice.DEKAN:
-#         return redirect('kirish')
-
-#     context = {}
-#     return render(request, 'dekan/home.html', context)
-
-
-# # Hodim
-
-# def hodim_home(request):
-#     if not request.user.is_authenticated:
-#         return redirect('kirish')
-    
-#     if not request.user.role == RoleChoice.HODIM:
-#         return redirect('kirish')
-    
-#     context = {}
-#     return render(request, 'hodim/home.html', context)
+    context = {
+        'form': form,
+        'target_role': target_role,
+        'user': user,
+        'RoleChoice': RoleChoice,
+    }
+    return render(request, 'users/user_update.html', context)

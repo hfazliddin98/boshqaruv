@@ -1,0 +1,508 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QO'QON DAVLAT UNIVERSITETI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Main CSS -->
+    <link href="{% static 'asosiy/topshiriq/main.css' %}" rel="stylesheet">
+
+    <style>
+        /* Custom CSS for fixing layout issues */
+        .main-content {
+            margin-left: 250px; /* Sidebar width bilan mos qilish */
+            padding: 20px;
+            min-height: calc(100vh - 70px);
+            background-color: #f8f9fa;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Sidebar collapsed holati uchun */
+        .main-content.sidebar-collapsed {
+            margin-left: 70px;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0 !important; /* Mobile'da sidebar yo'q */
+                padding: 15px;
+            }
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #e3e6f0;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #5a5c69;
+            vertical-align: middle;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            font-size: 0.85rem;
+            padding: 0.75rem;
+        }
+        
+        .btn-group-vertical .btn {
+            margin-bottom: 2px;
+        }
+        
+        .btn-group-vertical .btn:last-child {
+            margin-bottom: 0;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .stats-card {
+            transition: transform 0.15s ease-in-out;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+        }
+        
+        .icon-circle {
+            height: 2rem;
+            width: 2rem;
+            border-radius: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Responsive fixes */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px 10px;
+            }
+
+            .page-header .d-flex {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .page-header .input-group {
+                width: 100% !important;
+                min-width: auto !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.75rem;
+            }
+            
+            .btn-group-vertical {
+                flex-direction: row;
+            }
+
+            .stats-card .card-body {
+                padding: 1rem 0.75rem;
+            }
+
+            .icon-circle {
+                width: 1.5rem;
+                height: 1.5rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 10px 5px;
+            }
+
+            .container-fluid {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .d-flex.gap-2 {
+                flex-direction: column;
+                gap: 0.5rem !important;
+            }
+
+            .input-group {
+                width: 100% !important;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Fix for overlapping elements */
+        .dropdown-menu {
+            z-index: 1050;
+        }
+        
+        .alert {
+            margin-bottom: 1rem;
+        }
+
+        /* Sidebar toggle effects */
+        body.sidebar-toggled .main-content {
+            margin-left: 70px;
+        }
+
+        /* Smooth transitions */
+        * {
+            box-sizing: border-box;
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Navbar -->
+    {% include "asosiy/navbar.html" %}
+    <!-- Sidebar -->
+    {% include "asosiy/sidebar.html" %}
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid px-2 px-md-4">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="mb-3 mb-md-0">
+                        <h1 class="h3 mb-2 text-gray-800">
+                            <i class="fas fa-chart-line text-primary me-2"></i>
+                            Mening Hisobotlarim
+                        </h1>
+                        <p class="text-muted mb-0">{{ user_role_display|default:user.role }} sifatida mavjud hisobotlar</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <!-- Filter Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-filter me-1"></i> Filter
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item {% if request.GET.status == 'completed' %}active{% endif %}" href="?status=completed">
+                                    <i class="fas fa-clock text-warning me-2"></i>Topshirilgan
+                                </a></li>
+                                <li><a class="dropdown-item {% if request.GET.status == 'approved' %}active{% endif %}" href="?status=approved">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Tasdiqlangan
+                                </a></li>
+                                <li><a class="dropdown-item {% if request.GET.status == 'rejected' %}active{% endif %}" href="?status=rejected">
+                                    <i class="fas fa-times-circle text-danger me-2"></i>Rad etilgan
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item {% if not request.GET.status %}active{% endif %}" href="?">
+                                    <i class="fas fa-list me-2"></i>Barchasi
+                                </a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Export Button - faqat hisobotlar mavjud bo'lsa -->
+                        {% if reports %}
+                        <a href="{% url 'export_all_reports' %}" class="btn btn-success">
+                            <i class="fas fa-download me-1"></i>
+                            <span class="d-none d-sm-inline">Export</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stats-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Jami Hisobotlar
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ stats.total_tasks|default:0 }}
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <div class="icon-circle bg-primary">
+                                        <i class="fas fa-chart-pie text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stats-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Kutilayotgan
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ stats.pending_tasks|default:0 }}
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <div class="icon-circle bg-warning">
+                                        <i class="fas fa-clock text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stats-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Tasdiqlangan
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ stats.completed_tasks|default:0 }}
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <div class="icon-circle bg-success">
+                                        <i class="fas fa-check-circle text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stats-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                        Rad etilgan
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ stats.overdue_tasks|default:0 }}
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <div class="icon-circle bg-danger">
+                                        <i class="fas fa-times-circle text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Data Table -->
+            <div class="card">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">Hisobotlar Ro'yxati</h6>
+                        <div class="text-muted small">
+                            Jami: {{ reports|length|default:0 }} ta hisobot
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="dataTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-center" style="width: 50px;">#</th>
+                                    <th style="width: 25%;">Topshiriq</th>
+                                    <th style="width: 15%;">Yaratuvchi</th>
+                                    <th style="width: 15%;">Bajaruvchi</th>
+                                    <th class="text-center" style="width: 10%;">Sana</th>
+                                    <th class="text-center" style="width: 10%;">Holati</th>
+                                    <th class="text-center" style="width: 15%;">Amallar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in reports %}
+                                <tr>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="fw-bold text-primary mb-1">
+                                            <a href="{% url 'topshiriq_detail' target_role=report.topshiriq.bajaruvchi_user.role pk=report.topshiriq.id %}" 
+                                               class="text-decoration-none">
+                                                {{ report.topshiriq.title|truncatechars:35|default:"Nomi ko'rsatilmagan" }}
+                                            </a>
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ report.topshiriq.body|truncatechars:50|default:"Mazmun kiritilmagan" }}
+                                        </small>
+                                        {% if report.topshiriq.tugash_vaqti %}
+                                        <div class="small mt-1">
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ report.topshiriq.tugash_vaqti|date:"d.m.Y" }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <div class="icon-circle bg-primary" style="width: 30px; height: 30px;">
+                                                    <i class="fas fa-user text-white" style="font-size: 0.75rem;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold small">
+                                                    {{ report.yaratuvchi.get_full_name|default:"N/A"|truncatechars:15 }}
+                                                </div>
+                                                <div class="text-muted" style="font-size: 0.75rem;">
+                                                    {{ report.yaratuvchi.get_role_display|default:"" }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <div class="icon-circle bg-success" style="width: 30px; height: 30px;">
+                                                    <i class="fas fa-user text-white" style="font-size: 0.75rem;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold small">
+                                                    {{ report.bajaruvchi.get_full_name|default:"N/A"|truncatechars:15 }}
+                                                </div>
+                                                <div class="text-muted" style="font-size: 0.75rem;">
+                                                    {{ report.topshiriq.bajaruvchi_user.get_role_display|default:report.topshiriq.bajaruvchi_user.role }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="small">
+                                            <div class="fw-bold">{{ report.completed_at|date:"d.m.Y" }}</div>
+                                            <div class="text-muted">{{ report.completed_at|date:"H:i" }}</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-{% if report.status == 'completed' %}warning{% elif report.status == 'approved' %}success{% elif report.status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                                            {{ report.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                            <a href="{% url 'hisobot_detail' report_id=report.id %}" 
+                                               class="btn btn-sm btn-primary" 
+                                               title="Hisobot batafsil">
+                                                <i class="fas fa-file-alt"></i>
+                                            </a>
+                                            
+                                            {% if user == report.topshiriq.yaratuvchi_user and report.status == 'completed' %}
+                                                <a href="{% url 'approve_report' report_id=report.id %}" 
+                                                   class="btn btn-sm btn-success" 
+                                                   title="Tasdiqlash"
+                                                   onclick="return confirm('Hisobotni tasdiqlashni xohlaysizmi?')">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                                <a href="{% url 'reject_report' report_id=report.id %}" 
+                                                   class="btn btn-sm btn-danger" 
+                                                   title="Rad etish"
+                                                   onclick="return confirm('Hisobotni rad etishni xohlaysizmi?')">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            {% endif %}
+                                            
+                                            <a href="{% url 'download_report' report_id=report.id %}" 
+                                               class="btn btn-sm btn-secondary" 
+                                               title="Excel yuklash">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="fas fa-chart-pie fa-3x mb-3 text-gray-300"></i>
+                                            <h5 class="text-gray-600">Hisobotlar mavjud emas</h5>
+                                            <p class="mb-3">Hozircha sizga tegishli hisobotlar topilmadi</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Sidebar toggle functionality
+            $(document).on('click', '.sidebar-toggle', function(e) {
+                e.preventDefault();
+                $('body').toggleClass('sidebar-toggled');
+                $('.main-content').toggleClass('sidebar-collapsed');
+            });
+
+            // Responsive sidebar handling
+            function handleSidebarResponsive() {
+                if ($(window).width() < 992) {
+                    $('.main-content').removeClass('sidebar-collapsed');
+                    $('body').removeClass('sidebar-toggled');
+                }
+            }
+
+            $(window).resize(function() {
+                handleSidebarResponsive();
+            });
+
+            handleSidebarResponsive();
+
+            // Mobile sidebar close when clicking outside
+            $(document).on('click', function(e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('.sidebar, .sidebar-toggle').length) {
+                        $('.sidebar').removeClass('show');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

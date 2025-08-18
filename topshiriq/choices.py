@@ -11,6 +11,7 @@ class XolatChoice(models.TextChoices):
 
 class StatusChoice(models.TextChoices):
     YUBORILDI = ('Yuborildi', 'Yuborildi')
+    TEKSHIRILMOQDA = ('Topshirilmoqda', 'Topshirilmoqda')
     BAJARILDI = ('Bajarildi', 'Bajarildi')
     BAJARILMADI = ('Bajarilmadi', 'Bajarilmadi')
     KECHIKDI = ('Kechikdi', 'Kechikdi')
@@ -42,11 +43,12 @@ ALLOWED_TOPSHIRIQ_MAP = {
 
 
 ALLOWED_TOPSHIRIQ_JAVOB_MAP = {
-    RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
-    RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
-    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
-    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
-    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
-    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
-    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
+    RoleChoice.PROREKTOR: [RoleChoice.REKTOR],
+    RoleChoice.BOLIM_RAHBARI: [RoleChoice.PROREKTOR],
+    RoleChoice.DEKAN: [RoleChoice.PROREKTOR],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.BOLIM_RAHBARI],
+    RoleChoice.HODIM: [RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.DEKAN],
+    RoleChoice.ZAM_DEKAN: [RoleChoice.DEKAN],
+    RoleChoice.TYUTOR: [RoleChoice.ZAM_DEKAN],
 }

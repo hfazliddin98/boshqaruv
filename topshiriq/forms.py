@@ -1,5 +1,5 @@
 from django import forms
-from .models import Topshiriq
+from .models import Topshiriq, TopshiriqJavob, TopshiriqJavobFile
 from django.core.exceptions import ValidationError
 from users.models import Users
 from users.choices import RoleChoice
@@ -73,3 +73,30 @@ class TopshiriqForm(forms.ModelForm):
         if yaratuvchi and bajaruvchi and yaratuvchi == bajaruvchi:
             raise ValidationError("O'zingizga topshiriq bera olmaysiz!")
         return cleaned_data
+
+class TopshiriqJavobForm(forms.ModelForm):
+   
+
+    class Meta:
+        model = TopshiriqJavob
+        fields = ['title', 'body', 'izoh']
+
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Javob sarlavhasi'}),
+            'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Javob matni'}),
+            'izoh': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Izoh (ixtiyoriy)'}),
+        }
+
+    def save(self, commit=True, topshiriq=None, bajaruvchi_user=None, files=None):
+        javob = super().save(commit=False)
+        if topshiriq:
+            javob.topshiriq = topshiriq
+        if bajaruvchi_user:
+            javob.bajaruvchi_user = bajaruvchi_user
+        if commit:
+            javob.save()
+            # Fayllarni saqlash
+            if files:
+                for f in files.getlist('files'):
+                    TopshiriqJavobFile.objects.create(javob=javob, file=f)
+        return javob

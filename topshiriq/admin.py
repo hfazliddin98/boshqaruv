@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile
+from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, TopshiriqReport, TopshiriqReportFile
 
 
 class TopshiriqFileInline(admin.TabularInline):
@@ -39,3 +39,30 @@ class TopshiriqFileAdmin(admin.ModelAdmin):
 class TopshiriqJavobFileAdmin(admin.ModelAdmin):
     list_display = ('javob', 'file', 'created_at')
     search_fields = ('javob__title', 'file')
+
+
+class TopshiriqReportFileInline(admin.TabularInline):
+    model = TopshiriqReportFile
+    extra = 1
+
+
+@admin.register(TopshiriqReport)
+class TopshiriqReportAdmin(admin.ModelAdmin):
+    list_display = ['id', 'topshiriq', 'yaratuvchi', 'bajaruvchi', 'status', 'completed_at']
+    list_filter = ['status', 'completed_at', 'yaratuvchi__role', 'bajaruvchi__role']
+    search_fields = ['topshiriq__title', 'yaratuvchi__username', 'bajaruvchi__username', 'javob']
+    date_hierarchy = 'completed_at'
+    inlines = [TopshiriqReportFileInline]
+    readonly_fields = ['completed_at']
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related(
+            'topshiriq', 'yaratuvchi', 'bajaruvchi'
+        )
+
+
+@admin.register(TopshiriqReportFile)
+class TopshiriqReportFileAdmin(admin.ModelAdmin):
+    list_display = ['id', 'report', 'file', 'uploaded_at']
+    list_filter = ['uploaded_at']
+    search_fields = ['report__topshiriq__title', 'file']

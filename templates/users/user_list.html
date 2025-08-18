@@ -32,7 +32,7 @@
     <main class="main-content" id="mainContent">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0 text-gray-800">Prorektorlar</h1>
+                <h1 class="h3 mb-0 text-gray-800">{{target_role|capfirst}}lar</h1>
                 <a href="{% url 'user_create' target_role %}" class="btn btn-primary">
                     <i class="fas fa-plus me-1"></i> Yangi {{target_role|lower}} qo'shish
                 </a>
@@ -40,7 +40,7 @@
 
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Prorektorlar ro'yxati</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{target_role|capfirst}}lar ro'yxati</h6>
                     <div class="input-group" style="width: 300px;">
                         <input type="text" class="form-control" placeholder="Qidirish..." id="searchInput">
                         <button class="btn btn-outline-secondary" type="button" id="searchButton">
@@ -58,7 +58,6 @@
                                     <th>Ism</th>
                                     <th>Familiya</th>
                                     <th>Lavozim</th>
-                                    <th>Roli</th>
                                     <th>Holati</th>
                                     <th>Amallar</th>
                                 </tr>
@@ -70,8 +69,7 @@
                                     <td>{{ user.username }}</td>
                                     <td>{{ user.first_name }}</td>
                                     <td>{{ user.last_name }}</td>
-                                    <td>{{ user.lavozim|default:"-" }}</td>
-                                    <td><span class="badge bg-primary">{{ user.get_role_display }}</span></td>
+                                    <td>{{ user.struktura|default:"-" }}</td>
                                     <td>
                                         {% if user.is_active %}
                                         <span class="badge bg-success">Faol</span>

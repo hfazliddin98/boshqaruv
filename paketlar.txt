@@ -21,6 +21,7 @@ fontawesomefree
 django-import-export
 openpyxl
 pytz
+xlwt
 
 
 gunicorn 

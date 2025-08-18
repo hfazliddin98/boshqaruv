@@ -8,9 +8,10 @@ from users.choices import RoleChoice, ALLOWED_USER_MAP
 from users.models import Users
 from users.forms import KirishForm, UserCreateForm, UserUpdateForm
 
-@login_required
 @csrf_exempt
 def home(request):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
     context = {
         'RoleChoice': RoleChoice,
     }

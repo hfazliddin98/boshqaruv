@@ -1,7 +1,9 @@
 from django.db import models
 from users.models import AsosiyModel, Users
-from topshiriq.choices import TopshiriqType
-from prorektor.choices import StatusChoice, XolatChoice
+from topshiriq.choices import TopshiriqType, StatusChoice, XolatChoice
+from django.conf import settings
+from datetime import datetime
+from django.utils import timezone
 
 
 
@@ -59,4 +61,60 @@ class TopshiriqJavobFile(AsosiyModel):
 
     def __str__(self):
         return self.file.name
+
+
+class TopshiriqReport(models.Model):
+    STATUS_CHOICES = [
+        ('completed', 'Topshirilgan'),
+        ('approved', 'Tasdiqlangan'),
+        ('rejected', 'Rad etilgan'),
+    ]
+    
+    topshiriq = models.ForeignKey(Topshiriq, on_delete=models.CASCADE, related_name='reports')
+    yaratuvchi = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='created_reports')
+    bajaruvchi = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='submitted_reports')
+    javob = models.TextField('Javob matni')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='completed')
+    comment = models.TextField('Izoh', blank=True, null=True)
+    completed_at = models.DateTimeField('Topshirilgan vaqti', auto_now_add=True)
+    approved_at = models.DateTimeField('Tasdiqlangan vaqti', blank=True, null=True)
+    rejected_at = models.DateTimeField('Rad etilgan vaqti', blank=True, null=True)
+    
+    class Meta:
+        verbose_name = 'Topshiriq hisoboti'
+        verbose_name_plural = 'Topshiriq hisobotlari'
+        ordering = ['-completed_at']
+    
+    def __str__(self):
+        return f"{self.topshiriq.title} - {self.bajaruvchi.get_full_name()}"
+
+
+class TopshiriqReportFile(models.Model):
+    """Files attached to task reports"""
+    report = models.ForeignKey(TopshiriqReport, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='topshiriq_report_files/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Hisobot fayli: {self.file.name}"
+    
+    class Meta:
+        verbose_name = "Hisobot fayli"
+        verbose_name_plural = "Hisobot fayllari"
+        verbose_name_plural = "Topshiriq hisobotlari"
+        ordering = ['-completed_at']
+
+
+class TopshiriqReportFile(models.Model):
+    """Files attached to task reports"""
+    report = models.ForeignKey(TopshiriqReport, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='topshiriq_report_files/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Hisobot fayli: {self.file.name}"
+    
+    class Meta:
+        verbose_name = "Hisobot fayli"
+        verbose_name_plural = "Hisobot fayllari"
 

@@ -1,0 +1,155 @@
+<table class="table table-hover align-middle mb-0">
+    <thead>
+        <tr>
+            <th>Topshiriq</th>
+            <th>Yaratuvchi</th>
+            <th>Bajaruvchi</th>
+            <th>Yakunlangan</th>
+            <th>Status</th>
+            <th class="text-center">Amallar</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+        <tr>
+            <td>
+                <div class="d-flex align-items-center">
+                    <span class="report-icon me-3">
+                        <i class="fas fa-file-alt text-primary"></i>
+                    </span>
+                    <div>
+                        <h6 class="mb-0 fw-semibold task-title" title="{{ report.topshiriq.title }}">{{ report.topshiriq.title }}</h6>
+                        <span class="text-muted small">{{ report.topshiriq.body|truncatechars:60 }}</span>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm me-2 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        {{ report.yaratuvchi.first_name|first|default:"?" }}
+                    </div>
+                    <div>
+                        {{ report.yaratuvchi.get_full_name }}
+                        <div class="small text-muted">{{ report.yaratuvchi.get_role_display }}</div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm me-2 bg-success text-white rounded-circle d-flex align-items-center justify-content-center">
+                        {{ report.bajaruvchi.first_name|first|default:"?" }}
+                    </div>
+                    <div>
+                        {{ report.bajaruvchi.get_full_name }}
+                        <div class="small text-muted">{{ report.bajaruvchi.get_role_display }}</div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div>
+                    {{ report.completed_at|date:"d-m-Y H:i" }}
+                </div>
+                <div class="small">
+                    {% if report.is_on_time %}
+                    <i class="fas fa-check-circle text-success me-1"></i> O'z vaqtida
+                    {% else %}
+                    <i class="fas fa-clock text-warning me-1"></i> {{ report.delay_days }} kun kechikkan
+                    {% endif %}
+                </div>
+            </td>
+            <td>
+                <span class="badge bg-{% if report.status == 'completed' %}warning{% elif report.status == 'approved' %}success{% elif report.status == 'rejected' %}danger{% else %}secondary{% endif %} px-2 py-1">
+                    {{ report.get_status_display }}
+                </span>
+            </td>
+            <td class="text-center">
+                <a href="{% url 'hisobot_detail' report.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i>
+                </a>
+                
+                {% if user == report.topshiriq.yaratuvchi_user and report.status == 'completed' %}
+                <!-- Approval/Rejection buttons for task creators -->
+                <button type="button" class="btn btn-sm btn-outline-success report-action-btn" data-report-id="{{ report.id }}" data-action="approve">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger report-action-btn" data-report-id="{{ report.id }}" data-action="reject">
+                    <i class="fas fa-times"></i>
+                </button>
+                {% endif %}
+                
+                {% if user.role == 'rektor' %}
+                <!-- Download option for rektor -->
+                <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-download"></i>
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-chart-pie fa-3x mb-3 text-muted"></i>
+                    <h5>Hisobotlar mavjud emas</h5>
+                    <p class="text-muted">Hozircha yuborilgan javoblar yo'q</p>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: #64748b;
+        font-size: 0.9rem;
+        border-top: none;
+        background-color: #f9fafc;
+    }
+    
+    .table td {
+        vertical-align: middle;
+        padding: 0.85rem 1rem;
+        border-color: #f1f5f9;
+    }
+    
+    .table tr {
+        transition: all 0.2s;
+    }
+    
+    .table tr:hover {
+        background-color: #f8fafc;
+    }
+    
+    .report-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #eef2ff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    
+    .task-title {
+        display: block;
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .empty-state {
+        padding: 2rem;
+        color: #64748b;
+    }
+</style>

@@ -54,8 +54,6 @@ INSTALLED_APPS = [
     # men qoshgan app
     'users',
     'topshiriq',
-    'rektor',
-    'prorektor',
 ]
 
 

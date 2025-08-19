@@ -24,3 +24,36 @@ ALLOWED_USER_MAP = {
     RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
     RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
 }
+
+
+class TopshiriqJavobStatus(models.TextChoices):
+    JARAYONDA = ("Jarayonda", "Jarayonda")
+    BAJARILDI = ("Bajarildi", "Bajarildi")
+    QISMAN_BAJARILDI = ("Qisman bajarildi", "Qisman bajarildi")
+    KECHIKTIRILDI = ("Kechiktirildi", "Kechiktirildi")
+    BEKOR_QILINDI = ("Bekor qilindi", "Bekor qilindi")
+    QAYTA_ISHLASH = ("Qayta ishlash", "Qayta ishlash")
+
+
+# Kimga topshiriq javob berish huquqi bor
+ALLOWED_JAVOB_MAP = {
+    RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
+    RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
+    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
+    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
+    RoleChoice.TYUTOR: [RoleChoice.HODIM],
+}
+
+# Kimga javob ko'rish huquqi bor (yuqori lavozimlar pastki lavozimlar javoblarini ko'ra oladi)
+ALLOWED_VIEW_JAVOB_MAP = {
+    RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
+    RoleChoice.REKTOR: [RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM],
+    RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM],
+    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI, RoleChoice.HODIM],
+    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR, RoleChoice.HODIM],
+}

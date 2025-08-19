@@ -5,318 +5,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QO'QON DAVLAT UNIVERSITETI</title>
-
+    <title>Hisobotlar - QO'QON DAVLAT UNIVERSITETI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-
-    <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
-    <!-- Main CSS -->
     <link href="{% static 'asosiy/topshiriq/main.css' %}" rel="stylesheet">
-
-    <style>
-        /* Custom CSS for fixing layout issues */
-        .main-content {
-            margin-left: 250px; /* Sidebar width bilan mos qilish */
-            padding: 20px;
-            min-height: calc(100vh - 70px);
-            background-color: #f8f9fa;
-            transition: margin-left 0.3s ease;
-        }
-
-        /* Sidebar collapsed holati uchun */
-        .main-content.sidebar-collapsed {
-            margin-left: 70px;
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 991.98px) {
-            .main-content {
-                margin-left: 0 !important; /* Mobile'da sidebar yo'q */
-                padding: 15px;
-            }
-        }
-        
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-        
-        .card-header {
-            background-color: #fff;
-            border-bottom: 1px solid #e3e6f0;
-            border-radius: 10px 10px 0 0 !important;
-        }
-        
-        .table th {
-            border-top: none;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #5a5c69;
-            vertical-align: middle;
-        }
-        
-        .table td {
-            vertical-align: middle;
-            font-size: 0.85rem;
-            padding: 0.75rem;
-        }
-        
-        .btn-group-vertical .btn {
-            margin-bottom: 2px;
-        }
-        
-        .btn-group-vertical .btn:last-child {
-            margin-bottom: 0;
-        }
-        
-        .page-header {
-            margin-bottom: 2rem;
-        }
-        
-        .stats-card {
-            transition: transform 0.15s ease-in-out;
-        }
-        
-        .stats-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .badge {
-            font-size: 0.75rem;
-        }
-        
-        .icon-circle {
-            height: 2rem;
-            width: 2rem;
-            border-radius: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Responsive fixes */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 15px 10px;
-            }
-
-            .page-header .d-flex {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .page-header .input-group {
-                width: 100% !important;
-                min-width: auto !important;
-            }
-            
-            .table-responsive {
-                font-size: 0.75rem;
-            }
-            
-            .btn-group-vertical {
-                flex-direction: row;
-            }
-
-            .stats-card .card-body {
-                padding: 1rem 0.75rem;
-            }
-
-            .icon-circle {
-                width: 1.5rem;
-                height: 1.5rem;
-                font-size: 0.75rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .main-content {
-                padding: 10px 5px;
-            }
-
-            .container-fluid {
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-            .d-flex.gap-2 {
-                flex-direction: column;
-                gap: 0.5rem !important;
-            }
-
-            .input-group {
-                width: 100% !important;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-        
-        /* Fix for overlapping elements */
-        .dropdown-menu {
-            z-index: 1050;
-        }
-        
-        .alert {
-            margin-bottom: 1rem;
-        }
-
-        /* Sidebar toggle effects */
-        body.sidebar-toggled .main-content {
-            margin-left: 70px;
-        }
-
-        /* Smooth transitions */
-        * {
-            box-sizing: border-box;
-        }
-    </style>
-
 </head>
+
 <body>
-    <!-- Navbar -->
     {% include "asosiy/navbar.html" %}
-    <!-- Sidebar -->
     {% include "asosiy/sidebar.html" %}
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent">
-        <div class="container-fluid px-2 px-md-4">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="d-flex justify-content-between align-items-center flex-wrap">
-                    <div class="mb-3 mb-md-0">
-                        <h1 class="h3 mb-2 text-gray-800">
-                            <i class="fas fa-chart-line text-primary me-2"></i>
-                            Mening Hisobotlarim
-                        </h1>
-                        <p class="text-muted mb-0">{{ user_role_display|default:user.role }} sifatida mavjud hisobotlar</p>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <!-- Filter Dropdown -->
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-filter me-1"></i> Filter
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item {% if request.GET.status == 'completed' %}active{% endif %}" href="?status=completed">
-                                    <i class="fas fa-clock text-warning me-2"></i>Topshirilgan
-                                </a></li>
-                                <li><a class="dropdown-item {% if request.GET.status == 'approved' %}active{% endif %}" href="?status=approved">
-                                    <i class="fas fa-check-circle text-success me-2"></i>Tasdiqlangan
-                                </a></li>
-                                <li><a class="dropdown-item {% if request.GET.status == 'rejected' %}active{% endif %}" href="?status=rejected">
-                                    <i class="fas fa-times-circle text-danger me-2"></i>Rad etilgan
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item {% if not request.GET.status %}active{% endif %}" href="?">
-                                    <i class="fas fa-list me-2"></i>Barchasi
-                                </a></li>
-                            </ul>
-                        </div>
-                        
-                        <!-- Export Button - faqat hisobotlar mavjud bo'lsa -->
-                        {% if reports %}
-                        <a href="{% url 'export_all_reports' %}" class="btn btn-success">
-                            <i class="fas fa-download me-1"></i>
-                            <span class="d-none d-sm-inline">Export</span>
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistics Cards -->
-            <div class="row g-4 mb-4">
-                <div class="col-xl-3 col-md-6">
-                    <div class="card stats-card h-100">
+        <div class="container-fluid py-4">
+            
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-grow-1">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Jami Hisobotlar
+                                        Jami Javoblar
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                        {{ stats.total_tasks|default:0 }}
-                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_reports }}</div>
                                 </div>
-                                <div class="ms-3">
-                                    <div class="icon-circle bg-primary">
-                                        <i class="fas fa-chart-pie text-white"></i>
-                                    </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-comment-dots fa-2x text-gray-300"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-xl-3 col-md-6">
-                    <div class="card stats-card h-100">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-grow-1">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                        Kutilayotgan
+                                        Ko'rib chiqish kutilmoqda
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                        {{ stats.pending_tasks|default:0 }}
-                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.pending_reports }}</div>
                                 </div>
-                                <div class="ms-3">
-                                    <div class="icon-circle bg-warning">
-                                        <i class="fas fa-clock text-white"></i>
-                                    </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-xl-3 col-md-6">
-                    <div class="card stats-card h-100">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-grow-1">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                         Tasdiqlangan
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                        {{ stats.completed_tasks|default:0 }}
-                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.approved_reports }}</div>
                                 </div>
-                                <div class="ms-3">
-                                    <div class="icon-circle bg-success">
-                                        <i class="fas fa-check-circle text-white"></i>
-                                    </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-xl-3 col-md-6">
-                    <div class="card stats-card h-100">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-danger shadow h-100 py-2">
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-grow-1">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                         Rad etilgan
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                        {{ stats.overdue_tasks|default:0 }}
-                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.rejected_reports }}</div>
                                 </div>
-                                <div class="ms-3">
-                                    <div class="icon-circle bg-danger">
-                                        <i class="fas fa-times-circle text-white"></i>
-                                    </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
                                 </div>
                             </div>
                         </div>
@@ -324,136 +94,152 @@
                 </div>
             </div>
 
-            <!-- Main Data Table -->
-            <div class="card">
+            <!-- Reports Table -->
+            <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold text-primary">Hisobotlar Ro'yxati</h6>
-                        <div class="text-muted small">
-                            Jami: {{ reports|length|default:0 }} ta hisobot
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-reply me-2"></i>
+                            Topshiriq javoblari
+                        </h6>
+                        
+                        <div class="d-flex align-items-center">
+                            <!-- Filter -->
+                            <form method="GET" class="d-flex me-3">
+                                <select name="status" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+                                    <option value="">Barcha holatlar</option>
+                                    <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Ko'rib chiqish kutilmoqda</option>
+                                    <option value="approved" {% if current_status == 'approved' %}selected{% endif %}>Tasdiqlangan</option>
+                                    <option value="rejected" {% if current_status == 'rejected' %}selected{% endif %}>Rad etilgan</option>
+                                </select>
+                            </form>
+                            
+                            <!-- Excel Export Button -->
+                            <a href="{% url 'export_all_reports' %}{% if current_status %}?status={{ current_status }}{% endif %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-file-excel me-1"></i>
+                                Excel Export
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body">
+                    {% if reports %}
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="dataTable">
-                            <thead class="table-light">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
                                 <tr>
-                                    <th class="text-center" style="width: 50px;">#</th>
-                                    <th style="width: 25%;">Topshiriq</th>
-                                    <th style="width: 15%;">Yaratuvchi</th>
-                                    <th style="width: 15%;">Bajaruvchi</th>
-                                    <th class="text-center" style="width: 10%;">Sana</th>
-                                    <th class="text-center" style="width: 10%;">Holati</th>
-                                    <th class="text-center" style="width: 15%;">Amallar</th>
+                                    <th>#</th>
+                                    <th>Topshiriq</th>
+                                    <th>Bajaruvchi</th>
+                                    <th>Javob bergan vaqt</th>
+                                    <th>Holat</th>
+                                    <th>Baho</th>
+                                    <th class="text-center">Amallar</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for report in reports %}
+                                {% for topshiriq in reports %}
                                 <tr>
-                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td>{{ forloop.counter }}</td>
                                     <td>
-                                        <div class="fw-bold text-primary mb-1">
-                                            <a href="{% url 'topshiriq_detail' target_role=report.topshiriq.bajaruvchi_user.role pk=report.topshiriq.id %}" 
-                                               class="text-decoration-none">
-                                                {{ report.topshiriq.title|truncatechars:35|default:"Nomi ko'rsatilmagan" }}
-                                            </a>
-                                        </div>
+                                        <div class="font-weight-bold">{{ topshiriq.title|truncatechars:40 }}</div>
+                                        {% if topshiriq.javob %}
+                                            {% if topshiriq.javob.title %}
+                                            <small class="text-muted">Javob: {{ topshiriq.javob.title|truncatechars:30 }}</small>
+                                            {% elif topshiriq.javob.body %}
+                                            <small class="text-muted">{{ topshiriq.javob.body|truncatechars:30|striptags }}</small>
+                                            {% endif %}
+                                            
+                                            <!-- Javob fayllari ko'rsatkichi -->
+                                            {% if topshiriq.javob.files.all %}
+                                            <div class="mt-1">
+                                                <span class="badge bg-info badge-sm">
+                                                    <i class="fas fa-paperclip me-1"></i>
+                                                    {{ topshiriq.javob.files.all|length }} fayl
+                                                </span>
+                                            </div>
+                                            {% endif %}
+                                        {% else %}
                                         <small class="text-muted">
-                                            {{ report.topshiriq.body|truncatechars:50|default:"Mazmun kiritilmagan" }}
+                                            <i class="fas fa-check-circle me-1 text-success"></i>
+                                            Javob yuborilgan
                                         </small>
-                                        {% if report.topshiriq.tugash_vaqti %}
-                                        <div class="small mt-1">
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="fas fa-clock me-1"></i>
-                                                {{ report.topshiriq.tugash_vaqti|date:"d.m.Y" }}
-                                            </span>
-                                        </div>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="me-2">
-                                                <div class="icon-circle bg-primary" style="width: 30px; height: 30px;">
-                                                    <i class="fas fa-user text-white" style="font-size: 0.75rem;"></i>
-                                                </div>
+                                            <div class="user-avatar bg-primary text-white rounded-circle me-2">
+                                                {{ topshiriq.bajaruvchi_user.first_name|first }}{{ topshiriq.bajaruvchi_user.last_name|first }}
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <div class="fw-bold small">
-                                                    {{ report.yaratuvchi.get_full_name|default:"N/A"|truncatechars:15 }}
-                                                </div>
-                                                <div class="text-muted" style="font-size: 0.75rem;">
-                                                    {{ report.yaratuvchi.get_role_display|default:"" }}
-                                                </div>
+                                            <div>
+                                                <div class="font-weight-bold">{{ topshiriq.bajaruvchi_user.get_full_name }}</div>
+                                                <small class="text-muted">{{ topshiriq.bajaruvchi_user.role }}</small>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-2">
-                                                <div class="icon-circle bg-success" style="width: 30px; height: 30px;">
-                                                    <i class="fas fa-user text-white" style="font-size: 0.75rem;"></i>
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="fw-bold small">
-                                                    {{ report.bajaruvchi.get_full_name|default:"N/A"|truncatechars:15 }}
-                                                </div>
-                                                <div class="text-muted" style="font-size: 0.75rem;">
-                                                    {{ report.topshiriq.bajaruvchi_user.get_role_display|default:report.topshiriq.bajaruvchi_user.role }}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        {% if topshiriq.bajarilgan_vaqti %}
+                                        <div>{{ topshiriq.bajarilgan_vaqti|date:"d.m.Y" }}</div>
+                                        <small class="text-muted">{{ topshiriq.bajarilgan_vaqti|date:"H:i" }}</small>
+                                        {% else %}
+                                        <small class="text-muted">-</small>
+                                        {% endif %}
                                     </td>
-                                    <td class="text-center">
-                                        <div class="small">
-                                            <div class="fw-bold">{{ report.completed_at|date:"d.m.Y" }}</div>
-                                            <div class="text-muted">{{ report.completed_at|date:"H:i" }}</div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-{% if report.status == 'completed' %}warning{% elif report.status == 'approved' %}success{% elif report.status == 'rejected' %}danger{% else %}secondary{% endif %}">
-                                            {{ report.get_status_display }}
+                                    <td>
+                                        {% if topshiriq.status == 'YUBORILDI' %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-hourglass-half me-1"></i>
+                                            Ko'rib chiqilmoqda
                                         </span>
+                                        {% elif topshiriq.status == 'QABUL_QILINDI' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Tasdiqlangan
+                                        </span>
+                                        {% elif topshiriq.status == 'QAYTARILDI' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times-circle me-1"></i>
+                                            Rad etilgan
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">
+                                            {{ topshiriq.get_status_display }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if topshiriq.report and topshiriq.report.rating %}
+                                        <div class="rating-stars" title="Baho: {{ topshiriq.report.rating }}/5">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star {% if forloop.counter <= topshiriq.report.rating %}text-warning{% else %}text-muted{% endif %}" style="font-size: 14px;"></i>
+                                            {% endfor %}
+                                            <small class="text-muted ms-1">({{ topshiriq.report.rating }})</small>
+                                        </div>
+                                        {% else %}
+                                        <span class="text-muted">
+                                            <i class="fas fa-star-o me-1"></i>
+                                            Baholanmagan
+                                        </span>
+                                        {% endif %}
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-1 flex-wrap">
-                                            <a href="{% url 'hisobot_detail' report_id=report.id %}" 
-                                               class="btn btn-sm btn-primary" 
-                                               title="Hisobot batafsil">
-                                                <i class="fas fa-file-alt"></i>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'topshiriq_detail' topshiriq.bajaruvchi_user.role topshiriq.id %}" 
+                                               class="btn btn-outline-info" 
+                                               title="Javobni batafsil ko'rish">
+                                                <i class="fas fa-eye"></i>
                                             </a>
                                             
-                                            {% if user == report.topshiriq.yaratuvchi_user and report.status == 'completed' %}
-                                                <a href="{% url 'approve_report' report_id=report.id %}" 
-                                                   class="btn btn-sm btn-success" 
-                                                   title="Tasdiqlash"
-                                                   onclick="return confirm('Hisobotni tasdiqlashni xohlaysizmi?')">
-                                                    <i class="fas fa-check"></i>
-                                                </a>
-                                                <a href="{% url 'reject_report' report_id=report.id %}" 
-                                                   class="btn btn-sm btn-danger" 
-                                                   title="Rad etish"
-                                                   onclick="return confirm('Hisobotni rad etishni xohlaysizmi?')">
-                                                    <i class="fas fa-times"></i>
-                                                </a>
+                                            {% if can_evaluate and topshiriq.status == 'YUBORILDI' and request.user == topshiriq.yaratuvchi_user %}
+                                            <button class="btn btn-outline-success" 
+                                                    title="Tasdiqlash">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger" 
+                                                    title="Rad etish">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                             {% endif %}
-                                            
-                                            <a href="{% url 'download_report' report_id=report.id %}" 
-                                               class="btn btn-sm btn-secondary" 
-                                               title="Excel yuklash">
-                                                <i class="fas fa-download"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="7" class="text-center py-5">
-                                        <div class="text-muted">
-                                            <i class="fas fa-chart-pie fa-3x mb-3 text-gray-300"></i>
-                                            <h5 class="text-gray-600">Hisobotlar mavjud emas</h5>
-                                            <p class="mb-3">Hozircha sizga tegishli hisobotlar topilmadi</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -461,48 +247,201 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination -->
+                    {% if reports.has_other_pages %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if reports.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ reports.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in reports.paginator.page_range %}
+                            {% if num == reports.number %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > reports.number|add:'-3' and num < reports.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if current_status %}&status={{ current_status }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if reports.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ reports.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-comment-dots fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Javoblar mavjud emas</h5>
+                        <p class="text-muted">Hozircha hech qanday topshiriq javobi topilmadi.</p>
+                        <div class="mt-3">
+                            <a href="{% url 'topshiriq_list' request.user.role %}" class="btn btn-outline-primary">
+                                <i class="fas fa-tasks me-2"></i>
+                                Topshiriqlarni ko'rish
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
+
+            <!-- Modals for approve/reject -->
+<div class="modal fade" id="approveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Javobni tasdiqlash</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="approveForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Baho (1-5)</label>
+                        <select name="rating" class="form-select">
+                            <option value="">Baho bermang</option>
+                            <option value="5">5 - A'lo</option>
+                            <option value="4">4 - Yaxshi</option>
+                            <option value="3">3 - Qoniqarli</option>
+                            <option value="2">2 - Qoniqarsiz</option>
+                            <option value="1">1 - Yomon</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Izoh</label>
+                        <textarea name="comment" class="form-control" rows="3" placeholder="Tasdiq izohi..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="submit" class="btn btn-success">Tasdiqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Javobni rad etish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="rejectForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Rad etish sababi <span class="text-danger">*</span></label>
+                        <textarea name="comment" class="form-control" rows="4" placeholder="Rad etish sababini yozing..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="submit" class="btn btn-danger">Rad etish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function approveTopshiriq(topshiriqId) {
+    // Topshiriq uchun report topish va tasdiqlash
+    $.post('/topshiriq/topshiriq/' + topshiriqId + '/approve/', {
+        'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+    }).done(function(data) {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Xatolik yuz berdi: ' + data.message);
+        }
+    }).fail(function() {
+        // Modal orqali tasdiqlash
+        $('#approveForm').attr('action', '/topshiriq/topshiriq/' + topshiriqId + '/approve/');
+        $('#approveModal').modal('show');
+    });
+}
+
+function rejectTopshiriq(topshiriqId) {
+    // Modal orqali rad etish
+    $('#rejectForm').attr('action', '/topshiriq/topshiriq/' + topshiriqId + '/reject/');
+    $('#rejectModal').modal('show');
+}
+
+// Page loading animation
+$(document).ready(function() {
+    // Table row hover effect
+    $('.table tbody tr').hover(function() {
+        $(this).addClass('table-hover-highlight');
+    }, function() {
+        $(this).removeClass('table-hover-highlight');
+    });
+});
+</script>
+
+<style>
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.rating-stars {
+    white-space: nowrap;
+}
+
+.table-hover-highlight {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    transition: background-color 0.2s ease;
+}
+
+.badge-sm {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.border-left-primary {
+    border-left: 4px solid #007bff !important;
+}
+
+.border-left-warning {
+    border-left: 4px solid #ffc107 !important;
+}
+
+.border-left-success {
+    border-left: 4px solid #28a745 !important;
+}
+
+.border-left-danger {
+    border-left: 4px solid #dc3545 !important;
+}
+</style>
+
         </div>
     </main>
 
-    <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            // Sidebar toggle functionality
-            $(document).on('click', '.sidebar-toggle', function(e) {
-                e.preventDefault();
-                $('body').toggleClass('sidebar-toggled');
-                $('.main-content').toggleClass('sidebar-collapsed');
-            });
-
-            // Responsive sidebar handling
-            function handleSidebarResponsive() {
-                if ($(window).width() < 992) {
-                    $('.main-content').removeClass('sidebar-collapsed');
-                    $('body').removeClass('sidebar-toggled');
-                }
-            }
-
-            $(window).resize(function() {
-                handleSidebarResponsive();
-            });
-
-            handleSidebarResponsive();
-
-            // Mobile sidebar close when clicking outside
-            $(document).on('click', function(e) {
-                if ($(window).width() < 992) {
-                    if (!$(e.target).closest('.sidebar, .sidebar-toggle').length) {
-                        $('.sidebar').removeClass('show');
-                    }
-                }
-            });
-        });
-    </script>
 </body>
-
 </html>

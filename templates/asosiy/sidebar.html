@@ -22,6 +22,12 @@
                         <span class="sidebar-text">Topshiriqlar</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{% url 'hisobot_list' %}" class="nav-link {% if request.resolver_match.url_name == 'hisobot_list' %}active{% endif %}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Hisobotlar</span>
+                    </a>
+                </li>
             {% elif request.user.role == RoleChoice.PROREKTOR.value %}
                 <li>
                     <a href="{% url 'user_list' RoleChoice.BOLIM_RAHBARI.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.BOLIM_RAHBARI.value %}active{% endif %}">
@@ -36,7 +42,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'topshiriq_javob_list' RoleChoice.REKTOR.value %}" class="">
+                    <a href="{% url 'topshiriq_bajaruvchi_list' RoleChoice.REKTOR.value %}" class="">
                         <i class="fas fa-book"></i>
                         <span class="sidebar-text">Rektor topshiriqlari</span>
                     </a>

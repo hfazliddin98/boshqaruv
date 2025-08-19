@@ -8,6 +8,12 @@ class XolatChoice(models.TextChoices):
     ORTA = ('O`rta', 'O`rta')
     ODDIY = ('Oddiy', 'Oddiy')
 
+class BaxoChoice(models.TextChoices):
+    QONIQARSIZ = ('Qoniqarsiz', 'Qoniqarsiz')
+    QONIQARLI = ('Qoniqarli', 'Qoniqarli')
+    YAXSHI = ('Yaxshi', 'Yaxshi')
+    ALO = ('Alo', 'Alo')
+
 
 class StatusChoice(models.TextChoices):
     YUBORILDI = ('Yuborildi', 'Yuborildi')
@@ -16,18 +22,13 @@ class StatusChoice(models.TextChoices):
     BAJARILMADI = ('Bajarilmadi', 'Bajarilmadi')
     KECHIKDI = ('Kechikdi', 'Kechikdi')
 
-
 class TopshiriqType(models.TextChoices):
-    REKTOR = "rektor", "Rektor"
-    PROREKTOR = "prorektor", "Prorektor"
-    BOLIM_RAHBARI = "bolim_rahbari", "Bo'lim rahbari"
-    BOLIM_BOSHLIGI = "bolim_boshligi", "Bo'lim boshligi"
-    DEKAN = "dekan", "Dekan"
-    ZAMDEKAN = "zamdekan", "Zamdekan"
-    KAFEDRA_MUDIRI = "kafedra_mudiri", "Kafedra mudiri"
-    TUTOR = "tyutor", "Tyutor"
-    XODIM = "xodim", "Xodim"
-    KOMISSIYA = "komissiya", "Komissiya"
+    YUBORILDI = ('Yuborildi', 'Yuborildi')
+    TEKSHIRILMOQDA = ('Topshirilmoqda', 'Topshirilmoqda')
+    BAJARILDI = ('Bajarildi', 'Bajarildi')
+    BAJARILMADI = ('Bajarilmadi', 'Bajarilmadi')
+    KECHIKDI = ('Kechikdi', 'Kechikdi')
+
 
 
 
@@ -42,6 +43,19 @@ ALLOWED_TOPSHIRIQ_MAP = {
 }
 
 
+# Kimga javoblarni ko'rish huquqi bor (yuqori lavozimlar pastki lavozimlar javoblarini ko'ra oladi)
+ALLOWED_TOPSHIRIQ_VIEW_MAP = {
+    RoleChoice.KOMISSIYA: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
+    RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
+    RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
+    RoleChoice.PROREKTOR: [RoleChoice.REKTOR, RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
+    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
+    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
+}
+
 ALLOWED_TOPSHIRIQ_JAVOB_MAP = {
     RoleChoice.PROREKTOR: [RoleChoice.REKTOR],
     RoleChoice.BOLIM_RAHBARI: [RoleChoice.PROREKTOR],
@@ -51,4 +65,17 @@ ALLOWED_TOPSHIRIQ_JAVOB_MAP = {
     RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.DEKAN],
     RoleChoice.ZAM_DEKAN: [RoleChoice.DEKAN],
     RoleChoice.TYUTOR: [RoleChoice.ZAM_DEKAN],
+}
+
+# Kimga javoblarni ko'rish huquqi bor (yuqori lavozimlar pastki lavozimlar javoblarini ko'ra oladi)
+ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP = {
+    RoleChoice.KOMISSIYA: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
+    RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
+    RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
+    RoleChoice.PROREKTOR: [RoleChoice.REKTOR, RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
+    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
+    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
 }

@@ -204,6 +204,217 @@
     <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Sidebar toggle functionality
+            $('#sidebarToggle').click(function() {
+                $('#sidebar').toggleClass('collapsed');
+                $('#mainContent').toggleClass('expanded');
+                
+                if ($(window).width() < 992) {
+                    $('#sidebar').toggleClass('show');
+                }
+            });
+
+            // File upload functionality
+            let selectedFiles = [];
+            
+            // File input change event
+            $('#files').change(function() {
+                handleFiles(this.files);
+            });
+
+            // Drag and drop events
+            $('#fileDropArea').on('dragover', function(e) {
+                e.preventDefault();
+                $(this).addClass('border-primary bg-primary-subtle');
+            });
+
+            $('#fileDropArea').on('dragleave', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-primary bg-primary-subtle');
+            });
+
+            $('#fileDropArea').on('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-primary bg-primary-subtle');
+                handleFiles(e.originalEvent.dataTransfer.files);
+            });
+
+            // Handle selected files
+            function handleFiles(files) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    
+                    // Check file size (10MB limit)
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert(`Fayl "${file.name}" hajmi 10MB dan oshmasligi kerak`);
+                        continue;
+                    }
+
+                    // Check if file already exists
+                    if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                        alert(`Fayl "${file.name}" allaqachon qo'shilgan`);
+                        continue;
+                    }
+
+                    selectedFiles.push(file);
+                }
+                
+                updateFileList();
+                updateFileInput();
+            }
+
+            // Update file list display
+            function updateFileList() {
+                const fileListContainer = $('#fileList');
+                fileListContainer.empty();
+
+                if (selectedFiles.length === 0) {
+                    return;
+                }
+
+                const listGroup = $('<div class="list-group shadow-sm"></div>');
+                
+                selectedFiles.forEach((file, index) => {
+                    const fileItem = $(`
+                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-alt text-primary me-3 fa-lg"></i>
+                                <div>
+                                    <h6 class="mb-1 text-truncate" style="max-width: 300px;">${file.name}</h6>
+                                    <small class="text-muted">${formatFileSize(file.size)}</small>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `);
+                    listGroup.append(fileItem);
+                });
+
+                fileListContainer.append(listGroup);
+            }
+
+            // Update file input with selected files
+            function updateFileInput() {
+                const dt = new DataTransfer();
+                selectedFiles.forEach(file => {
+                    dt.items.add(file);
+                });
+                document.getElementById('files').files = dt.files;
+            }
+
+            // Remove file function
+            window.removeFile = function(index) {
+                selectedFiles.splice(index, 1);
+                updateFileList();
+                updateFileInput();
+            };
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Real-time validation functions
+            function validateField(field) {
+                const $field = $(field);
+                const value = $field.val().trim();
+                
+                // Check required fields
+                if ($field.prop('required') && !value) {
+                    $field.addClass('is-invalid');
+                    $field.removeClass('is-valid');
+                    return false;
+                } else if ($field.prop('required') && value) {
+                    $field.removeClass('is-invalid');
+                    $field.addClass('is-valid');
+                    return true;
+                }
+                return true;
+            }
+
+            // Date validation with real-time feedback
+            function validateDates() {
+                const boshlanish = $('#{{ form.boshlanish_vaqti.id_for_label }}').val();
+                const tugash = $('#{{ form.tugash_vaqti.id_for_label }}').val();
+                const $tugashInput = $('#{{ form.tugash_vaqti.id_for_label }}');
+                const joriyVaqt = new Date();
+                
+                if (tugash) {
+                    const tugashDate = new Date(tugash);
+                    
+                    // Tugash vaqti joriy vaqtdan kichik bo'lsa
+                    if (tugashDate <= joriyVaqt) {
+                        $tugashInput[0].setCustomValidity('Tugash vaqti joriy vaqtdan keyin bo\'lishi kerak');
+                        $tugashInput.addClass('is-invalid');
+                        $tugashInput.removeClass('is-valid');
+                        
+                        let errorDiv = $tugashInput.siblings('.invalid-feedback');
+                        if (errorDiv.length === 0) {
+                            errorDiv = $('<div class="invalid-feedback"></div>');
+                            $tugashInput.after(errorDiv);
+                        }
+                        errorDiv.text('Tugash vaqti joriy vaqtdan keyin bo\'lishi kerak');
+                        return false;
+                    }
+                }
+                
+                if (boshlanish && tugash) {
+                    const boshlanishDate = new Date(boshlanish);
+                    const tugashDate = new Date(tugash);
+                    
+                    if (tugashDate <= boshlanishDate) {
+                        $tugashInput[0].setCustomValidity('Tugash vaqti boshlanish vaqtidan keyin bo\'lishi kerak');
+                        $tugashInput.addClass('is-invalid');
+                        $tugashInput.removeClass('is-valid');
+                        
+                        let errorDiv = $tugashInput.siblings('.invalid-feedback');
+                        if (errorDiv.length === 0) {
+                            errorDiv = $('<div class="invalid-feedback"></div>');
+                            $tugashInput.after(errorDiv);
+                        }
+                        errorDiv.text('Tugash vaqti boshlanish vaqtidan keyin bo\'lishi kerak');
+                        return false;
+                    } else {
+                        $tugashInput[0].setCustomValidity('');
+                        $tugashInput.removeClass('is-invalid');
+                        $tugashInput.addClass('is-valid');
+                        return true;
+                    }
+                } else if (tugash) {
+                    $tugashInput[0].setCustomValidity('');
+                    $tugashInput.removeClass('is-invalid');
+                    $tugashInput.addClass('is-valid');
+                    return true;
+                }
+                return true;
+            }
+
+            // Date validation with real-time feedback
+            $('#{{ form.boshlanish_vaqti.id_for_label }}, #{{ form.tugash_vaqti.id_for_label }}').on('change blur input', function() {
+                validateDates();
+            });
+
+            // Form submission validation
+            $('form').on('submit', function(e) {
+                validateDates();
+                
+                if (!this.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                $(this).addClass('was-validated');
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -5,541 +5,803 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QO'QON DAVLAT UNIVERSITETI</title>
-
+    <title>Topshiriq - {{ topshiriq.title }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-
-    <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
-    <!-- Main CSS -->
     <link href="{% static 'asosiy/topshiriq/main.css' %}" rel="stylesheet">
 
     <style>
-        /* Modern UI Color Scheme - System-wide Colors */
         :root {
-            /* Primary colors */
-            --app-primary: #4f46e5;
-            --app-primary-hover: #4338ca;
-            --app-primary-light: #eef2ff;
-            
-            /* Secondary colors */
-            --app-secondary: #64748b;
-            --app-secondary-hover: #475569;
-            --app-secondary-light: #f8fafc;
-            
-            /* Text colors */
-            --app-text: #1e293b;
-            --app-text-light: #64748b;
-            --app-text-lighter: #94a3b8;
-            
-            /* Border colors */
-            --app-border: #e2e8f0;
-            --app-border-focus: #cbd5e1;
-            
-            /* Background colors */
-            --app-bg: #ffffff;
-            --app-bg-light: #f8fafc;
-            --app-bg-card: #ffffff;
-            
-            /* Status colors */
-            --app-success: #10b981;
-            --app-success-hover: #059669;
-            --app-warning: #f59e0b;
-            --app-danger: #ef4444;
-            --app-info: #3b82f6;
-            --app-danger-rgb: 239, 68, 68;
-            
-            /* Shadows */
-            --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --app-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --app-shadow-md: 0 10px 15px rgba(0, 0, 0, 0.04);
-            --app-shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.05);
-            
-            /* Spacing */
-            --app-space-1: 0.25rem;
-            --app-space-2: 0.5rem;
-            --app-space-3: 0.75rem;
-            --app-space-4: 1rem;
-            --app-space-5: 1.5rem;
-            --app-space-6: 2rem;
-            
-            /* Border radius */
-            --app-radius-sm: 0.375rem;
-            --app-radius: 0.5rem;
-            --app-radius-md: 0.75rem;
-            --app-radius-lg: 1rem;
-            
-            /* Transitions */
-            --app-transition: all 0.2s ease;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --border: #e5e7eb;
         }
 
-        /* Custom styles for countdown and task detail */
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 50%, #fef3c7 100%);
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 0.85rem;
+        }
+
+        /* Compact Header */
         .task-header {
-            background: linear-gradient(135deg, var(--app-primary), var(--app-primary-hover));
+            background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
             color: white;
-            padding: var(--app-space-5);
-            border-radius: var(--app-radius-md);
-            margin-bottom: var(--app-space-5);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: var(--app-shadow);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
         }
-        
-        .countdown-container {
-            background-color: rgba(0, 0, 0, 0.4);
-            padding: 0.5rem 1rem;
-            border-radius: var(--app-radius);
-            color: white;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-        
-        .countdown-container i {
-            margin-right: 0.75rem;
-            color: #ffffff;
-            font-size: 1.1rem;
-        }
-        
-        .countdown-timer {
-            font-family: 'Courier New', monospace;
-            letter-spacing: 0.1rem;
-            color: #ffffff;
+
+        .task-title {
+            font-size: 1.75rem;
             font-weight: 700;
-            font-size: 1.1rem;
+            line-height: 1.3;
+            word-break: break-word;
+            hyphens: auto;
+            overflow-wrap: break-word;
         }
-        
-        .countdown-expired {
-            background-color: rgba(var(--app-danger-rgb), 0.85);
+
+        .task-title-wrapper {
+            min-width: 0;
         }
-        
-        .btn-submit {
-            background-color: var(--app-success);
+
+        .countdown-wrapper {
+            margin-top: 0.5rem;
+        }
+
+        /* Compact Countdown Timer */
+        .countdown-timer {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%);
+            backdrop-filter: blur(20px);
             color: white;
-            border: none;
-            padding: 0.5rem 1.25rem;
-            border-radius: var(--app-radius);
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
-            transition: var(--app-transition);
+            gap: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        
-        .btn-submit:hover {
-            background-color: var(--app-success-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--app-shadow);
-            color: white;
+
+        .countdown-timer.danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.8) 100%);
+            animation: pulse 1.5s infinite;
         }
-        
-        /* Card styles */
-        .content-card {
-            background-color: var(--app-bg-card);
-            border-radius: var(--app-radius-md);
-            box-shadow: var(--app-shadow);
-            margin-bottom: var(--app-space-5);
+
+        .countdown-timer.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(217, 119, 6, 0.8) 100%);
+        }
+
+        /* Compact Content Cards */
+        .content-section {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
             overflow: hidden;
-            border: 1px solid var(--app-border);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
         }
-        
-        .card-body {
-            padding: var(--app-space-5);
+
+        .section-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
         }
-        
-        .card-title {
-            color: var(--app-text);
+
+        .section-title {
+            font-size: 1rem;
             font-weight: 600;
-            font-size: 1.1rem;
+            color: var(--dark);
             display: flex;
             align-items: center;
+            gap: 0.5rem;
+            margin: 0;
         }
-        
-        .card-title i {
-            color: var(--app-primary);
+
+        .section-title i {
+            color: var(--primary);
+            font-size: 1.1rem;
         }
-        
-        /* Meta item styles */
-        .meta-item {
-            padding: var(--app-space-3);
-            border-radius: var(--app-radius);
-            background-color: var(--app-bg-light);
-            height: 100%;
-            transition: var(--app-transition);
-            border: 1px solid var(--app-border);
+
+        .section-body {
+            padding: 1.5rem;
         }
-        
-        .meta-item:hover {
-            background-color: var(--app-primary-light);
-            border-color: var(--app-primary);
+
+        /* Compact Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
         }
-        
-        .meta-label {
-            color: var(--app-text-light);
+
+        .info-item {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .info-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.3px;
+            color: #6b7280;
+            margin-bottom: 0.4rem;
         }
-        
-        /* File grid */
+
+        .info-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        /* Compact Priority Badges */
+        .priority-high { 
+            background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%); 
+            color: #991b1b; 
+            padding: 0.3rem 0.7rem;
+            font-size: 0.7rem;
+            border-radius: 12px;
+        }
+        .priority-medium { 
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); 
+            color: #9a3412;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.7rem;
+            border-radius: 12px;
+        }
+        .priority-low { 
+            background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%); 
+            color: #166534;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.7rem;
+            border-radius: 12px;
+        }
+
+        /* Compact File Grid */
         .file-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: var(--app-space-3);
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
         }
-        
+
         .file-card {
-            background-color: var(--app-bg);
-            border: 1px solid var(--app-border);
-            border-radius: var(--app-radius);
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             overflow: hidden;
-            height: 100%;
-            transition: var(--app-transition);
+            transition: all 0.2s ease;
         }
-        
+
         .file-card:hover {
-            box-shadow: var(--app-shadow);
-            border-color: var(--app-primary);
+            border-color: var(--primary);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.08);
+            transform: translateY(-2px);
         }
-        
+
         .file-preview {
-            height: 100px;
-            background-color: var(--app-bg-light);
+            height: 80px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-bottom: 1px solid var(--app-border);
         }
-        
-        .file-preview i {
-            font-size: 2.5rem;
-            color: var(--app-primary);
+
+        .file-icon {
+            font-size: 2rem;
+            opacity: 0.8;
         }
-        
-        /* Answer box */
-        .answer-box {
-            background-color: var(--app-primary-light);
-            border-left: 4px solid var(--app-info);
-            padding: var(--app-space-5);
-            border-radius: var(--app-radius);
+
+        .file-info {
+            padding: 1rem;
         }
-        
-        /* Form labels */
-        .form-label {
-            color: var(--app-text-light);
+
+        .file-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .file-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 6px;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-download {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #059669;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-view {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-view:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h5 {
+            font-size: 1rem;
             margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* Badge sizes */
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+        }
+
+        /* Answer styling */
+        .answer-title {
+            background: var(--light);
+            border-left: 4px solid var(--info);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .answer-text {
+            background: var(--light);
+            border-left: 4px solid var(--success);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        .answer-note {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        .answer-meta {
+            background: rgba(16, 185, 129, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .task-title { 
+                font-size: 1.4rem; 
+                margin-bottom: 1rem;
+            }
+            
+            .task-header .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .countdown-wrapper {
+                margin-top: 1rem;
+                align-self: flex-end;
+            }
+            
+            .info-grid { grid-template-columns: 1fr; }
+            .file-grid { grid-template-columns: 1fr; }
+            .back-btn { 
+                bottom: 1rem; 
+                right: 1rem; 
+                width: 45px; 
+                height: 45px;
+                font-size: 1.1rem;
+            }
+            .section-body { padding: 1rem; }
+            .task-header { padding: 1.25rem; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
         }
     </style>
 </head>
 
 <body>
-    <!-- Navbar -->
     {% include "asosiy/navbar.html" %}
-
-    <!-- Sidebar -->
     {% include "asosiy/sidebar.html" %}
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent">
-        <div class="container-fluid py-4">
+        <div class="container-fluid py-3">
+            
             <!-- Task Header -->
-            <div class="task-header mb-4">
-                <!-- Left side - Countdown timer -->
-                <div id="countdown" class="countdown-container">
-                    <i class="fas fa-hourglass-half"></i>
-                    <span id="countdown-timer" class="countdown-timer">Hisoblanmoqda...</span>
-                </div>
-                
-                <!-- Right side - Javob yuborish button -->
-                <div class="header-buttons">
-                    <a href="{% url 'topshiriq_javob_create' target_role=topshiriq.bajaruvchi_user.role pk=topshiriq.pk %}" class="btn btn-success btn-submit">
-                        <i class="fas fa-paper-plane me-2"></i> Javob yuborish
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Task Content -->
-            <!-- Topshiriq mazmuni -->
-            <div class="content-card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">
-                        <i class="fas fa-align-left me-2"></i>
-                        Topshiriq mazmuni
-                    </h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Sarlavha</label>
-                            <div class="fw-bold fs-5 mb-3">{{ topshiriq.title }}</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Maqsad</label>
-                            <div>{{ topshiriq.body }}</div>
-                        </div>
+            <div class="task-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="task-title-wrapper flex-grow-1 me-3">
+                        <h1 class="task-title mb-0">{{ topshiriq.title }}</h1>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Meta ma'lumotlar -->
-            <div class="content-card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-4 text-center">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Topshiriq ma'lumotlari
-                    </h5>
-                    <div class="row">
-                        <!-- Yaratuvchi -->
-                        <div class="col-md-3 mb-3">
-                            <div class="meta-item h-100">
-                                <div class="meta-label mb-2">Yaratuvchi</div>
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-user-tie me-2 text-secondary"></i>
-                                    <div>
-                                        {{ topshiriq.yaratuvchi_user.get_full_name|default:"N/A" }}
-                                        <div class="small text-muted">{{ topshiriq.yaratuvchi_user.get_role_display|default:"" }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Bajaruvchi -->
-                        <div class="col-md-3 mb-3">
-                            <div class="meta-item h-100">
-                                <div class="meta-label mb-2">Bajaruvchi</div>
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-user me-2 text-primary"></i>
-                                    <div>
-                                        {{ topshiriq.bajaruvchi_user.get_full_name|default:"N/A" }}
-                                        <div class="small text-muted">{{ topshiriq.bajaruvchi_user.get_role_display|default:"" }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Status -->
-                        <div class="col-md-3 mb-3">
-                            <div class="meta-item h-100">
-                                <div class="meta-label mb-2">Status</div>
-                                <div>
-                                    <span class="badge bg-secondary">
-                                        {{ topshiriq.get_status_display }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Holat -->
-                        <div class="col-md-3 mb-3">
-                            <div class="meta-item h-100">
-                                <div class="meta-label mb-2">Holat</div>
-                                <div>
-                                    <span class="badge bg-{% if topshiriq.xolat == 'Shoshilinch' %}danger{% elif topshiriq.xolat == 'O`rta' %}warning{% else %}success{% endif %}">
-                                        {{ topshiriq.get_xolat_display }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Fayllar -->
-            <div class="content-card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">
-                        <i class="fas fa-paperclip me-2"></i>
-                        Biriktirilgan fayllar
-                    </h5>
                     
-                    {% if topshiriq.files.all %}
-                        <div class="file-grid">
-                            {% for f in topshiriq.files.all %}
-                                <div class="file-card shadow-sm">
-                                    <div class="file-preview">
-                                        {% if f.file.name|lower|slice:"-3:" == 'pdf' %}
-                                            <i class="fas fa-file-pdf text-danger"></i>
-                                        {% elif f.file.name|lower|slice:"-3:" == 'doc' or f.file.name|lower|slice:"-4:" == 'docx' %}
-                                            <i class="fas fa-file-word text-primary"></i>
-                                        {% elif f.file.name|lower|slice:"-3:" == 'xls' or f.file.name|lower|slice:"-4:" == 'xlsx' %}
-                                            <i class="fas fa-file-excel text-success"></i>
-                                        {% elif f.file.name|lower|slice:"-3:" == 'jpg' or f.file.name|lower|slice:"-4:" == 'jpeg' or f.file.name|lower|slice:"-3:" == 'png' %}
-                                            <i class="fas fa-file-image text-info"></i>
-                                        {% else %}
-                                            <i class="fas fa-file-alt text-secondary"></i>
-                                        {% endif %}
-                                    </div>
-                                    <div class="p-3">
-                                        <div class="small fw-bold mb-2 text-truncate">{{ f.file.name|slice:"15:" }}</div>
-                                        <div class="d-flex">
-                                            <a href="{{ f.file.url }}" class="btn btn-sm btn-outline-primary w-50 me-1" download>
-                                                <i class="fas fa-download"></i>
-                                            </a>
-                                            <a href="{{ f.file.url }}" class="btn btn-sm btn-outline-secondary w-50" target="_blank">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </div>
+                    <div class="countdown-wrapper flex-shrink-0">
+                        <div id="countdown-container" class="countdown-timer">
+                            <i class="fas fa-clock"></i>
+                            <span id="countdown-timer">Yuklanmoqda...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Description -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-file-text"></i>
+                        Topshiriq mazmuni
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <p style="font-size: 1.1rem; line-height: 1.7; color: #374151;">
+                        {{ topshiriq.body }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Task Information -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Topshiriq ma'lumotlari
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user-tie me-1"></i>
+                                Yaratuvchi
+                            </div>
+                            <div class="info-value">
+                                {{ topshiriq.yaratuvchi_user.get_full_name }}
+                                <span class="badge bg-primary ms-2">{{ topshiriq.yaratuvchi_user.role }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user me-1"></i>
+                                Bajaruvchi
+                            </div>
+                            <div class="info-value">
+                                {{ topshiriq.bajaruvchi_user.get_full_name }}
+                                <span class="badge bg-success ms-2">{{ topshiriq.bajaruvchi_user.role }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-flag me-1"></i>
+                                Muhimlik darajasi
+                            </div>
+                            <div class="info-value">
+                                <span class="badge priority-{% if topshiriq.xolat == 'Shoshilinch' %}high{% elif topshiriq.xolat == 'O`rta' %}medium{% else %}low{% endif %} px-3 py-2">
+                                    {% if topshiriq.xolat == 'Shoshilinch' %}
+                                        <i class="fas fa-exclamation-triangle me-1"></i> Shoshilinch
+                                    {% elif topshiriq.xolat == 'O`rta' %}
+                                        <i class="fas fa-exclamation-circle me-1"></i> O'rta
+                                    {% else %}
+                                        <i class="fas fa-info-circle me-1"></i> Oddiy
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-calendar-plus me-1"></i>
+                                Boshlanish vaqti
+                            </div>
+                            <div class="info-value">
+                                <i class="fas fa-calendar me-2 text-info"></i>
+                                {{ topshiriq.created_at|date:"d.m.Y" }}
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-calendar-check me-1"></i>
+                                Tugash muddati
+                            </div>
+                            <div class="info-value">
+                                {% if topshiriq.tugash_vaqti %}
+                                    <i class="fas fa-calendar-times me-2 text-warning"></i>
+                                    {{ topshiriq.tugash_vaqti|date:"d.m.Y" }}
+                                {% else %}
+                                    <span class="text-muted">Belgilanmagan</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
+                        {% if topshiriq.javob_yuborildi %}
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Bajarilgan vaqti
+                            </div>
+                            <div class="info-value">
+                                <i class="fas fa-check me-2 text-success"></i>
+                                {{ topshiriq.bajarilgan_vaqti|date:"d.m.Y"|default:"N/A" }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Section -->
+            {% if topshiriq.files.all %}
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-paperclip"></i>
+                        Biriktirilgan fayllar ({{ topshiriq.files.all|length }} ta)
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <div class="file-grid">
+                        {% for f in topshiriq.files.all %}
+                        <div class="file-card">
+                            <div class="file-preview">
+                                {% if f.file.name|lower|slice:"-3:" == 'pdf' %}
+                                    <i class="fas fa-file-pdf file-icon text-danger"></i>
+                                {% elif 'doc' in f.file.name|lower %}
+                                    <i class="fas fa-file-word file-icon text-primary"></i>
+                                {% elif 'xls' in f.file.name|lower %}
+                                    <i class="fas fa-file-excel file-icon text-success"></i>
+                                {% elif 'jpg' in f.file.name|lower or 'png' in f.file.name|lower or 'jpeg' in f.file.name|lower %}
+                                    <i class="fas fa-file-image file-icon text-info"></i>
+                                {% else %}
+                                    <i class="fas fa-file-alt file-icon text-secondary"></i>
+                                {% endif %}
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">{{ f.file.name }}</div>
+                                <div class="file-actions">
+                                    <a href="{{ f.file.url }}" class="file-btn btn-download" download>
+                                        <i class="fas fa-download me-1"></i> Yuklab olish
+                                    </a>
+                                    <a href="{{ f.file.url }}" class="file-btn btn-view" target="_blank">
+                                        <i class="fas fa-external-link-alt me-1"></i> Ochish
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-paperclip"></i>
+                        Biriktirilgan fayllar
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h5>Fayllar mavjud emas</h5>
+                        <p>Bu topshiriqda hech qanday fayl biriktirilmagan.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Javob Section -->
+            {% if javob %}
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-comment-dots"></i>
+                        Yuborilgan javob
+                        <span class="badge bg-success ms-2">
+                            <i class="fas fa-check-circle me-1"></i>
+                            Bajarilgan
+                        </span>
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <!-- Javob sarlavhasi -->
+                    {% if javob.title %}
+                    <div class="mb-4">
+                        <h6 class="info-label mb-2">
+                            <i class="fas fa-heading me-1"></i>
+                            Javob sarlavhasi
+                        </h6>
+                        <div class="answer-title">
+                            {{ javob.title }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Javob matni -->
+                    {% if javob.body %}
+                    <div class="mb-4">
+                        <h6 class="info-label mb-2">
+                            <i class="fas fa-comment me-1"></i>
+                            Javob matni
+                        </h6>
+                        <div class="answer-text">
+                            {{ javob.body|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Qo'shimcha izoh -->
+                    {% if javob.izoh %}
+                    <div class="mb-4">
+                        <h6 class="info-label mb-2">
+                            <i class="fas fa-sticky-note me-1"></i>
+                            Qo'shimcha izoh
+                        </h6>
+                        <div class="answer-note">
+                            {{ javob.izoh|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Javob fayllar -->
+                    {% if javob_files %}
+                    <div class="mb-4">
+                        <h6 class="info-label mb-3">
+                            <i class="fas fa-paperclip me-1"></i>
+                            Javobda yuborilgan fayllar ({{ javob_files|length }} ta)
+                        </h6>
+                        <div class="file-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                            {% for file in javob_files %}
+                            <div class="file-card">
+                                <div class="file-preview">
+                                    {% if file.file.name|lower|slice:"-3:" == 'pdf' %}
+                                        <i class="fas fa-file-pdf file-icon text-danger"></i>
+                                    {% elif 'doc' in file.file.name|lower %}
+                                        <i class="fas fa-file-word file-icon text-primary"></i>
+                                    {% elif 'xls' in file.file.name|lower %}
+                                        <i class="fas fa-file-excel file-icon text-success"></i>
+                                    {% elif 'jpg' in file.file.name|lower or 'png' in file.file.name|lower or 'jpeg' in file.file.name|lower %}
+                                        <i class="fas fa-file-image file-icon text-info"></i>
+                                    {% else %}
+                                        <i class="fas fa-file-alt file-icon text-secondary"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name">{{ file.file.name }}</div>
+                                    <div class="file-actions">
+                                        <a href="{{ file.file.url }}" class="file-btn btn-download" download>
+                                            <i class="fas fa-download me-1"></i> Yuklab olish
+                                        </a>
+                                        <a href="{{ file.file.url }}" class="file-btn btn-view" target="_blank">
+                                            <i class="fas fa-external-link-alt me-1"></i> Ochish
+                                        </a>
                                     </div>
                                 </div>
+                            </div>
                             {% endfor %}
                         </div>
-                    {% else %}
-                        <div class="alert alert-light py-3 text-center">
-                            <i class="fas fa-info-circle me-2"></i> Fayl biriktirilmagan
-                        </div>
+                    </div>
                     {% endif %}
-                </div>
-            </div>
-            
-            <!-- Javob -->
-            {% if topshiriq.javob %}
-                <div class="content-card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4">
-                            <i class="fas fa-comment-alt me-2"></i>
-                            Yuborilgan javob
-                        </h5>
-                        
-                        <div class="answer-box">
-                            <p class="mb-3">{{ topshiriq.javob }}</p>
-                            
-                            {% if topshiriq.javob_fayl %}
-                                <div class="file-card shadow-sm mt-3" style="max-width: 240px;">
-                                    <div class="file-preview" style="height: 80px;">
-                                        <i class="fas fa-file-alt text-primary"></i>
+
+                    <!-- Javob meta ma'lumotlari -->
+                    <div class="answer-meta">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-user me-1"></i>
+                                        Javob beruvchi
                                     </div>
-                                    <div class="p-3">
-                                        <div class="small fw-bold mb-2">Javob fayli</div>
-                                        <div class="d-flex">
-                                            <a href="{{ topshiriq.javob_fayl.url }}" class="btn btn-sm btn-outline-primary w-50 me-1" download>
-                                                <i class="fas fa-download"></i>
-                                            </a>
-                                            <a href="{{ topshiriq.javob_fayl.url }}" class="btn btn-sm btn-outline-secondary w-50" target="_blank">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </div>
+                                    <div class="info-value">
+                                        {{ javob.bajaruvchi_user.get_full_name }}
+                                        <span class="badge bg-success ms-2">{{ javob.bajaruvchi_user.role }}</span>
                                     </div>
                                 </div>
-                            {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-calendar-check me-1"></i>
+                                        Yuborilgan vaqt
+                                    </div>
+                                    <div class="info-value">
+                                        <i class="fas fa-clock me-2 text-success"></i>
+                                        {{ javob.created_at|date:"d.m.Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <span class="badge priority-low px-4 py-2" style="font-size: 0.8rem;">
+                                <i class="fas fa-check-double me-2"></i>
+                                Javob muvaffaqiyatli yuborildi
+                            </span>
                         </div>
                     </div>
                 </div>
+            </div>
+            {% elif topshiriq.javob_yuborildi %}
+            <!-- Javob yuborilgan lekin ma'lumotlar topilmagan holat -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-comment-dots"></i>
+                        Javob holati
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <div class="alert alert-success text-center">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <h6>Javob yuborilgan</h6>
+                        <p class="mb-0">Bu topshiriqqa javob yuborilgan, lekin tafsilotlar mavjud emas.</p>
+                        {% if topshiriq.bajarilgan_vaqti %}
+                        <small class="text-muted mt-2 d-block">
+                            Bajarilgan: {{ topshiriq.bajarilgan_vaqti|date:"d.m.Y" }}
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
             {% endif %}
+
         </div>
+
+        <!-- Back Button -->
+        <a href="{% url 'topshiriq_bajaruvchi_list' topshiriq.bajaruvchi_user.role %}" class="back-btn" title="Orqaga">
+            <i class="fas fa-arrow-left"></i>
+        </a>
     </main>
 
-    <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- Sidebar toggle script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('mainContent');
-                const toggleSidebarBtn = document.querySelector('.toggle-sidebar');
-                
-                if (toggleSidebarBtn && sidebar && mainContent) {
-                    // Function to toggle sidebar
-                    function toggleSidebar() {
-                        if (window.innerWidth <= 768) {
-                            // On mobile, just show/hide the sidebar
-                            sidebar.classList.toggle('sidebar-visible');
-                        } else {
-                            // On desktop, collapse/expand the sidebar
-                            sidebar.classList.toggle('sidebar-collapsed');
-                            mainContent.classList.toggle('expanded');
-                        }
-                    }
-                    
-                    // Add click event listener to the toggle button
-                    toggleSidebarBtn.addEventListener('click', toggleSidebar);
-                    
-                    // Initialize the sidebar state
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('sidebar-visible');
-                    }
-                    
-                    // Add resize event handler
-                    window.addEventListener('resize', function() {
-                        if (window.innerWidth <= 768) {
-                            sidebar.classList.remove('sidebar-collapsed');
-                            mainContent.classList.remove('expanded');
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error("Sidebar toggle error:", error);
-            }
-        });
-    </script>
 
-    <!-- Countdown timer script -->
+    <!-- Countdown Timer Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            try {
-                // Topshiriq tugash vaqti (server vaqtidan olish)
-                const tugashVaqtiStr = "{{ topshiriq.tugash_vaqti|date:'Y-m-d' }}";
-                const boshlanishVaqtiStr = "{{ topshiriq.created_at|date:'Y-m-d' }}";
-                
-                // Sanani satrga o'zgartirish, lekin vaqtni qo'shishimiz kerak
-                const tugashVaqti = new Date(tugashVaqtiStr + "T23:59:59");
-                const boshlanishVaqti = new Date(boshlanishVaqtiStr + "T00:00:00");
-                
-                const countdownElement = document.getElementById('countdown-timer');
-                const countdownContainer = document.getElementById('countdown');
-                
-                function updateCountdown() {
-                    const hozirgiVaqt = new Date();
-                    
-                    // Agar tugash vaqti o'tib ketgan bo'lsa
-                    if (hozirgiVaqt > tugashVaqti) {
-                        countdownElement.textContent = "Muddat tugagan!";
-                        countdownContainer.classList.add('countdown-expired');
-                        return;
-                    }
-                    
-                    // Qolgan vaqtni hisoblash
-                    const qolganVaqtMs = tugashVaqti - hozirgiVaqt;
-                    
-                    const qolganKunlar = Math.floor(qolganVaqtMs / (1000 * 60 * 60 * 24));
-                    const qolganSoatlar = Math.floor((qolganVaqtMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const qolganDaqiqalar = Math.floor((qolganVaqtMs % (1000 * 60 * 60)) / (1000 * 60));
-                    const qolganSoniyalar = Math.floor((qolganVaqtMs % (1000 * 60)) / 1000);
-                    
-                    // Formatlash
-                    const formatVaqt = (n) => n < 10 ? '0' + n : n;
-                    
-                    // Ko'rinishni yangilash
-                    if (qolganKunlar > 0) {
-                        countdownElement.textContent = `${qolganKunlar} kun, ${formatVaqt(qolganSoatlar)}:${formatVaqt(qolganDaqiqalar)}:${formatVaqt(qolganSoniyalar)}`;
-                    } else {
-                        countdownElement.textContent = `${formatVaqt(qolganSoatlar)}:${formatVaqt(qolganDaqiqalar)}:${formatVaqt(qolganSoniyalar)}`;
-                    }
-                    
-                    // Agar kam vaqt qolgan bo'lsa, ogohlantirish rangini qo'shish
-                    if (qolganVaqtMs < 86400000) { // 24 soatdan kam
-                        countdownContainer.style.backgroundColor = 'rgba(239, 68, 68, 0.6)';
-                    } else if (qolganVaqtMs < 259200000) { // 3 kundan kam
-                        countdownContainer.style.backgroundColor = 'rgba(245, 158, 11, 0.6)';
-                    }
-                }
-                
-                // Dastlabki yangilash
-                updateCountdown();
-                
-                // Har sekundda yangilanib turadi
-                setInterval(updateCountdown, 1000);
-            } catch (error) {
-                console.error("Countdown xatolik:", error);
-                document.getElementById('countdown').style.display = 'none';
+            const tugashVaqtiStr = "{{ topshiriq.tugash_vaqti|date:'Y-m-d' }}";
+            
+            if (!tugashVaqtiStr || tugashVaqtiStr === "None") {
+                document.getElementById('countdown-container').innerHTML = '<i class="fas fa-infinity"></i> Cheksiz';
+                return;
             }
+
+            const tugashVaqti = new Date(tugashVaqtiStr + "T23:59:59");
+            const timerElement = document.getElementById('countdown-timer');
+            const containerElement = document.getElementById('countdown-container');
+
+            function updateCountdown() {
+                const hozir = new Date();
+                const qolganMs = tugashVaqti - hozir;
+
+                if (qolganMs <= 0) {
+                    timerElement.textContent = "Muddat tugagan!";
+                    containerElement.classList.add('danger');
+                    return;
+                }
+
+                const qolganKun = Math.floor(qolganMs / (1000 * 60 * 60 * 24));
+                const qolganSoat = Math.floor((qolganMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const qolganDaqiqa = Math.floor((qolganMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                if (qolganKun > 0) {
+                    timerElement.textContent = `${qolganKun} kun ${qolganSoat} soat`;
+                } else {
+                    timerElement.textContent = `${qolganSoat}:${qolganDaqiqa.toString().padStart(2, '0')}`;
+                }
+
+                // Warning colors
+                if (qolganMs < 86400000) { // 1 kun
+                    containerElement.classList.add('danger');
+                } else if (qolganMs < 259200000) { // 3 kun
+                    containerElement.classList.add('warning');
+                }
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 60000); // Har daqiqada yangilanadi
         });
     </script>
 </body>
-
 </html>

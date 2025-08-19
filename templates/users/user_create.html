@@ -267,7 +267,39 @@
                 $(this).addClass('active');
             });
 
-            // Parol ko‘rsatish/berkitish
+            // Parol validatsiyasi
+            function validatePasswords() {
+                const password1 = $('#id_password1').val();
+                const password2 = $('#id_password2').val();
+                const $password2Input = $('#id_password2');
+                
+                if (password1 && password2) {
+                    if (password1 !== password2) {
+                        $password2Input.addClass('is-invalid');
+                        $password2Input.removeClass('is-valid');
+                        
+                        let errorDiv = $password2Input.closest('.input-group').siblings('.invalid-feedback');
+                        if (errorDiv.length === 0) {
+                            errorDiv = $('<div class="invalid-feedback"></div>');
+                            $password2Input.closest('.input-group').after(errorDiv);
+                        }
+                        errorDiv.text('Parollar mos kelmaydi');
+                        return false;
+                    } else {
+                        $password2Input.removeClass('is-invalid');
+                        $password2Input.addClass('is-valid');
+                        return true;
+                    }
+                }
+                return true;
+            }
+
+            // Parol maydonlariga validatsiya qo'shish
+            $('#id_password1, #id_password2').on('input blur', function() {
+                validatePasswords();
+            });
+
+            // Parol ko'rsatish/berkitish
             $('.toggle-password').click(function () {
                 let input = $(this).siblings('input');
                 let icon = $(this).find('i');
@@ -278,6 +310,15 @@
                     input.attr('type', 'password');
                     icon.removeClass('fa-eye-slash').addClass('fa-eye');
                 }
+            });
+
+            // Form yuborishda validatsiya
+            $('form').on('submit', function(e) {
+                if (!validatePasswords()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                $(this).addClass('was-validated');
             });
         });
     </script>

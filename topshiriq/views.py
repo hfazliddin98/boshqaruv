@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from .models import Topshiriq, TopshiriqFile, TopshiriqReport, TopshiriqJavob
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, TopshiriqReport
 from .forms import TopshiriqForm, TopshiriqJavobForm
-from topshiriq.choices import RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP
+from topshiriq.choices import ALLOWED_TOPSHIRIQ_VIEW_MAP, RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP, ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP
 from users.choices import ALLOWED_USER_MAP
 
 # Try to import xlwt, use alternative if not available
@@ -22,12 +23,28 @@ def topshiriq_list(request, target_role):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
-    allowed_roles = ALLOWED_TOPSHIRIQ_MAP.get(request.user.role, [])
-    if target_role not in allowed_roles:
-        return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchiga topshiriqlarini ko'ra olmaysiz.")
-
-    # Faqat target_role roldagi bajaruvchilarga berilgan topshiriqlarni ko'rsatish
-    topshiriq_data = Topshiriq.objects.select_related('bajaruvchi_user').filter(bajaruvchi_user__role=target_role)
+    # ALLOWED_TOPSHIRIQ_VIEW_MAP orqali ruxsat tekshirish
+    allowed_view_roles = ALLOWED_TOPSHIRIQ_VIEW_MAP.get(request.user.role, [])
+   
+    # Agar foydalanuvchi o'z topshiriqlarini ko'rmoqchi bo'lsa (bajaruvchi sifatida)
+    if request.user.role == target_role:
+        # Bajaruvchi o'ziga berilgan topshiriqlarni ko'ra oladi
+        topshiriq_data = Topshiriq.objects.select_related('bajaruvchi_user').filter(
+            bajaruvchi_user=request.user,
+            javob_yuborildi=False
+        ).order_by('-created_at')
+    elif target_role in [role.value for role in allowed_view_roles]:
+        # Ruxsat bor bo'lsa, target_role roldagi bajaruvchilarga berilgan topshiriqlarni ko'rsatish
+        topshiriq_data = Topshiriq.objects.select_related('bajaruvchi_user').filter(
+            bajaruvchi_user__role=target_role,
+            javob_yuborildi=False
+        ).order_by('-created_at')
+        
+        # Agar foydalanuvchi Admin yoki Rektor bo'lmasa, faqat o'zi yaratgan topshiriqlarni ko'radi
+        if request.user.role not in ['Admin', 'Rektor']:
+            topshiriq_data = topshiriq_data.filter(yaratuvchi_user=request.user)
+    else:
+        return HttpResponseForbidden(f"Siz {target_role} rolidagi foydalanuvchilar topshiriqlarini ko'ra olmaysiz.")
 
     context = {
         'topshiriq_data': topshiriq_data,
@@ -166,9 +183,22 @@ def topshiriq_javob_create(request, target_role, pk):
     
     topshiriq = get_object_or_404(Topshiriq, pk=pk)
     
-    # Ruxsat tekshirish - faqat bajaruvchi javob bera oladi
+    # ALLOWED_TOPSHIRIQ_JAVOB_MAP bo'yicha ruxsat tekshirish
+    allowed_receivers = ALLOWED_TOPSHIRIQ_JAVOB_MAP.get(request.user.role, [])
+    
+    # Foydalanuvchi topshiriq yaratuvchisiga javob bera oladimi tekshirish
+    if topshiriq.yaratuvchi_user.role not in allowed_receivers:
+        return HttpResponseForbidden(f"Siz {topshiriq.yaratuvchi_user.role} rolidagi foydalanuvchi topshiriqlariga javob bera olmaysiz.")
+    
+    # Topshiriq bajaruvchisi ekanligini tekshirish
     if request.user != topshiriq.bajaruvchi_user:
         return HttpResponseForbidden("Siz ushbu topshiriqqa javob bera olmaysiz.")
+    
+    # Javob allaqachon yuborilgan bo'lsa
+    existing_javob = TopshiriqJavob.objects.filter(topshiriq=topshiriq, bajaruvchi_user=request.user).first()
+    if existing_javob:
+        messages.warning(request, "Siz bu topshiriqqa allaqachon javob yuborib bo'lgansiz.")
+        return redirect('topshiriq_bajaruvchi_list', target_role=target_role)
     
     if request.method == 'POST':
         form = TopshiriqJavobForm(request.POST, request.FILES)
@@ -178,26 +208,14 @@ def topshiriq_javob_create(request, target_role, pk):
             javob.bajaruvchi_user = request.user
             javob.save()
             
-            # Topshiriq holatini yangilash
-            topshiriq.javob_yuborildi = True
-            topshiriq.status = 'YUBORILDI'
-            topshiriq.save()
+            # Fayllarni saqlash (agar yuklangan bo'lsa)
+            for f in request.FILES.getlist('files'):
+                TopshiriqJavobFile.objects.create(javob=javob, file=f)
             
-            # Avtomatik hisobot yaratish (agar TopshiriqReport jadval mavjud bo'lsa)
-            try:
-                TopshiriqReport.objects.create(
-                    topshiriq=topshiriq,
-                    yaratuvchi=topshiriq.yaratuvchi_user,
-                    bajaruvchi=request.user,
-                    javob=javob.javob_matni,
-                    status='completed',
-                    completed_at=timezone.now()
-                )
-            except Exception as e:
-                messages.warning(request, "Hisobot yaratishda xatolik yuz berdi, lekin javob muvaffaqiyatli yuborildi.")
+            # Signal avtomatik ravishda topshiriq va hisobot holatini yangilaydi
+            messages.success(request, "Javob muvaffaqiyatli yuborildi va hisobot yaratildi!")
             
-            messages.success(request, "Javob muvaffaqiyatli yuborildi!")
-            return redirect('topshiriq_list', target_role=target_role)
+            return redirect('topshiriq_bajaruvchi_list', target_role=target_role)
     else:
         form = TopshiriqJavobForm()
 
@@ -210,15 +228,71 @@ def topshiriq_javob_create(request, target_role, pk):
     return render(request, 'topshiriq/topshiriq_javob_create.html', context)
 
 
+def topshiriq_bajaruvchi_list(request, target_role):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    # Foydalanuvchiga biriktirilgan topshiriqlar
+    topshiriq_data = Topshiriq.objects.filter(bajaruvchi_user=request.user).select_related('yaratuvchi_user').order_by('-created_at')
+
+    # Pagination
+    paginator = Paginator(topshiriq_data, 10)  # Her sahifada 10 ta
+    page = request.GET.get('page')
+    
+    try:
+        topshiriq_data = paginator.page(page)
+    except PageNotAnInteger:
+        topshiriq_data = paginator.page(1)
+    except EmptyPage:
+        topshiriq_data = paginator.page(paginator.num_pages)
+
+    context = {
+        'topshiriq_data': topshiriq_data,
+        'target_role': target_role,
+        'RoleChoice': RoleChoice,
+    }
+    return render(request, 'topshiriq/topshiriq_bajaruvchi_list.html', context)
+
+
 def topshiriq_javob_list(request, target_role):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
-    # Foydalanuvchiga biriktirilgan va hali javob yuborilmagan topshiriqlar
-    topshiriq_data = Topshiriq.objects.filter(bajaruvchi_user=request.user, javob_yuborildi=False).select_related('yaratuvchi_user')
-    
-    # Har bir topshiriq uchun javoblarni olish
-    javoblar = TopshiriqJavob.objects.filter(topshiriq__in=topshiriq_data, bajaruvchi_user=request.user).select_related('bajaruvchi_user', 'topshiriq').order_by('-created_at')
+    # Agar foydalanuvchi o'z javoblarini ko'rmoqchi bo'lsa (bajaruvchi sifatida)
+    if request.user.role == target_role:
+        # Bajaruvchi o'ziga berilgan va javob yuborgan topshiriqlarni ko'ra oladi
+        topshiriq_data = Topshiriq.objects.select_related('bajaruvchi_user', 'yaratuvchi_user').filter(
+            bajaruvchi_user=request.user,
+            javob_yuborildi=False
+        )
+        
+        javoblar = topshiriq_data
+        
+    else:
+        # ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP bo'yicha ruxsat tekshirish
+        allowed_view_roles = ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP.get(request.user.role, [])
+
+
+        # Agar target_role ko'rish ruxsati bo'lmasa
+        if target_role not in [role.value for role in allowed_view_roles]:
+            print(f"Ruxsat yo'q: {target_role} not in {[role.value for role in allowed_view_roles]}")
+            return HttpResponseForbidden(f"Siz {target_role} rolidagi foydalanuvchilar javoblarini ko'ra olmaysiz.")
+        
+        
+        # Target_role roldagi foydalanuvchilarning javob yuborgan topshiriqlarini olish
+        topshiriq_data = Topshiriq.objects.select_related('bajaruvchi_user', 'yaratuvchi_user').filter(
+            bajaruvchi_user__role=target_role,
+            javob_yuborildi=False
+        )
+        
+        # Javoblar ham topshiriqlarning o'zidan olinadi
+        javoblar = topshiriq_data
+        
+        
+        # Agar foydalanuvchi Admin yoki Rektor bo'lmasa, faqat o'zi yaratgan topshiriqlar javoblarini ko'radi
+        if request.user.role not in ['Admin', 'Rektor']:
+            javoblar = javoblar.filter(yaratuvchi_user=request.user)
+            topshiriq_data = topshiriq_data.filter(yaratuvchi_user=request.user)
     
     context = {
         'topshiriq_data': topshiriq_data,
@@ -246,9 +320,25 @@ def topshiriq_javob_yuborish_list(request):
 def topshiriq_detail(request, target_role, pk):
     if not request.user.is_authenticated:
         return redirect('kirish')
+    
     topshiriq = get_object_or_404(Topshiriq, pk=pk)
+    
+    # Javob ma'lumotlarini olish
+    javob = None
+    javob_files = []
+    if topshiriq.javob_yuborildi:
+        try:
+            javob = TopshiriqJavob.objects.filter(topshiriq=topshiriq).first()
+            if javob:
+                javob_files = javob.files.all()
+        except TopshiriqJavob.DoesNotExist:
+            javob = None
+    
     context = {
         'topshiriq': topshiriq,
+        'javob': javob,
+        'javob_files': javob_files,
+        'target_role': target_role,
         'RoleChoice': RoleChoice,
     }
     return render(request, 'topshiriq/topshiriq_detail.html', context)
@@ -256,67 +346,115 @@ def topshiriq_detail(request, target_role, pk):
 
 @login_required
 def hisobot_list(request):
-    """Foydalanuvchi roliga qarab hisobotlar ro'yxati"""
+    """Javob yuborilgan topshiriqlarni ko'rish va baholash"""
     user = request.user
     
     try:
-        # Get sort and filter parameters
+        # Status filter
         status_filter = request.GET.get('status', None)
         
-        # User roliga qarab ruxsat etilgan hisobotlarni olish
+        # Javob yuborilgan topshiriqlarni olish
         if user.role == 'Rektor':
-            # Rektor barcha hisobotlarni ko'ra oladi
-            all_reports = TopshiriqReport.objects.select_related(
-                'topshiriq', 'bajaruvchi', 'yaratuvchi', 'topshiriq__bajaruvchi_user', 'topshiriq__yaratuvchi_user'
-            ).all()
+            # Rektor barcha javob yuborilgan topshiriqlarni ko'ra oladi
+            all_topshiriqlar = Topshiriq.objects.select_related(
+                'bajaruvchi_user', 'yaratuvchi_user'
+            ).filter(javob_yuborildi=True)
         else:
-            # Boshqa rollar faqat o'zlari yaratgan yoki o'zlariga tegishli hisobotlarni ko'radi
+            # Boshqa rollar faqat o'zlari yaratgan yoki tegishli topshiriqlar javoblarini ko'radi
             allowed_roles = ALLOWED_USER_MAP.get(user.role, [])
             target_roles = [role.value for role in allowed_roles]
             
-            all_reports = TopshiriqReport.objects.select_related(
-                'topshiriq', 'bajaruvchi', 'yaratuvchi', 'topshiriq__bajaruvchi_user', 'topshiriq__yaratuvchi_user'
+            all_topshiriqlar = Topshiriq.objects.select_related(
+                'bajaruvchi_user', 'yaratuvchi_user'
             ).filter(
-                Q(topshiriq__yaratuvchi_user=user) |  # O'zi yaratgan topshiriqlarning hisobotlari
-                Q(bajaruvchi=user) |  # O'zi bajargan topshiriqlarning hisobotlari
-                Q(topshiriq__bajaruvchi_user__role__in=target_roles)  # O'z qo'l ostidagi rollarning hisobotlari
+                javob_yuborildi=True
+            ).filter(
+                Q(yaratuvchi_user=user) |  # O'zi yaratgan topshiriqlar
+                Q(bajaruvchi_user=user) |  # O'zi bajargan topshiriqlar
+                Q(bajaruvchi_user__role__in=target_roles)  # O'z qo'l ostidagi rollar
             )
         
-        # Apply status filter
+        # Status filter - topshiriq status bo'yicha
         if status_filter:
-            all_reports = all_reports.filter(status=status_filter)
+            if status_filter == 'completed':
+                all_topshiriqlar = all_topshiriqlar.filter(status='YUBORILDI')
+            elif status_filter == 'approved':
+                all_topshiriqlar = all_topshiriqlar.filter(status='QABUL_QILINDI')
+            elif status_filter == 'rejected':
+                all_topshiriqlar = all_topshiriqlar.filter(status='QAYTARILDI')
         
-        # Sort by date
-        all_reports = all_reports.order_by('-completed_at')
+        # Yangi javoblar birinchi
+        all_topshiriqlar = all_topshiriqlar.order_by('-bajarilgan_vaqti')
         
-        # Calculate stats
+        # Statistika
         stats = {
-            'total_tasks': all_reports.count(),
-            'pending_tasks': all_reports.filter(status='completed').count(),
-            'completed_tasks': all_reports.filter(status='approved').count(),
-            'overdue_tasks': all_reports.filter(status='rejected').count(),
+            'total_reports': all_topshiriqlar.count(),
+            'pending_reports': all_topshiriqlar.filter(status='YUBORILDI').count(),
+            'approved_reports': all_topshiriqlar.filter(status='QABUL_QILINDI').count(),
+            'rejected_reports': all_topshiriqlar.filter(status='QAYTARILDI').count(),
         }
         
         # Role display name
         user_role_display = dict(RoleChoice.choices).get(user.role, user.role)
         
+        # Har bir topshiriq uchun javob ma'lumotlarini qo'shish
+        topshiriq_list = []
+        for topshiriq in all_topshiriqlar:
+            # Javob ma'lumotlarini olish
+            try:
+                javob = TopshiriqJavob.objects.filter(topshiriq=topshiriq).first()
+                if javob:
+                    topshiriq.javob = javob
+                    # Report ma'lumotlarini qo'shish
+                    try:
+                        report = TopshiriqReport.objects.get(topshiriq=topshiriq)
+                        topshiriq.report = report
+                    except TopshiriqReport.DoesNotExist:
+                        # Default report yaratish
+                        report = type('obj', (object,), {
+                            'status': 'completed' if topshiriq.status == 'YUBORILDI' else 'approved' if topshiriq.status == 'QABUL_QILINDI' else 'rejected',
+                            'rating': None,
+                            'id': None
+                        })
+                        topshiriq.report = report
+                else:
+                    topshiriq.javob = None
+                    topshiriq.report = None
+            except Exception:
+                topshiriq.javob = None
+                topshiriq.report = None
+            
+            topshiriq_list.append(topshiriq)
+        
+        # Pagination
+        paginator = Paginator(topshiriq_list, 15)
+        page = request.GET.get('page')
+        
+        try:
+            reports = paginator.page(page)
+        except PageNotAnInteger:
+            reports = paginator.page(1)
+        except EmptyPage:
+            reports = paginator.page(paginator.num_pages)
+        
     except Exception as e:
-        # Agar jadval mavjud bo'lmasa, bo'sh ma'lumotlar bilan sahifa ko'rsatish
-        messages.error(request, f"Ma'lumotlar bazasida xatolik: {str(e)}. Iltimos, migratsiyalarni ishga tushiring.")
-        all_reports = []
+        messages.error(request, f"Ma'lumotlar bazasida xatolik: {str(e)}")
+        reports = []
         stats = {
-            'total_tasks': 0,
-            'pending_tasks': 0,
-            'completed_tasks': 0,
-            'overdue_tasks': 0,
+            'total_reports': 0,
+            'pending_reports': 0,
+            'approved_reports': 0,
+            'rejected_reports': 0,
         }
         user_role_display = user.role
     
     context = {
-        'reports': all_reports,
+        'reports': reports,  # Topshiriq obyektlari javob va report ma'lumotlari bilan
         'stats': stats,
         'user_role_display': user_role_display,
         'RoleChoice': RoleChoice,
+        'current_status': status_filter,
+        'can_evaluate': True,
     }
     
     return render(request, 'topshiriq/hisobot_list.html', context)
@@ -341,59 +479,67 @@ def hisobot_detail(request, report_id):
 
 @login_required
 def approve_report(request, report_id):
-    """Approve a submitted report"""
+    """Javobni tasdiqlash"""
     report = get_object_or_404(TopshiriqReport, id=report_id)
     
-    # Only the task creator can approve
+    # Faqat topshiriq yaratuvchisi tasdiqlashi mumkin
     if request.user != report.topshiriq.yaratuvchi_user:
-        messages.error(request, "Sizda ushbu hisobotni tasdiqlash uchun ruxsat yo'q")
+        messages.error(request, "Sizda ushbu javobni tasdiqlash uchun ruxsat yo'q")
         return redirect('hisobot_detail', report_id=report_id)
     
     if request.method == 'POST':
         comment = request.POST.get('comment', '')
+        rating = request.POST.get('rating', None)
+        
         report.status = 'approved'
         report.approved_at = timezone.now()
+        report.tasdiqlovchi = request.user
         report.comment = comment
+        
+        if rating and rating.isdigit():
+            report.rating = int(rating)
+        
         report.save()
         
-        # Update task status
+        # Topshiriq holatini yangilash
         report.topshiriq.status = 'QABUL_QILINDI'
         report.topshiriq.save()
         
-        messages.success(request, "Hisobot muvaffaqiyatli tasdiqlandi!")
+        messages.success(request, f"Javob muvaffaqiyatli tasdiqlandi! Baho: {report.rating or 'Berilmagan'}")
     
-    target_role = report.topshiriq.bajaruvchi_user.role
-    return redirect('hisobot_list', target_role=target_role)
+    return redirect('hisobot_list')
 
 
 @login_required
 def reject_report(request, report_id):
-    """Reject a submitted report"""
+    """Javobni rad etish"""
     report = get_object_or_404(TopshiriqReport, id=report_id)
     
-    # Only the task creator can reject
+    # Faqat topshiriq yaratuvchisi rad etishi mumkin
     if request.user != report.topshiriq.yaratuvchi_user:
-        messages.error(request, "Sizda ushbu hisobotni rad etish uchun ruxsat yo'q")
+        messages.error(request, "Sizda ushbu javobni rad etish uchun ruxsat yo'q")
         return redirect('hisobot_detail', report_id=report_id)
     
     if request.method == 'POST':
         comment = request.POST.get('comment', '')
         if not comment.strip():
             messages.error(request, "Rad etish sababi majburiy!")
-            return redirect('hisobot_list', target_role=report.bajaruvchi.role)
+            return redirect('hisobot_list')
             
         report.status = 'rejected'
         report.rejected_at = timezone.now()
+        report.tasdiqlovchi = request.user
         report.comment = comment
         report.save()
         
-        # Update task status
+        # Topshiriq holatini yangilash
         report.topshiriq.status = 'QAYTARILDI'
+        report.topshiriq.javob_yuborildi = False  # Javobni qayta yuborish imkoni
         report.topshiriq.save()
         
-        messages.success(request, "Hisobot rad etildi")
+        messages.success(request, "Javob rad etildi va qayta ishlash uchun yuborildi")
         
-    return redirect('hisobot_list', target_role=report.bajaruvchi.role)
+    return redirect('hisobot_list')
 
 
 @login_required
@@ -529,7 +675,7 @@ def export_all_reports(request):
                 report.yaratuvchi.get_full_name(),
                 report.bajaruvchi.get_full_name(),
                 report.topshiriq.created_at.strftime('%Y-%m-%d'),
-                report.completed_at.strftime('%Y-%m-%d'),
+                report.completed_at.strftime('%Y-%m-%d') if report.completed_at else 'N/A',
                 report.get_status_display()
             ]
             
@@ -545,7 +691,52 @@ def export_all_reports(request):
         
     except Exception as e:
         # Agar jadval mavjud bo'lmasa yoki boshqa xatolik bo'lsa
-        messages.error(request, "Export qilishda xatolik yuz berdi. Iltimos, admin bilan bog'laning.")
+        messages.error(request, f"Export qilishda xatolik yuz berdi: {str(e)}. Iltimos, admin bilan bog'laning.")
         return redirect('hisobot_list')
 
 
+@login_required
+def get_javob_report_id(request, javob_id):
+    """Javob ID'dan Report ID'ni qaytarish"""
+    try:
+        javob = get_object_or_404(TopshiriqJavob, id=javob_id)
+        report = TopshiriqReport.objects.get(javob=javob)
+        return JsonResponse({'report_id': report.id})
+    except TopshiriqReport.DoesNotExist:
+        # Report yo'q bo'lsa yaratish
+        report = TopshiriqReport.objects.create(
+            javob=javob,
+            topshiriq=javob.topshiriq,
+            yaratuvchi=javob.topshiriq.yaratuvchi_user,
+            bajaruvchi=javob.bajaruvchi_user,
+            status='completed',
+            completed_at=javob.created_at
+        )
+        return JsonResponse({'report_id': report.id})
+            
+
+        
+    except Exception as e:
+        # Agar jadval mavjud bo'lmasa yoki boshqa xatolik bo'lsa
+        messages.error(request, f"Export qilishda xatolik yuz berdi: {str(e)}. Iltimos, admin bilan bog'laning.")
+        return redirect('hisobot_list')
+
+
+@login_required
+def get_javob_report_id(request, javob_id):
+    """Javob ID'dan Report ID'ni qaytarish"""
+    try:
+        javob = get_object_or_404(TopshiriqJavob, id=javob_id)
+        report = TopshiriqReport.objects.get(javob=javob)
+        return JsonResponse({'report_id': report.id})
+    except TopshiriqReport.DoesNotExist:
+        # Report yo'q bo'lsa yaratish
+        report = TopshiriqReport.objects.create(
+            javob=javob,
+            topshiriq=javob.topshiriq,
+            yaratuvchi=javob.topshiriq.yaratuvchi_user,
+            bajaruvchi=javob.bajaruvchi_user,
+            status='completed',
+            completed_at=javob.created_at
+        )
+        return JsonResponse({'report_id': report.id})

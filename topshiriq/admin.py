@@ -43,62 +43,27 @@ class TopshiriqJavobFileAdmin(admin.ModelAdmin):
 
 @admin.register(TopshiriqReport)
 class TopshiriqReportAdmin(admin.ModelAdmin):
-    list_display = [
-        'id', 
-        'title', 
-        'topshiriq', 
-        'bajaruvchi', 
-        'yaratuvchi', 
-        'status', 
-        'priority',
-        'completed_at',
-        'is_archived'
-    ]
-    list_filter = [
-        'status', 
-        'priority', 
-        'completed_at', 
-        'is_archived',
-        'created_at'
-    ]
-    search_fields = [
-        'title', 
-        'topshiriq__title', 
-        'bajaruvchi__first_name', 
-        'bajaruvchi__last_name',
-        'yaratuvchi__first_name', 
-        'yaratuvchi__last_name'
-    ]
-    readonly_fields = [
-        'created_at', 
-        'updated_at',
-        'view_count'
-    ]
+    list_display = ('topshiriq', 'title', 'status', 'priority', 'yaratuvchi', 'bajaruvchi', 'created_at')
+    list_filter = ('status', 'priority', 'is_archived', 'created_at')
+    search_fields = ('title', 'topshiriq__title', 'yaratuvchi__first_name', 'yaratuvchi__last_name', 'bajaruvchi__first_name', 'bajaruvchi__last_name')
+    date_hierarchy = 'created_at'
+    readonly_fields = ('view_count', 'full_report')
+    
     fieldsets = (
-        ('Asosiy Ma\'lumotlar', {
+        ('Asosiy ma\'lumotlar', {
             'fields': ('topshiriq', 'javob', 'title', 'summary')
         }),
         ('Foydalanuvchilar', {
             'fields': ('yaratuvchi', 'bajaruvchi', 'tasdiqlovchi')
         }),
-        ('Holat va Boshqarish', {
-            'fields': ('status', 'priority', 'deadline', 'rating')
+        ('Holat va boshqarish', {
+            'fields': ('status', 'priority', 'rating', 'comment')
         }),
-        ('Vaqt Ma\'lumotlari', {
-            'fields': ('completed_at', 'approved_at', 'rejected_at', 'created_at', 'updated_at')
+        ('Vaqt ma\'lumotlari', {
+            'fields': ('deadline', 'completed_at', 'approved_at', 'rejected_at')
         }),
         ('Qo\'shimcha', {
-            'fields': ('comment', 'is_archived', 'view_count'),
+            'fields': ('view_count', 'is_archived', 'full_report'),
             'classes': ('collapse',)
         })
     )
-    ordering = ['-created_at']
-    date_hierarchy = 'completed_at'
-    
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related(
-            'topshiriq', 
-            'yaratuvchi', 
-            'bajaruvchi', 
-            'tasdiqlovchi'
-        )

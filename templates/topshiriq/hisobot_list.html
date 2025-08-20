@@ -1,15 +1,17 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="uz">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hisobotlar - QO'QON DAVLAT UNIVERSITETI</title>
+    
+    <!-- CSS Files -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
-    <link href="{% static 'asosiy/topshiriq/main.css' %}" rel="stylesheet">
+    <link href="{% static 'asosiy/users/main.css' %}" rel="stylesheet">
+    <link href="{% static 'asosiy/topshiriq/hisobot_list.css' %}" rel="stylesheet">
 </head>
 
 <body>
@@ -359,89 +361,38 @@
     </div>
 </div>
 
-<script>
-function approveTopshiriq(topshiriqId) {
-    // Topshiriq uchun report topish va tasdiqlash
-    $.post('/topshiriq/topshiriq/' + topshiriqId + '/approve/', {
-        'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
-    }).done(function(data) {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Xatolik yuz berdi: ' + data.message);
-        }
-    }).fail(function() {
-        // Modal orqali tasdiqlash
-        $('#approveForm').attr('action', '/topshiriq/topshiriq/' + topshiriqId + '/approve/');
-        $('#approveModal').modal('show');
-    });
-}
+    </div>
+</div>
 
-function rejectTopshiriq(topshiriqId) {
-    // Modal orqali rad etish
-    $('#rejectForm').attr('action', '/topshiriq/topshiriq/' + topshiriqId + '/reject/');
-    $('#rejectModal').modal('show');
-}
-
-// Page loading animation
-$(document).ready(function() {
-    // Table row hover effect
-    $('.table tbody tr').hover(function() {
-        $(this).addClass('table-hover-highlight');
-    }, function() {
-        $(this).removeClass('table-hover-highlight');
-    });
-});
-</script>
-
-<style>
-.user-avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.rating-stars {
-    white-space: nowrap;
-}
-
-.table-hover-highlight {
-    background-color: rgba(0, 123, 255, 0.1) !important;
-    transition: background-color 0.2s ease;
-}
-
-.badge-sm {
-    font-size: 0.75rem;
-    padding: 0.25em 0.5em;
-}
-
-.btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-.border-left-primary {
-    border-left: 4px solid #007bff !important;
-}
-
-.border-left-warning {
-    border-left: 4px solid #ffc107 !important;
-}
-
-.border-left-success {
-    border-left: 4px solid #28a745 !important;
-}
-
-.border-left-danger {
-    border-left: 4px solid #dc3545 !important;
-}
-</style>
-
-        </div>
-    </main>
-
-    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- JavaScript Files -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'asosiy/home/asosiy.js' %}"></script>
+    <script src="{% static 'asosiy/topshiriq/hisobot_list.js' %}"></script>
+
+    <!-- Page specific scripts -->
+    <script>
+        // Topshiriq tasdiqlash va rad etish
+        function approveTopshiriq(topshiriqId) {
+            $.post('/topshiriq/topshiriq/' + topshiriqId + '/approve/', {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            }).done(function(data) {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    $('#approveForm').attr('action', '/topshiriq/topshiriq/' + topshiriqId + '/approve/');
+                    $('#approveModal').modal('show');
+                }
+            }).fail(function() {
+                $('#approveForm').attr('action', '/topshiriq/topshiriq/' + topshiriqId + '/approve/');
+                $('#approveModal').modal('show');
+            });
+        }
+
+        function rejectTopshiriq(topshiriqId) {
+            $('#rejectForm').attr('action', '/topshiriq/topshiriq/' + topshiriqId + '/reject/');
+            $('#rejectModal').modal('show');
+        }
+    </script>
 </body>
 </html>

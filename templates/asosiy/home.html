@@ -1,378 +1,110 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="uz">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QO'QON DAVLAT UNIVERSITETI</title>
-    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="{% static 'asosiy/favicon.ico' %}">
+
     <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #0b5ed7;
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-            --sidebar-collapsed-width-sm: 50px;
-            --navbar-height: 60px;
-            
-            /* Font o'lchamlari */
-            --font-size-xs: 0.75rem;
-            --font-size-sm: 0.575rem;
-            --font-size-base: 1rem;
-            --font-size-md: 1.125rem;
-            --font-size-lg: 1.25rem;
-            --font-size-xl: 1.5rem;
-        }
-        
-        body {
-            font-family: 'Roboto', sans-serif;
-            padding-top: var(--navbar-height);
-            background-color: #f8f9fa;
-            transition: all 0.3s;
-        }
-        
-        /* Navbar */
-        .navbar {
-            height: var(--navbar-height);
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1030;
-        }
-        
-        .navbar-brand {
-            font-size: var(--font-size-lg);
-        }
-        
-        .navbar-brand img {
-            height: 30px;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-collapsed-width);
-            height: calc(100vh - var(--navbar-height));
-            position: fixed;
-            left: 0;
-            top: var(--navbar-height);
-            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            transition: all 0.3s;
-            z-index: 1020;
-            overflow-y: auto;
-        }
-        
-        .sidebar.expanded {
-            width: var(--sidebar-width);
-        }
-        
-        .sidebar-menu {
-            list-style: none;
-            padding: 1rem 0;
-            margin: 0;
-        }
-        
-        .sidebar-menu li {
-            position: relative;
-        }
-        
-        .sidebar-menu a {
-            color: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-            white-space: nowrap;
-        }
-        
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left: 3px solid white;
-            color: white;
-        }
-        
-        .sidebar-menu i {
-            width: 24px;
-            text-align: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-        
-        .sidebar-text {
-            display: none;
-            margin-left: 12px;
-        }
-        
-        .sidebar.expanded .sidebar-text {
-            display: inline;
-            animation: fadeIn 0.3s;
-        }
-        
-        .menu-header {
-            display: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: var(--font-size-xs);
-            text-transform: uppercase;
-            padding: 1rem 1.5rem 0.5rem;
-            margin-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar.expanded .menu-header {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-collapsed-width);
-            padding: 1rem;
-            min-height: calc(100vh - var(--navbar-height));
-            transition: margin-left 0.3s;
-        }
-        
-        .main-content.expanded {
-            margin-left: var(--sidebar-width);
-        }
-        
-        /* Cards */
-        .card-title {
-            font-size: var(--font-size-lg);
-            margin-bottom: 0.5rem;
-        }
-        
-        .card-text {
-            font-size: var(--font-size-base);
-            margin-bottom: 1rem;
-        }
-        
-        /* Desktop View */
-        @media (min-width: 992px) {
-            .sidebar {
-                width: var(--sidebar-width);
-            }
-            
-            .sidebar-text {
-                display: inline;
-            }
-            
-            .menu-header {
-                display: block;
-            }
-            
-            .main-content {
-                margin-left: var(--sidebar-width);
-            }
-            
-            .sidebar-toggle {
-                display: none;
-            }
-            
-            .navbar-brand {
-                font-size: var(--font-size-xl);
-            }
-            
-            .card-title {
-                font-size: var(--font-size-xl);
-            }
-        }
-        
-        /* Planshet uchun stil (768px - 991px) */
-        @media (min-width: 768px) and (max-width: 991.98px) {
-            .sidebar {
-                width: var(--sidebar-collapsed-width);
-            }
-            
-            .main-content {
-                margin-left: var(--sidebar-collapsed-width);
-            }
-            
-            .card-title {
-                font-size: var(--font-size-lg);
-            }
-        }
-        
-        /* Mobil uchun maxsus stil (≤767px) */
-        @media (max-width: 767.98px) {
-            .navbar-brand span {
-                font-size: var(--font-size-base);
-            }
-            
-            .sidebar {
-                width: var(--sidebar-collapsed-width-sm);
-            }
-            
-            .sidebar-menu a {
-                font-size: var(--font-size-xs);
-                padding: 0.75rem 0.5rem;
-                justify-content: center;
-            }
-            
-            .sidebar.expanded .sidebar-menu a {
-                font-size: var(--font-size-sm);
-                justify-content: flex-start;
-                padding: 0.75rem 1rem;
-            }
-            
-            .sidebar-menu i {
-                font-size: 1rem;
-            }
-            
-            .main-content {
-                margin-left: var(--sidebar-collapsed-width-sm);
-                padding: 0.5rem;
-            }
-            
-            .card {
-                margin-bottom: 1rem;
-            }
-            
-            .card-title {
-                font-size: var(--font-size-md);
-            }
-            
-            .card-text {
-                font-size: var(--font-size-sm);
-            }
-            
-            .btn {
-                font-size: var(--font-size-sm);
-            }
-            
-            .row > .col-md-4 {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
-        }
-    </style>
+    <!-- Asosiy css -->
+    <link rel="stylesheet" href="{% static 'asosiy/users/main.css' %}">
+
+
 </head>
+
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand navbar-light">
-        <div class="container-fluid">
-            <button class="btn sidebar-toggle" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'asosiy/images/logo.png' %}" alt="Logo" height="30" class="me-2">
-                <span class="d-none d-sm-inline">QO'QON DAVLAT UNIVERSITETI</span>
-                <span class="d-sm-none">QDU</span>
-            </a>
-            
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i>
-                        <span class="d-none d-sm-inline">Foydalanuvchi</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profil</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Sozlamalar</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Chiqish</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    {% include "asosiy/navbar.html" %}
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-inner">
-            <ul class="sidebar-menu">
-                <li class="menu-header">Asosiy menyu</li>
-                <li>
-                    <a href="#" class="active" data-text="Bosh sahifa">
-                        <i class="fas fa-home"></i>
-                        <span class="sidebar-text">Bosh sahifa</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-text="Foydalanuvchilar">
-                        <i class="fas fa-users"></i>
-                        <span class="sidebar-text">Foydalanuvchilar</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-text="Topshiriqlar">
-                        <i class="fas fa-book"></i>
-                        <span class="sidebar-text">Topshiriqlar</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-text="Dars jadvali">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span class="sidebar-text">Dars jadvali</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-text="Hisobotlar">
-                        <i class="fas fa-chart-bar"></i>
-                        <span class="sidebar-text">Hisobotlar</span>
-                    </a>
-                </li>
-                
-                <li class="menu-header">Sozlamalar</li>
-                <li>
-                    <a href="#" data-text="Tizim sozlamalari">
-                        <i class="fas fa-cog"></i>
-                        <span class="sidebar-text">Tizim sozlamalari</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-text="Parolni o'zgartirish">
-                        <i class="fas fa-key"></i>
-                        <span class="sidebar-text">Parolni o'zgartirish</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    {% include "asosiy/sidebar.html" %}
 
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div class="container-fluid">
-            <div class="row mt-4">
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Tizimga hush kelibsiz !!!</h1>
+                <small class="text-muted">{% now "j F Y" %}</small>
+            </div>
+
+            <div class="row">
+                <!-- Users Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
                         <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-users text-primary me-2"></i> Foydalanuvchilar</h5>
-                            <p class="card-text">Tizimdagi foydalanuvchilarni boshqarish</p>
-                            <a href="#" class="btn btn-primary">Kirish</a>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Prorektorlar</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">245</div>
+                                    <p class="mt-2 mb-0 text-muted text-sm">
+                                        Jami bo`limga tegishli prorektorlar
+                                    </p>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-primary">
+                                        <i class="fas fa-users text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
+
+                <!-- Tasks Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
                         <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-book text-success me-2"></i> Kurslar</h5>
-                            <p class="card-text">O'quv kurslarini boshqarish</p>
-                            <a href="#" class="btn btn-success">Kirish</a>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Topshiriqlar</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">48</div>
+                                    <p class="mt-2 mb-0 text-muted text-sm">
+                                        Jami yaratilgan topshiriqlar
+                                    </p>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-success">
+                                        <i class="fas fa-book text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
+
+                <!-- Reports Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
                         <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-chart-bar text-info me-2"></i> Hisobotlar</h5>
-                            <p class="card-text">Tizim hisobotlarini ko'rish</p>
-                            <a href="#" class="btn btn-info">Kirish</a>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Hisobotlar</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+                                    <p class="mt-2 mb-0 text-muted text-sm">
+                                        Jami tayyor hisobotlar
+                                    </p>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-info">
+                                        <i class="fas fa-chart-bar text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-info mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
                 </div>
@@ -382,55 +114,39 @@
 
     <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const toggleBtn = document.getElementById('sidebarToggle');
-            
-            // Toggle sidebar on button click
-            toggleBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('expanded');
-                mainContent.classList.toggle('expanded');
-            });
-            
-            // Auto-expand on desktop
-            function handleResize() {
-                if (window.innerWidth >= 992) {
-                    sidebar.classList.add('expanded');
-                    mainContent.classList.add('expanded');
-                } else {
-                    sidebar.classList.remove('expanded');
-                    mainContent.classList.remove('expanded');
+        $(document).ready(function () {
+            // Sidebar toggle functionality
+            $('#sidebarToggle').click(function () {
+                $('#sidebar').toggleClass('collapsed');
+                $('#mainContent').toggleClass('expanded');
+
+                // For mobile view
+                if ($(window).width() < 992) {
+                    $('#sidebar').toggleClass('show');
                 }
-            }
-            
-            // Initial setup
-            handleResize();
-            
-            // Handle window resize
-            window.addEventListener('resize', handleResize);
-            
-            // Mobile hover effect for menu items
-            const menuItems = document.querySelectorAll('.sidebar-menu a');
-            menuItems.forEach(item => {
-                item.addEventListener('mouseenter', function() {
-                    if (window.innerWidth < 992 && !sidebar.classList.contains('expanded')) {
-                        this.classList.add('hover-active');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            $(document).click(function (e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('#sidebar').length && !$(e.target).is('#sidebarToggle')) {
+                        $('#sidebar').removeClass('show');
                     }
-                });
-                
-                item.addEventListener('mouseleave', function() {
-                    this.classList.remove('hover-active');
-                });
-                
-                item.addEventListener('click', function() {
-                    if (window.innerWidth < 992) {
-                        // Close sidebar after clicking on mobile
-                        sidebar.classList.remove('expanded');
-                        mainContent.classList.remove('expanded');
-                    }
-                });
+                }
+            });
+
+            // Prevent closing when clicking inside sidebar
+            $('#sidebar').click(function (e) {
+                e.stopPropagation();
+            });
+
+            // Active menu item highlight
+            $('.sidebar-menu a').click(function () {
+                $('.sidebar-menu a').removeClass('active');
+                $(this).addClass('active');
             });
         });
     </script>

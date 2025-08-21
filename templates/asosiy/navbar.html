@@ -11,7 +11,19 @@
             <span class="d-sm-none">QDU</span>
         </a>
 
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
+            <!-- Bildirishnomalar -->
+            <li class="nav-item">
+                <a class="nav-link position-relative" href="#" id="notificationBell">
+                    <i class="fas fa-bell fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        3
+                        <span class="visually-hidden">o'qilmagan bildirishnomalar</span>
+                    </span>
+                </a>
+            </li>
+
+            <!-- User Profile -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                     data-bs-toggle="dropdown">
@@ -22,7 +34,7 @@
                     <li>
                         <div class="dropdown-header px-3 py-2">
                             <h6 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
-                            <small class="text-muted d-block">Prorektor</small>
+                            <small class="text-muted d-block">{{ user.get_role_display }}</small>
                         </div>
                     </li>
                     <li>

@@ -7,16 +7,134 @@ from django.views.decorators.csrf import csrf_exempt
 from users.choices import RoleChoice, ALLOWED_USER_MAP
 from users.models import Users
 from users.forms import KirishForm, UserCreateForm, UserUpdateForm
+from topshiriq.models import Topshiriq, TopshiriqJavob
 
 
 @csrf_exempt
 def home(request):
     if not request.user.is_authenticated:
         return redirect('kirish')
+    
+    # Role-based statistics
     context = {
         'RoleChoice': RoleChoice,
     }
-    return render(request, 'users/home.html', context)
+    
+    # REKTOR statistikasi
+    if request.user.role == RoleChoice.REKTOR.value:
+        context.update({
+            'prorektor_count': Users.objects.filter(
+                role=RoleChoice.PROREKTOR.value,
+                yaratgan_user=request.user
+            ).count(),
+            'topshiriq_count': Topshiriq.objects.filter(
+                yaratuvchi_user=request.user,
+                bajaruvchi_user__role=RoleChoice.PROREKTOR.value,
+                javob_yuborildi=False
+            ).count(),
+            'hisobot_count': Topshiriq.objects.filter(
+                yaratuvchi_user=request.user,
+                bajaruvchi_user__role=RoleChoice.PROREKTOR.value,
+                javob_yuborildi=True
+            ).count(),
+        })
+    
+    # PROREKTOR statistikasi
+    elif request.user.role == RoleChoice.PROREKTOR.value:
+        context.update({
+            'bolim_rahbar_count': Users.objects.filter(
+                role=RoleChoice.BOLIM_RAHBARI.value,
+                yaratgan_user=request.user
+            ).count(),
+            'dekan_count': Users.objects.filter(
+                role=RoleChoice.DEKAN.value,
+                yaratgan_user=request.user
+            ).count(),
+            'bolim_topshiriq_count': Topshiriq.objects.filter(
+                yaratuvchi_user=request.user,
+                bajaruvchi_user__role=RoleChoice.BOLIM_RAHBARI.value,
+                javob_yuborildi=False
+            ).count(),
+            'hisobot_count': Topshiriq.objects.filter(
+                yaratuvchi_user=request.user,
+                javob_yuborildi=True
+            ).count(),
+        })
+    
+    # BOLIM_RAHBARI statistikasi
+    elif request.user.role == RoleChoice.BOLIM_RAHBARI.value:
+        context.update({
+            'bolim_boshlik_count': Users.objects.filter(
+                role=RoleChoice.BOLIM_BOSHLIGI.value,
+                yaratgan_user=request.user
+            ).count(),
+            'bolim_topshiriq_count': Topshiriq.objects.filter(
+                yaratuvchi_user=request.user,
+                bajaruvchi_user__role=RoleChoice.BOLIM_BOSHLIGI.value,
+                javob_yuborildi=False
+            ).count(),
+        })
+    
+    # DEKAN statistikasi
+    elif request.user.role == RoleChoice.DEKAN.value:
+        context.update({
+            'kafedra_mudiri_count': Users.objects.filter(
+                role=RoleChoice.KAFEDRA_MUDIRI.value,
+                yaratgan_user=request.user
+            ).count(),
+            'zam_dekan_count': Users.objects.filter(
+                role=RoleChoice.ZAM_DEKAN.value,
+                yaratgan_user=request.user
+            ).count(),
+            'kafedra_topshiriq_count': Topshiriq.objects.filter(
+                yaratuvchi_user=request.user,
+                bajaruvchi_user__role=RoleChoice.KAFEDRA_MUDIRI.value,
+                javob_yuborildi=False
+            ).count(),
+        })
+    
+    # BOLIM_BOSHLIGI va KAFEDRA_MUDIRI statistikasi
+    elif request.user.role in [RoleChoice.BOLIM_BOSHLIGI.value, RoleChoice.KAFEDRA_MUDIRI.value]:
+        context.update({
+            'hodim_count': Users.objects.filter(
+                role=RoleChoice.HODIM.value,
+                yaratgan_user=request.user
+            ).count(),
+            'topshiriq_count': Topshiriq.objects.filter(
+                yaratuvchi_user=request.user,
+                bajaruvchi_user__role=RoleChoice.HODIM.value,
+                javob_yuborildi=False
+            ).count(),
+        })
+    
+    # ZAM_DEKAN statistikasi
+    elif request.user.role == RoleChoice.ZAM_DEKAN.value:
+        context.update({
+            'hodim_count': Users.objects.filter(
+                role=RoleChoice.HODIM.value,
+                yaratgan_user=request.user
+            ).count(),
+            'topshiriq_count': Topshiriq.objects.filter(
+                yaratuvchi_user=request.user,
+                bajaruvchi_user__role=RoleChoice.HODIM.value,
+                javob_yuborildi=False
+            ).count(),
+        })
+    
+    # HODIM va TYUTOR uchun o'ziga berilgan topshiriqlar
+    else:
+        context.update({
+            'topshiriq_count': Topshiriq.objects.filter(
+                bajaruvchi_user=request.user,
+                javob_yuborildi=False
+            ).count(),
+            'bajarilgan_count': Topshiriq.objects.filter(
+                bajaruvchi_user=request.user,
+                javob_yuborildi=True
+            ).count(),
+        })
+    
+    return render(request, 'asosiy/home.html', context)
 
 def chiqish(request):
     if request.user.is_authenticated:

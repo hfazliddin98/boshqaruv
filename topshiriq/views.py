@@ -266,7 +266,6 @@ def topshiriq_baxolash(request, target_role, pk):
             
             topshiriq.save()
             
-            messages.success(request, "Baholash muvaffaqiyatli saqlandi!")
             return redirect('hisobot_list')
     else:
         form = TopshiriqBaxolashForm(instance=topshiriq)

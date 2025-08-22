@@ -1780,8 +1780,8 @@
                                     {% else %}
                                         Cheksiz
                                     {% endif %}
-                                    <span class="badge priority-{% if topshiriq.xolat == 'Shoshilinch' %}high{% elif topshiriq.xolat == 'O`rta' %}medium{% else %}low{% endif %} ms-2">
-                                        {{ topshiriq.xolat }}
+                                    <span class="badge priority-{% if topshiriq.status == 'Shoshilinch' %}high{% elif topshiriq.status == 'O`rta' %}medium{% else %}low{% endif %} ms-2">
+                                        {{ topshiriq.status }}
                                     </span>
                                 </div>
                             </div>
@@ -1890,19 +1890,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Qo'shimcha izoh -->
-                    {% if javob.izoh %}
-                    <div class="mb-4">
-                        <h6 class="info-label mb-2">
-                            <i class="fas fa-sticky-note me-1"></i>
-                            Qo'shimcha izoh
-                        </h6>
-                        <div class="answer-note">
-                            {{ javob.izoh|linebreaks }}
-                        </div>
-                    </div>
-                    {% endif %}
-
                     <!-- Javob fayllar -->
                     {% if javob_files %}
                     <div class="mb-4">
@@ -1963,7 +1950,7 @@
                                 <div class="info-item">
                                     <div class="info-label">
                                         <i class="fas fa-chart-line me-1"></i>
-                                        Holat / Baho
+                                        Status / Baho
                                     </div>
                                     <div class="info-value">
                                         {% if javob.tasdiqlangan %}
@@ -1988,7 +1975,7 @@
                 <div class="section-header">
                     <h2 class="section-title">
                         <i class="fas fa-comment-dots"></i>
-                        Javob holati
+                        Javob statusi
                     </h2>
                 </div>
                 <div class="section-body">
@@ -2028,7 +2015,7 @@
                                 <div class="form-group">
                                     <label class="form-label fw-bold">
                                         <i class="fas fa-check-circle me-2 text-success"></i>
-                                        Topshiriq holati
+                                        Topshiriq statusi
                                     </label>
                                     {{ form.status }}
                                     <small class="form-text text-muted mt-1">
@@ -2052,18 +2039,6 @@
                             </div>
                         </div>
 
-                        <!-- Qo'shimcha izoh -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-comment-dots me-2 text-info"></i>
-                                Qo'shimcha izoh (ixtiyoriy)
-                            </label>
-                            <textarea name="izoh" class="form-control" rows="4" placeholder="Baholash izohini yozing..."></textarea>
-                            <small class="form-text text-muted mt-1">
-                                Bajaruvchiga taklif va izohlaringizni yozing
-                            </small>
-                        </div>
-
                         <!-- Amal tugmalari -->
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="evaluation-info">
@@ -2085,39 +2060,7 @@
                             </div>
                         </div>
 
-                        <!-- Baholash statistikasi -->
-                        <div class="evaluation-stats mt-4 p-3 bg-light rounded">
-                            <div class="row text-center">
-                                <div class="col-md-4 mb-2">
-                                    <small class="text-muted d-block">Berilgan vaqt</small>
-                                    <strong>{{ topshiriq.created_at|date:"d.m.Y" }}</strong>
-                                </div>
-                                <div class="col-md-4 mb-2">
-                                    <small class="text-muted d-block">Bajarilish muddati</small>
-                                    <strong>
-                                        {% if javob and topshiriq.created_at %}
-                                            {{ javob.created_at|timesince:topshiriq.created_at }}
-                                        {% else %}
-                                            N/A
-                                        {% endif %}
-                                    </strong>
-                                </div>
-                                <div class="col-md-4 mb-2">
-                                    <small class="text-muted d-block">Holat</small>
-                                    <strong>
-                                        {% if topshiriq.tugash_vaqti and javob.created_at %}
-                                            {% if javob.created_at <= topshiriq.tugash_vaqti %}
-                                                <span class="text-success">O'z vaqtida</span>
-                                            {% else %}
-                                                <span class="text-danger">Kech</span>
-                                            {% endif %}
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </strong>
-                                </div>
-                            </div>
-                        </div>
+
                     </form>
                 </div>
             </div>

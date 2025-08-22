@@ -883,22 +883,18 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group btn-group-sm">
+                                            <!-- Ko'rish tugmasi -->
                                             <a href="{% url 'topshiriq_detail' topshiriq.bajaruvchi_user.role topshiriq.id %}" 
-                                               class="btn btn-outline-info" 
+                                               class="btn btn-outline-primary" 
                                                title="Javobni batafsil ko'rish">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             
-                                            {% if can_evaluate and topshiriq.status == 'YUBORILDI' and request.user == topshiriq.yaratuvchi_user %}
-                                            <button class="btn btn-outline-success" 
-                                                    title="Tasdiqlash">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="btn btn-outline-danger" 
-                                                    title="Rad etish">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                            {% endif %}
+                                            <!-- Baholash tugmasi - faqat dizayn uchun -->
+                                            <a class="btn btn-outline-warning" 
+                                                    title="Baholash">
+                                                <i class="fas fa-star"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

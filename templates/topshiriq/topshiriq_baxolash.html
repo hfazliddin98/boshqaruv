@@ -1,0 +1,2305 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topshiriq - {{ topshiriq.title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+
+        <!-- Asosiy css -->
+    <link rel="stylesheet" href="{% static 'asosiy/home/asosiy.css' %}">
+
+    <style>
+        .menu-header {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 1rem 1.5rem 0.5rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* === ULTRA MODERN MAIN CONTENT === */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: calc(100vh - var(--navbar-height));
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(248, 250, 252, 0.9) 50%,
+                rgba(241, 245, 249, 0.85) 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: var(--navbar-height);
+            left: var(--sidebar-width);
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .main-content.expanded::before {
+            left: var(--sidebar-collapsed-width);
+        }
+
+        /* Ultra Modern Container */
+        .main-content .container-fluid {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* === Toggle Button === */
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-right: 1rem;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* === Card Styles - Ultra Modern === */
+        .card {
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-body {
+            padding: 1.25rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* === ULTRA MODERN CARD HEADER === */
+        .card-header {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(249, 250, 251, 0.9) 100%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.2);
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(102, 126, 234, 0.02) 0%, 
+                transparent 50%,
+                rgba(118, 75, 162, 0.01) 100%);
+            pointer-events: none;
+        }
+
+        /* Modern Icon Circles - Smaller */
+        .icon-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-circle::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+            transform: rotate(-45deg);
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .icon-circle::before {
+            transform: rotate(45deg);
+        }
+
+        .card:hover .icon-circle {
+            transform: rotate(5deg) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-circle i {
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 3;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .icon-circle i {
+            transform: scale(1.1);
+        }
+
+        /* Modern gradients for different roles */
+        .bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+        .bg-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; }
+        .bg-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important; }
+        .bg-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
+        .bg-danger { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%) !important; }
+
+        /* Modern buttons - Smaller */
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Specific button colors */
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .btn-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+        /* Modern text styles - Smaller */
+        .text-xs {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .h5 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Smaller paragraph text */
+        .card-body p {
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+
+        /* Animated number counter */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .h5 {
+            animation: countUp 0.8s ease;
+        }
+
+        /* Glass effect for cards */
+        .border-left-primary,
+        .border-left-success,
+        .border-left-info,
+        .border-left-warning,
+        .border-left-danger {
+            border-left: none !important;
+            position: relative;
+        }
+
+        /* Hover effects for statistics */
+        .card-body:hover .text-xs {
+            color: #667eea !important;
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Additional modern effects */
+        .card-hover-active {
+            transform: translateY(-8px) scale(1.01) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .card-info {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-footer-action {
+            margin-top: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Loading button states */
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Pulse animation for numbers */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .counter-number {
+            animation: pulse 2s infinite;
+        }
+
+        /* Gradient text for headings */
+        .main-content h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        /* Floating particles background effect */
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Responsive improvements - SM size optimized */
+        @media (max-width: 768px) {
+            .icon-circle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .icon-circle i {
+                font-size: 1rem;
+            }
+            
+            .h5 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+            }
+
+            .text-xs {
+                font-size: 0.6rem;
+            }
+
+            .card-body p {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 0.85rem;
+            }
+
+            .icon-circle {
+                width: 35px;
+                height: 35px;
+            }
+
+            .icon-circle i {
+                font-size: 0.9rem;
+            }
+
+            .h5 {
+                font-size: 1.3rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.3rem;
+            }
+
+            .btn {
+                font-size: 0.6rem;
+                padding: 5px 10px;
+            }
+
+            .card-body p {
+                font-size: 0.7rem;
+                line-height: 1.2;
+            }
+        }
+
+        /* === ULTRA MODERN TABLES === */
+        .table {
+            margin-bottom: 0;
+            background: transparent;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, 
+                rgba(248, 250, 252, 0.95) 0%, 
+                rgba(241, 245, 249, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            color: #334155;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            padding: 12px 16px;
+            position: relative;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.02),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .table th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(102, 126, 234, 0.3) 50%, 
+                transparent 100%);
+        }
+
+        .table tbody tr {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            box-shadow: 
+                0 2px 12px rgba(0, 0, 0, 0.04),
+                0 1px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.08);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.06),
+                0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+
+        .table td {
+            vertical-align: middle;
+            font-size: 13px;
+            padding: 12px 16px;
+            border: none;
+            color: #475569;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .table-responsive {
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            padding: 8px;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.02);
+        }
+
+        /* === ULTRA MODERN BUTTONS === */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 8px 16px;
+            font-size: 13px;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 16px rgba(102, 126, 234, 0.3),
+                0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 16px rgba(74, 222, 128, 0.3),
+                0 2px 8px rgba(74, 222, 128, 0.2);
+        }
+
+        .btn-outline-primary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        /* === ULTRA MODERN BADGES === */
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent, rgba(255, 255, 255, 0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+        }
+
+        .bg-success {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+        }
+
+        .bg-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            color: white !important;
+        }
+
+        .bg-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        }
+
+        .bg-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+        }
+
+        .badge:hover {
+            transform: translateY(-1px) scale(1.05);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* === ULTRA MODERN FORM STYLES === */
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 10px 14px;
+            border: 1px solid rgba(203, 213, 225, 0.5);
+            font-size: 13px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: rgba(102, 126, 234, 0.6);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 
+                0 0 0 3px rgba(102, 126, 234, 0.1),
+                0 2px 8px rgba(102, 126, 234, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .form-select-sm,
+        .form-control-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* === Input groups === */
+        .input-group .form-control:not(:first-child) {
+            border-left: none;
+        }
+
+        .input-group .btn {
+            border-left: none;
+        }
+
+        /* === Gradients and Utilities === */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        }
+
+        .file-upload-area {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bg-light-hover:hover,
+        .file-upload-area:hover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05) !important;
+        }
+
+        .border-dashed {
+            border-style: dashed !important;
+        }
+
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* === File List Styles === */
+        .list-group {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 0.375rem;
+        }
+
+        .list-group-item {
+            padding: 0.75rem 1.25rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .list-group-item:hover {
+            border-left-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+
+        /* === Shadow Utilities === */
+        .shadow-sm {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+
+        .shadow {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* === Text utilities === */
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .font-weight-bold {
+            font-weight: 600 !important;
+        }
+
+        .font-weight-normal {
+            font-weight: 400 !important;
+        }
+
+        /* === ULTRA MODERN PAGINATION === */
+        .pagination {
+            margin: 0;
+            gap: 6px;
+        }
+
+        .pagination .page-item {
+            margin: 0;
+        }
+
+        .pagination .page-link {
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(203, 213, 225, 0.4);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        .pagination .page-link:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 2px 8px rgba(102, 126, 234, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(102, 126, 234, 0.4);
+            color: white;
+            box-shadow: 
+                0 4px 16px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #94a3b8;
+            background: rgba(241, 245, 249, 0.6);
+            border-color: rgba(203, 213, 225, 0.3);
+            cursor: not-allowed;
+        }
+
+        .pagination-sm .page-link {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        /* === ULTRA MODERN DETAIL PAGE STYLES === */
+        
+        /* Task Header Ultra Modern */
+        .task-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.06),
+                0 4px 16px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #667eea 100%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .task-title {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        /* Countdown Timer Ultra Modern */
+        .countdown-timer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 
+                0 4px 16px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-timer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: slideShine 2s ease-in-out infinite;
+        }
+
+        @keyframes slideShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .countdown-timer.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .countdown-timer.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* Content Sections Ultra Modern */
+        .content-section {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.06),
+                0 4px 16px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .content-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 48px rgba(0, 0, 0, 0.08),
+                0 8px 24px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, 
+                rgba(248, 250, 252, 0.95) 0%, 
+                rgba(241, 245, 249, 0.9) 100%);
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.3);
+            position: relative;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(102, 126, 234, 0.3) 50%, 
+                transparent 100%);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #334155;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: #667eea;
+            font-size: 1rem;
+        }
+
+        .section-body {
+            padding: 1.5rem;
+        }
+
+        /* Info Grid Ultra Modern */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid rgba(226, 232, 240, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(102, 126, 234, 0.15),
+                0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .info-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* Priority Badges Ultra Modern */
+        .priority-high {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+        }
+
+        .priority-medium {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+        }
+
+        .priority-low {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+        }
+
+        /* File Grid Ultra Modern */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .file-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid rgba(226, 232, 240, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .file-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 32px rgba(0, 0, 0, 0.1),
+                0 6px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .file-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .file-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-card:hover .file-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 1rem;
+            word-break: break-all;
+            font-size: 0.9rem;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: nowrap;
+            margin-top: 1rem;
+        }
+
+        .file-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            border: 1px solid;
+            white-space: nowrap;
+            flex: 1;
+            max-width: 120px;
+            text-align: center;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+            color: white;
+        }
+
+        .btn-view {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-view:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Answer Section Ultra Modern */
+        .answer-title,
+        .answer-text,
+        .answer-note {
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid #667eea;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #374151;
+            margin-top: 0.5rem;
+        }
+
+        .answer-title {
+            font-weight: 600;
+            border-left-color: #22c55e;
+        }
+
+        .answer-note {
+            border-left-color: #f59e0b;
+        }
+
+        /* Empty State Ultra Modern */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #d1d5db;
+        }
+
+        .empty-state h5 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        /* Back Button Ultra Modern */
+        .back-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            box-shadow: 
+                0 8px 25px rgba(102, 126, 234, 0.3),
+                0 4px 12px rgba(102, 126, 234, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 12px 35px rgba(102, 126, 234, 0.4),
+                0 6px 18px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        /* Answer Meta Ultra Modern */
+        .answer-meta {
+            background: linear-gradient(135deg, 
+                rgba(249, 250, 251, 0.9) 0%, 
+                rgba(243, 244, 246, 0.8) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(226, 232, 240, 0.4);
+        }
+
+        /* Responsive Optimizations */
+        @media (max-width: 768px) {
+            .task-header {
+                padding: 1.5rem;
+            }
+
+            .task-title {
+                font-size: 1.5rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .file-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .countdown-timer {
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }
+
+            .back-btn {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                width: 45px;
+                height: 45px;
+            }
+
+            .file-actions {
+                gap: 0.25rem;
+            }
+
+            .file-btn {
+                padding: 6px 8px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .task-header {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .section-body,
+            .section-header {
+                padding: 1rem;
+            }
+
+            .info-item {
+                padding: 1rem;
+            }
+
+            .file-card {
+                padding: 1rem;
+            }
+
+            .task-title {
+                font-size: 1.3rem;
+            }
+
+            .file-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .file-btn {
+                max-width: none;
+                padding: 8px 12px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* === Container Overrides === */
+        .container, 
+        .container-fluid {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* === Animation utilities === */
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .content-section {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .content-section:nth-child(1) { animation-delay: 0.1s; }
+        .content-section:nth-child(2) { animation-delay: 0.2s; }
+        .content-section:nth-child(3) { animation-delay: 0.3s; }
+        .content-section:nth-child(4) { animation-delay: 0.4s; }
+
+        /* === Custom Alerts === */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+            color: #166534;
+        }
+
+        .alert-success::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+        }
+
+        /* === Animation utilities === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* === Loading states === */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        /* === Custom scrollbar === */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+                z-index: 1050;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .card-body .row>div {
+                margin-bottom: 1.5rem;
+            }
+            
+            .table-responsive {
+                font-size: 12px;
+            }
+            
+            .btn {
+                font-size: 12px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .input-group {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand span.d-none.d-sm-inline {
+                display: none !important;
+            }
+            
+            .card-header h6 {
+                font-size: 14px;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem 0.25rem;
+                font-size: 12px;
+            }
+            
+            .badge {
+                font-size: 10px;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        /* === ULTRA MODERN EVALUATION FORM === */
+        .evaluation-form {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .evaluation-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 33%, #f093fb 66%, #667eea 100%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-label {
+            font-size: 0.95rem;
+            color: #334155;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .form-label i {
+            font-size: 1rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 2px solid rgba(203, 213, 225, 0.4);
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 
+                0 0 0 4px rgba(102, 126, 234, 0.1),
+                0 4px 16px rgba(102, 126, 234, 0.15);
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        .form-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .evaluation-info {
+            flex: 1;
+        }
+
+        .evaluation-stats {
+            background: linear-gradient(135deg, 
+                rgba(248, 250, 252, 0.9) 0%, 
+                rgba(241, 245, 249, 0.8) 100%) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.3);
+            border-radius: 12px;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .evaluation-stats .col-md-3:not(:last-child) {
+            border-right: 1px solid rgba(226, 232, 240, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 4px 16px rgba(102, 126, 234, 0.3),
+                0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(102, 126, 234, 0.4),
+                0 4px 12px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        .btn-outline-secondary {
+            background: rgba(107, 114, 128, 0.1);
+            border: 2px solid rgba(107, 114, 128, 0.3);
+            color: #6b7280;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-secondary:hover {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 
+                0 4px 16px rgba(107, 114, 128, 0.3),
+                0 2px 8px rgba(107, 114, 128, 0.2);
+        }
+
+        /* Form validation styles */
+        .is-valid {
+            border-color: #22c55e !important;
+            box-shadow: 
+                0 0 0 4px rgba(34, 197, 94, 0.1),
+                0 4px 16px rgba(34, 197, 94, 0.15) !important;
+        }
+
+        .is-invalid {
+            border-color: #ef4444 !important;
+            box-shadow: 
+                0 0 0 4px rgba(239, 68, 68, 0.1),
+                0 4px 16px rgba(239, 68, 68, 0.15) !important;
+        }
+
+        .invalid-feedback {
+            color: #ef4444;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        /* Progress indicator */
+        .form-progress {
+            height: 3px;
+            background: rgba(203, 213, 225, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+
+            .evaluation-info {
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+
+            .evaluation-stats .col-md-3 {
+                border-right: none;
+                border-bottom: 1px solid rgba(226, 232, 240, 0.4);
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            .evaluation-stats .col-md-3:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    {% include "asosiy/navbar.html" %}
+    {% include "asosiy/sidebar.html" %}
+
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid py-3">
+            
+            <!-- Task Header -->
+            <div class="task-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="task-title-wrapper flex-grow-1 me-3">
+                        <h1 class="task-title mb-0">{{ topshiriq.title }}</h1>
+                    </div>
+                    
+                    <div class="countdown-wrapper flex-shrink-0">
+                        <div id="countdown-container" class="countdown-timer">
+                            <i class="fas fa-clock"></i>
+                            <span id="countdown-timer">Yuklanmoqda...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Description -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-file-text"></i>
+                        Topshiriq mazmuni
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <p style="font-size: 1.1rem; line-height: 1.7; color: #374151;">
+                        {{ topshiriq.body }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Task Information -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Asosiy ma'lumotlar
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    Yaratuvchi / Bajaruvchi
+                                </div>
+                                <div class="info-value">
+                                    {{ topshiriq.yaratuvchi_user.get_full_name }} 
+                                    <i class="fas fa-arrow-right mx-2"></i>
+                                    {{ topshiriq.bajaruvchi_user.get_full_name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    Muddat / Holat
+                                </div>
+                                <div class="info-value">
+                                    {% if topshiriq.tugash_vaqti %}
+                                        {{ topshiriq.tugash_vaqti|date:"d.m.Y" }}
+                                    {% else %}
+                                        Cheksiz
+                                    {% endif %}
+                                    <span class="badge priority-{% if topshiriq.xolat == 'Shoshilinch' %}high{% elif topshiriq.xolat == 'O`rta' %}medium{% else %}low{% endif %} ms-2">
+                                        {{ topshiriq.xolat }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Section -->
+            {% if topshiriq.files.all %}
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-paperclip"></i>
+                        Biriktirilgan fayllar ({{ topshiriq.files.all|length }} ta)
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <div class="file-grid">
+                        {% for f in topshiriq.files.all %}
+                        <div class="file-card">
+                            <div class="file-preview">
+                                {% if f.file.name|lower|slice:"-3:" == 'pdf' %}
+                                    <i class="fas fa-file-pdf file-icon text-danger"></i>
+                                {% elif 'doc' in f.file.name|lower %}
+                                    <i class="fas fa-file-word file-icon text-primary"></i>
+                                {% elif 'xls' in f.file.name|lower %}
+                                    <i class="fas fa-file-excel file-icon text-success"></i>
+                                {% elif 'jpg' in f.file.name|lower or 'png' in f.file.name|lower or 'jpeg' in f.file.name|lower %}
+                                    <i class="fas fa-file-image file-icon text-info"></i>
+                                {% else %}
+                                    <i class="fas fa-file-alt file-icon text-secondary"></i>
+                                {% endif %}
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">{{ f.file.name }}</div>
+                                <div class="file-actions">
+                                    <a href="{{ f.file.url }}" class="file-btn btn-download" download>
+                                        <i class="fas fa-download me-1"></i> Yuklab olish
+                                    </a>
+                                    <a href="{{ f.file.url }}" class="file-btn btn-view" target="_blank">
+                                        <i class="fas fa-external-link-alt me-1"></i> Ochish
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-paperclip"></i>
+                        Biriktirilgan fayllar
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h5>Fayllar mavjud emas</h5>
+                        <p>Bu topshiriqda hech qanday fayl biriktirilmagan.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Javob Section -->
+            {% if javob %}
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-comment-dots"></i>
+                        Yuborilgan javob
+                        <span class="badge bg-success ms-2">
+                            <i class="fas fa-check-circle me-1"></i>
+                            Bajarilgan
+                        </span>
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <!-- Javob sarlavhasi -->
+                    {% if javob.title %}
+                    <div class="mb-4">
+                        <h6 class="info-label mb-2">
+                            <i class="fas fa-heading me-1"></i>
+                            Javob sarlavhasi
+                        </h6>
+                        <div class="answer-title">
+                            {{ javob.title }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Javob matni -->
+                    {% if javob.body %}
+                    <div class="mb-4">
+                        <h6 class="info-label mb-2">
+                            <i class="fas fa-comment me-1"></i>
+                            Javob matni
+                        </h6>
+                        <div class="answer-text">
+                            {{ javob.body|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Qo'shimcha izoh -->
+                    {% if javob.izoh %}
+                    <div class="mb-4">
+                        <h6 class="info-label mb-2">
+                            <i class="fas fa-sticky-note me-1"></i>
+                            Qo'shimcha izoh
+                        </h6>
+                        <div class="answer-note">
+                            {{ javob.izoh|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Javob fayllar -->
+                    {% if javob_files %}
+                    <div class="mb-4">
+                        <h6 class="info-label mb-3">
+                            <i class="fas fa-paperclip me-1"></i>
+                            Javobda yuborilgan fayllar ({{ javob_files|length }} ta)
+                        </h6>
+                        <div class="file-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                            {% for file in javob_files %}
+                            <div class="file-card">
+                                <div class="file-preview">
+                                    {% if file.file.name|lower|slice:"-3:" == 'pdf' %}
+                                        <i class="fas fa-file-pdf file-icon text-danger"></i>
+                                    {% elif 'doc' in file.file.name|lower %}
+                                        <i class="fas fa-file-word file-icon text-primary"></i>
+                                    {% elif 'xls' in file.file.name|lower %}
+                                        <i class="fas fa-file-excel file-icon text-success"></i>
+                                    {% elif 'jpg' in file.file.name|lower or 'png' in file.file.name|lower or 'jpeg' in file.file.name|lower %}
+                                        <i class="fas fa-file-image file-icon text-info"></i>
+                                    {% else %}
+                                        <i class="fas fa-file-alt file-icon text-secondary"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name">{{ file.file.name }}</div>
+                                    <div class="file-actions d-flex justify-content-center gap-2">
+                                        <a href="{{ file.file.url }}" class="file-btn btn-download" download>
+                                            <i class="fas fa-download me-1"></i> Yuklab olish
+                                        </a>
+                                        <a href="{{ file.file.url }}" class="file-btn btn-view" target="_blank">
+                                            <i class="fas fa-external-link-alt me-1"></i> Ochish
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Javob meta ma'lumotlari -->
+                    <div class="answer-meta">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-user me-1"></i>
+                                        Javob beruvchi / Vaqt
+                                    </div>
+                                    <div class="info-value">
+                                        {{ javob.bajaruvchi_user.get_full_name }}
+                                        <br>
+                                        <small class="text-muted">{{ javob.created_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        Holat / Baho
+                                    </div>
+                                    <div class="info-value">
+                                        {% if javob.tasdiqlangan %}
+                                            <span class="badge priority-low">Tasdiqlangan</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Kutilmoqda</span>
+                                        {% endif %}
+                                        
+                                        {% if javob.baho %}
+                                            <span class="badge bg-info ms-1">{{ javob.baho }} ball</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% elif topshiriq.javob_yuborildi %}
+            <!-- Javob yuborilgan lekin ma'lumotlar topilmagan holat -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-comment-dots"></i>
+                        Javob holati
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <div class="alert alert-success text-center">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <h6>Javob yuborilgan</h6>
+                        <p class="mb-0">Bu topshiriqqa javob yuborilgan, lekin tafsilotlar mavjud emas.</p>
+                        {% if topshiriq.bajarilgan_vaqti %}
+                        <small class="text-muted mt-2 d-block">
+                            Bajarilgan: {{ topshiriq.bajarilgan_vaqti|date:"d.m.Y" }}
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Baholash formasi -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-star-half-alt"></i>
+                        Topshiriqni baholash
+                        <span class="badge bg-warning ms-2">
+                            <i class="fas fa-exclamation me-1"></i>
+                            Majburiy
+                        </span>
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <form method="post" class="evaluation-form">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Status tanlash -->
+                            <div class="col-md-6 mb-4">
+                                <div class="form-group">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-check-circle me-2 text-success"></i>
+                                        Topshiriq holati
+                                    </label>
+                                    {{ form.status }}
+                                    <small class="form-text text-muted mt-1">
+                                        Topshiriq qabul qilindi yoki rad etildi
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Baho tanlash -->
+                            <div class="col-md-6 mb-4">
+                                <div class="form-group">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-star me-2 text-warning"></i>
+                                        Baho
+                                    </label>
+                                    {{ form.baxo }}
+                                    <small class="form-text text-muted mt-1">
+                                        Topshiriq bajarilishi uchun baho
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Qo'shimcha izoh -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-comment-dots me-2 text-info"></i>
+                                Qo'shimcha izoh (ixtiyoriy)
+                            </label>
+                            <textarea name="izoh" class="form-control" rows="4" placeholder="Baholash izohini yozing..."></textarea>
+                            <small class="form-text text-muted mt-1">
+                                Bajaruvchiga taklif va izohlaringizni yozing
+                            </small>
+                        </div>
+
+                        <!-- Amal tugmalari -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="evaluation-info">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Bu baholash topshiriq yaratuvchi tomonidan amalga oshiriladi
+                                </small>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <a href="{% url 'hisobot_list' %}" class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-times me-1"></i>
+                                    Bekor qilish
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-1"></i>
+                                    Baholashni yuborish
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Baholash statistikasi -->
+                        <div class="evaluation-stats mt-4 p-3 bg-light rounded">
+                            <div class="row text-center">
+                                <div class="col-md-4 mb-2">
+                                    <small class="text-muted d-block">Berilgan vaqt</small>
+                                    <strong>{{ topshiriq.created_at|date:"d.m.Y" }}</strong>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <small class="text-muted d-block">Bajarilish muddati</small>
+                                    <strong>
+                                        {% if javob and topshiriq.created_at %}
+                                            {{ javob.created_at|timesince:topshiriq.created_at }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <small class="text-muted d-block">Holat</small>
+                                    <strong>
+                                        {% if topshiriq.tugash_vaqti and javob.created_at %}
+                                            {% if javob.created_at <= topshiriq.tugash_vaqti %}
+                                                <span class="text-success">O'z vaqtida</span>
+                                            {% else %}
+                                                <span class="text-danger">Kech</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Back Button -->
+        <a href="{% url 'topshiriq_bajaruvchi_list' topshiriq.bajaruvchi_user.role %}" class="back-btn" title="Orqaga">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </main>
+
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Countdown Timer Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tugashVaqtiStr = "{{ topshiriq.tugash_vaqti|date:'Y-m-d' }}";
+            
+            if (!tugashVaqtiStr || tugashVaqtiStr === "None") {
+                document.getElementById('countdown-container').innerHTML = '<i class="fas fa-infinity"></i> Cheksiz';
+                return;
+            }
+
+            const tugashVaqti = new Date(tugashVaqtiStr + "T23:59:59");
+            const timerElement = document.getElementById('countdown-timer');
+            const containerElement = document.getElementById('countdown-container');
+
+            function updateCountdown() {
+                const hozir = new Date();
+                const qolganMs = tugashVaqti - hozir;
+
+                if (qolganMs <= 0) {
+                    timerElement.textContent = "Muddat tugagan!";
+                    containerElement.classList.add('danger');
+                    return;
+                }
+
+                const qolganKun = Math.floor(qolganMs / (1000 * 60 * 60 * 24));
+                const qolganSoat = Math.floor((qolganMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const qolganDaqiqa = Math.floor((qolganMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                if (qolganKun > 0) {
+                    timerElement.textContent = `${qolganKun} kun ${qolganSoat} soat`;
+                } else {
+                    timerElement.textContent = `${qolganSoat}:${qolganDaqiqa.toString().padStart(2, '0')}`;
+                }
+
+                // Warning colors
+                if (qolganMs < 86400000) { // 1 kun
+                    containerElement.classList.add('danger');
+                } else if (qolganMs < 259200000) { // 3 kun
+                    containerElement.classList.add('warning');
+                }
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 60000); // Har daqiqada yangilanadi
+        });
+
+        // Evaluation form JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.evaluation-form');
+            const progressBar = document.querySelector('.form-progress-bar');
+            const formInputs = form.querySelectorAll('select, textarea');
+            const submitButton = form.querySelector('button[type="submit"]');
+            
+            // Progress bar update
+            function updateProgress() {
+                const totalFields = formInputs.length;
+                let filledFields = 0;
+                
+                formInputs.forEach(input => {
+                    if (input.value && input.value.trim() !== '') {
+                        filledFields++;
+                        input.classList.add('is-valid');
+                        input.classList.remove('is-invalid');
+                    } else {
+                        input.classList.remove('is-valid');
+                        if (input.hasAttribute('required')) {
+                            input.classList.add('is-invalid');
+                        }
+                    }
+                });
+                
+                const progress = (filledFields / totalFields) * 100;
+                if (progressBar) {
+                    progressBar.style.width = progress + '%';
+                }
+                
+                // Enable/disable submit button
+                if (filledFields >= 2) { // status va baxo majburiy
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('opacity-50');
+                } else {
+                    submitButton.disabled = true;
+                    submitButton.classList.add('opacity-50');
+                }
+            }
+            
+            // Add progress bar if not exists
+            if (!progressBar) {
+                const progressDiv = document.createElement('div');
+                progressDiv.className = 'form-progress';
+                progressDiv.innerHTML = '<div class="form-progress-bar"></div>';
+                form.insertBefore(progressDiv, form.firstChild);
+                updateProgress();
+            }
+            
+            // Event listeners
+            formInputs.forEach(input => {
+                input.addEventListener('change', updateProgress);
+                input.addEventListener('input', updateProgress);
+                input.addEventListener('blur', function() {
+                    if (this.hasAttribute('required') && !this.value.trim()) {
+                        this.classList.add('is-invalid');
+                        this.classList.remove('is-valid');
+                    }
+                });
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                const requiredFields = form.querySelectorAll('[name="status"], [name="baxo"]');
+                
+                requiredFields.forEach(field => {
+                    if (!field.value || field.value.trim() === '') {
+                        field.classList.add('is-invalid');
+                        field.classList.remove('is-valid');
+                        isValid = false;
+                        
+                        // Add error message if not exists
+                        if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('invalid-feedback')) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'invalid-feedback';
+                            errorDiv.textContent = 'Bu maydon majburiy';
+                            field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                        }
+                    } else {
+                        const errorMsg = field.parentNode.querySelector('.invalid-feedback');
+                        if (errorMsg) {
+                            errorMsg.remove();
+                        }
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    
+                    // Animate invalid fields
+                    const invalidFields = form.querySelectorAll('.is-invalid');
+                    invalidFields.forEach(field => {
+                        field.style.animation = 'shake 0.5s ease-in-out';
+                        setTimeout(() => {
+                            field.style.animation = '';
+                        }, 500);
+                    });
+                    
+                    return false;
+                }
+                
+                // Show loading state
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Yuklanmoqda...';
+                submitButton.disabled = true;
+            });
+            
+            // Initialize progress
+            updateProgress();
+        });
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

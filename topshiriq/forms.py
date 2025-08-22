@@ -100,3 +100,13 @@ class TopshiriqJavobForm(forms.ModelForm):
                 for f in files.getlist('files'):
                     TopshiriqJavobFile.objects.create(javob=javob, file=f)
         return javob
+    
+
+class TopshiriqBaxolashForm(forms.ModelForm):
+    class Meta:
+        model = Topshiriq
+        fields = ['status', 'baxo']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'baxo': forms.Select(attrs={'class': 'form-select'}),
+        }

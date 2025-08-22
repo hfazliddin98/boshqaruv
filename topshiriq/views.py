@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, TopshiriqReport
-from .forms import TopshiriqForm, TopshiriqJavobForm
+from .forms import TopshiriqForm, TopshiriqJavobForm, TopshiriqBaxolashForm
 from topshiriq.choices import ALLOWED_TOPSHIRIQ_VIEW_MAP, RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP, ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP
 from users.choices import ALLOWED_USER_MAP
 
@@ -226,6 +226,60 @@ def topshiriq_javob_create(request, target_role, pk):
         'RoleChoice': RoleChoice,
     }
     return render(request, 'topshiriq/topshiriq_javob_create.html', context)
+
+
+def topshiriq_baxolash(request, target_role, pk):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    topshiriq = get_object_or_404(Topshiriq, pk=pk)
+
+    # Faqat yaratuvchi baholay oladi
+    if request.user != topshiriq.yaratuvchi_user:
+        return HttpResponseForbidden("Faqat topshiriq yaratuvchisi baholay oladi.")
+
+    # Topshiriq javob yuborilganligini tekshirish
+    if not topshiriq.javob_yuborildi:
+        return HttpResponseForbidden("Topshiriqqa hali javob yuborilmagan.")
+
+    # Javob ma'lumotlarini olish
+    javob = None
+    javob_files = []
+    try:
+        javob = TopshiriqJavob.objects.filter(topshiriq=topshiriq).first()
+        if javob:
+            javob_files = javob.files.all()
+    except TopshiriqJavob.DoesNotExist:
+        javob = None
+
+    if request.method == 'POST':
+        form = TopshiriqBaxolashForm(request.POST, instance=topshiriq)
+        if form.is_valid():
+            # Topshiriq statusini yangilash
+            topshiriq.status = form.cleaned_data['status']
+            topshiriq.baxo = form.cleaned_data['baxo']
+            
+            # Qo'shimcha izoh qo'shish
+            izoh = request.POST.get('izoh', '')
+            if izoh:
+                topshiriq.izoh = izoh
+            
+            topshiriq.save()
+            
+            messages.success(request, "Baholash muvaffaqiyatli saqlandi!")
+            return redirect('hisobot_list')
+    else:
+        form = TopshiriqBaxolashForm(instance=topshiriq)
+
+    context = {
+        'form': form,
+        'topshiriq': topshiriq,
+        'javob': javob,
+        'javob_files': javob_files,
+        'target_role': target_role,
+        'RoleChoice': RoleChoice,
+    }
+    return render(request, 'topshiriq/topshiriq_baxolash.html', context)
 
 
 def topshiriq_bajaruvchi_list(request, target_role):

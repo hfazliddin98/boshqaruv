@@ -9,7 +9,33 @@
                 </a>
             </li>
 
-            {% if request.user.role == RoleChoice.REKTOR.value %}
+            {% if request.user.role == RoleChoice.ADMIN.value %}
+                <li>
+                    <a href="" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.SUPER_ADMIN.value %}active{% endif %}">
+                        <i class="fas fa-users-cog"></i>
+                        <span class="sidebar-text">Foydalanuvchilar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.REKTOR.value %}active{% endif %}">
+                        <i class="fas fa-sitemap"></i>
+                        <span class="sidebar-text">Struktura</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.PROREKTOR.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Topshiriqlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.PROREKTOR.value %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="sidebar-text">Hisobotlar</span>
+                    </a>
+                </li>
+
+            {% elif request.user.role == RoleChoice.REKTOR.value %}
                 <li>
                     <a href="{% url 'user_list' RoleChoice.PROREKTOR.value %}" class="{% if url_name == 'user_list' %}active{% endif %}">
                         <i class="fas fa-users"></i>

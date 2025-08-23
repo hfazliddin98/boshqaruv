@@ -4,6 +4,7 @@ from topshiriq.views import topshiriq_create, topshiriq_list, topshiriq_update
 from topshiriq.views import topshiriq_file_delete, topshiriq_delete_message, topshiriq_delete  
 from topshiriq.views import topshiriq_javob_create, topshiriq_javob_list, topshiriq_bajaruvchi_list, topshiriq_baxolash
 from topshiriq import views
+from topshiriq.notification_views import notifications_list, notification_detail, mark_all_notifications_read, notification_count_ajax
 
 
 
@@ -36,4 +37,10 @@ urlpatterns = [
     path('hisobot/approve/<uuid:report_id>/', views.approve_report, name='approve_report'),
     path('hisobot/reject/<uuid:report_id>/', views.reject_report, name='reject_report'),
     path('hisobot/download/<uuid:report_id>/', views.download_report, name='download_report'),
+    
+    # Bildirishnoma URLs
+    path('notifications/', notifications_list, name='notifications_list'),
+    path('notification/<uuid:pk>/', notification_detail, name='notification_detail'),
+    path('notifications/mark-all-read/', mark_all_notifications_read, name='mark_all_notifications_read'),
+    path('notifications/count-ajax/', notification_count_ajax, name='notification_count_ajax'),
 ]

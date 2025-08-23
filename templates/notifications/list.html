@@ -1,0 +1,198 @@
+{% extends "asosiy/base.html" %}
+{% load static %}
+
+{% block title %}Bildirishnomalar{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-bell me-2"></i>Bildirishnomalar
+            </h1>
+            <p class="mb-0 text-muted">Sizga yuborilgan barcha bildirishnomalar</p>
+        </div>
+        {% if unread_count > 0 %}
+        <div>
+            <form method="post" action="{% url 'mark_all_notifications_read' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check-double me-1"></i>
+                    Barchasini o'qilgan deb belgilash ({{ unread_count }})
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Statistika -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-circle bg-primary me-3">
+                            <i class="fas fa-bell text-white"></i>
+                        </div>
+                        <div>
+                            <div class="h5 mb-0 text-gray-800">{{ notifications.paginator.count }}</div>
+                            <div class="text-xs text-primary">Jami bildirishnomalar</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-warning shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-circle bg-warning me-3">
+                            <i class="fas fa-envelope text-white"></i>
+                        </div>
+                        <div>
+                            <div class="h5 mb-0 text-gray-800">{{ unread_count }}</div>
+                            <div class="text-xs text-warning">O'qilmagan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bildirishnomalar ro'yxati -->
+    <div class="card shadow">
+        <div class="card-body">
+            {% if notifications %}
+                <div class="list-group list-group-flush">
+                    {% for notification in notifications %}
+                    <div class="list-group-item list-group-item-action {% if not notification.is_read %}bg-light border-left border-primary border-3{% endif %}">
+                        <a href="{% url 'notification_detail' notification.pk %}" class="text-decoration-none text-dark">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="d-flex">
+                                    <div class="notification-icon me-3 mt-1">
+                                        {% if notification.notification_type == 'topshiriq_yangi' %}
+                                            <div class="icon-circle bg-primary" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-plus text-white"></i>
+                                            </div>
+                                        {% elif notification.notification_type == 'topshiriq_javob' %}
+                                            <div class="icon-circle bg-success" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-reply text-white"></i>
+                                            </div>
+                                        {% elif notification.notification_type == 'topshiriq_baholandi' %}
+                                            <div class="icon-circle bg-warning" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-star text-white"></i>
+                                            </div>
+                                        {% else %}
+                                            <div class="icon-circle bg-info" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-bell text-white"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 fw-bold">
+                                            {{ notification.title }}
+                                            {% if not notification.is_read %}
+                                                <span class="badge bg-danger ms-2">Yangi</span>
+                                            {% endif %}
+                                        </h6>
+                                        <p class="mb-1 text-muted">{{ notification.message }}</p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>{{ notification.created_at|timesince }} oldin
+                                            {% if notification.sender %}
+                                                • <i class="fas fa-user me-1"></i>{{ notification.sender.get_full_name }}
+                                            {% endif %}
+                                            {% if notification.priority == 'urgent' %}
+                                                • <span class="badge bg-danger">Shoshilinch</span>
+                                            {% elif notification.priority == 'high' %}
+                                                • <span class="badge bg-warning">Muhim</span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    {% if not notification.is_read %}
+                                        <span class="badge bg-primary rounded-pill">Yangi</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if notifications.has_other_pages %}
+                <nav aria-label="Sahifalar" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if notifications.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ notifications.previous_page_number }}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in notifications.paginator.page_range %}
+                            {% if notifications.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > notifications.number|add:'-3' and num < notifications.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if notifications.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ notifications.next_page_number }}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-bell-slash display-4 text-muted mb-3"></i>
+                    <h4 class="text-muted">Bildirishnomalar yo'q</h4>
+                    <p class="text-muted">Sizga hali hech qanday bildirishnoma yuborilmagan.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.notification-item.notification-unread {
+    background-color: #f8f9fa !important;
+    border-left: 3px solid #007bff !important;
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa !important;
+    transform: translateX(5px);
+    transition: all 0.3s ease;
+}
+</style>
+{% endblock %}

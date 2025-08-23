@@ -11,7 +11,7 @@
 
             {% if request.user.role == RoleChoice.ADMIN.value %}
                 <li>
-                    <a href="" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.SUPER_ADMIN.value %}active{% endif %}">
+                    <a href="{% url 'admin_foydalanuvchi_list' RoleChoice.ADMIN.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.SUPER_ADMIN.value %}active{% endif %}">
                         <i class="fas fa-users-cog"></i>
                         <span class="sidebar-text">Foydalanuvchilar</span>
                     </a>

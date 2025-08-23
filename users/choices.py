@@ -16,6 +16,7 @@ class RoleChoice(models.TextChoices):
 
 
 ALLOWED_USER_MAP = {
+    RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
     RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
     RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
     RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],

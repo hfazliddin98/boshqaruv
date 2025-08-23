@@ -231,3 +231,39 @@ def user_update(request, target_role, pk):
         'RoleChoice': RoleChoice,
     }
     return render(request, 'users/user_update.html', context)
+
+
+def admin_foydalanuvchi_list(request, target_role):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != 'Admin':
+        return HttpResponseForbidden("Siz ushbu sahifani ko'rishga ruxsat bermaysiz.")
+
+    foydalanuvchilar = Users.objects.all()
+    context = {
+        'foydalanuvchilar': foydalanuvchilar
+    }
+    return render(request, 'users/admin_foydalanuvchi_list.html', context)
+
+
+def admin_foydalanuvchi_create(request, target_role):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != 'Admin':
+        return HttpResponseForbidden("Siz ushbu sahifani ko'rishga ruxsat bermaysiz.")
+
+    if request.method == 'POST':
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Foydalanuvchi muvaffaqiyatli yaratildi.")
+            return redirect('admin_foydalanuvchi_list')
+    else:
+        form = UserCreateForm()
+
+    context = {
+        'form': form
+    }
+    return render(request, 'users/admin_foydalanuvchi_create.html', context)

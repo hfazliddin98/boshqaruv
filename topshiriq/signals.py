@@ -2,6 +2,7 @@ from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from .models import TopshiriqJavob, TopshiriqReport, Topshiriq
+from .services import NotificationService
 import logging
 
 # Logger yaratish
@@ -64,6 +65,10 @@ def create_or_update_topshiriq_report(sender, instance, created, **kwargs):
         
         logger.info(f"TopshiriqReport {'yaratildi' if report_created else 'yangilandi'}: {report.id}")
         print(f"TopshiriqReport {'yaratildi' if report_created else 'yangilandi'}: {report.id}")
+        
+        # Bildirishnoma yuborish - javob kelgani haqida
+        if report_created:
+            NotificationService.notify_topshiriq_javob(instance)
         
     except Exception as e:
         logger.error(f"TopshiriqReport yaratishda/yangilashda xatolik: {str(e)}")
@@ -141,3 +146,18 @@ def update_report_on_topshiriq_change(sender, instance, created, **kwargs):
                 
         except Exception as e:
             print(f"TopshiriqReport yangilashda xatolik: {str(e)}")
+
+
+# BILDIRISHNOMA SIGNALLARI
+@receiver(post_save, sender=Topshiriq)
+def topshiriq_notification_signals(sender, instance, created, **kwargs):
+    """Topshiriq yaratilganda va yangilanganda bildirishnomalar"""
+    if created:
+        # Yangi topshiriq yaratilganda
+        print(f"🔔 Yangi topshiriq yaratildi: {instance.title}")
+        NotificationService.notify_new_topshiriq(instance)
+    else:
+        # Topshiriq baholanganda (baxo o'zgarsa)
+        if instance.baxo and instance.baxo != 'QONIQARSIZ':
+            print(f"⭐ Topshiriq baholandi: {instance.title}")
+            NotificationService.notify_topshiriq_baholandi(instance)

@@ -231,6 +231,66 @@ class TopshiriqReport(AsosiyModel):
         
         self.full_report = "\n".join(report_parts)
         return self.full_report
-        self.full_report = "\n".join(report_parts)
-        return self.full_report
+
+
+class Notification(AsosiyModel):
+    """Foydalanuvchi bildirishnomalari"""
+    
+    NOTIFICATION_TYPES = [
+        ('topshiriq_yangi', 'Yangi topshiriq'),
+        ('topshiriq_javob', 'Topshiriq javobi'),
+        ('topshiriq_baholandi', 'Topshiriq baholandi'),
+        ('topshiriq_qaytarildi', 'Topshiriq qaytarildi'),
+        ('topshiriq_muddat', 'Muddat yaqinlashdi'),
+        ('hisobot_yangi', 'Yangi hisobot'),
+        ('system', 'Tizim xabari'),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('low', 'Past'),
+        ('normal', 'Oddiy'),
+        ('high', 'Yuqori'),
+        ('urgent', 'Shoshilinch'),
+    ]
+    
+    recipient = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='notifications')
+    sender = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_notifications')
+    
+    title = models.CharField('Sarlavha', max_length=255)
+    message = models.TextField('Xabar matni')
+    notification_type = models.CharField('Tur', max_length=30, choices=NOTIFICATION_TYPES)
+    
+    # Bog'lanish obyektlari
+    topshiriq = models.ForeignKey(Topshiriq, on_delete=models.CASCADE, null=True, blank=True)
+    javob = models.ForeignKey(TopshiriqJavob, on_delete=models.CASCADE, null=True, blank=True)
+    hisobot = models.ForeignKey(TopshiriqReport, on_delete=models.CASCADE, null=True, blank=True)
+    
+    # Holat
+    is_read = models.BooleanField('O\'qildi', default=False)
+    read_at = models.DateTimeField('O\'qilgan vaqt', null=True, blank=True)
+    
+    # Qo'shimcha
+    action_url = models.CharField('Havolalar', max_length=500, null=True, blank=True)
+    priority = models.CharField('Muhimlik', max_length=20, choices=PRIORITY_CHOICES, default='normal')
+    
+    class Meta:
+        verbose_name = 'Bildirishnoma'
+        verbose_name_plural = 'Bildirishnomalar'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['recipient', 'is_read']),
+            models.Index(fields=['notification_type']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['sender']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} - {self.recipient.get_full_name()}"
+    
+    def mark_as_read(self):
+        """Bildirishnomani o'qilgan deb belgilash"""
+        if not self.is_read:
+            self.is_read = True
+            self.read_at = timezone.now()
+            self.save(update_fields=['is_read', 'read_at'])
 

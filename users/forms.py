@@ -204,3 +204,234 @@ class UserUpdateForm(UserChangeForm):
         if commit:
             user.save()
         return user
+
+class FoydalanuvchiCreateForm(UserCreationForm):
+    last_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Familya'}),
+        label="Familya"
+    )
+    first_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ism'}),
+        label="Ism"
+    )
+
+    sharif = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sharif'}),
+        label="Sharif"
+    )
+    role = forms.ChoiceField(
+        choices=[],  # choices bo‘sh, __init__da to‘ldiriladi
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Rol"
+    )
+    yaratgan_user = forms.ModelChoiceField(
+        queryset=Users.objects.filter(is_superuser=False),
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Yaratgan foydalanuvchi"
+    )
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Foydalanuvchi nomi'}),
+        label="Foydalanuvchi nomi"
+    )
+    password1 = forms.CharField(
+        label="Parol",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Parol'}),
+        min_length=8,
+        required=True,
+        error_messages={
+            'required': "Parolni kiriting",
+            'min_length': "Parol kamida 8 ta belgidan iborat bo‘lishi kerak!"
+        }
+    )
+    password2 = forms.CharField(
+        label="Parolni tasdiqlang",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Parolni tasdiqlang'}),
+        min_length=8,
+        required=True,
+        error_messages={
+            'required': "Parolni tasdiqlang",
+            'min_length': "Parol kamida 8 ta belgidan iborat bo‘lishi kerak!"
+        }
+    )
+    is_active = forms.BooleanField(
+        label='Aktiv foydalanuvchi',
+        required=True,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    class Meta:
+        model = Users
+        fields = ('username', 'last_name', 'first_name', 'sharif', 'role', 'yaratgan_user', 'struktura', 'is_active', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        target_role = kwargs.pop('target_role', None)
+        super().__init__(*args, **kwargs)
+
+        if target_role:
+            self.fields['role'].choices = [
+                (target_role, dict(Users._meta.get_field('role').choices).get(target_role, target_role))
+            ]
+            self.fields['role'].initial = target_role
+            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
+        else:
+            self.fields['struktura'].queryset = Struktura.objects.all()
+            self.fields['role'].choices = Users._meta.get_field('role').choices
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Parollar mos emas!")
+        if password1 and len(password1) < 8:
+            raise forms.ValidationError("Parol kamida 8 ta belgidan iborat bo‘lishi kerak!")
+        return password2
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        new_password = self.cleaned_data.get("password1")
+        if new_password:
+            user.parol = new_password  # oddiy parol maydoni uchun
+            user.set_password(new_password)  # Django auth uchun
+        if commit:
+            user.save()
+        return user
+    
+    
+
+class FoydalanuvchiUpdateForm(UserChangeForm):
+    last_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Familya'}),
+        label="Familya"
+    )
+    first_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ism'}),
+        label="Ism"
+    )
+    sharif = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sharif'}),
+        label="Sharif"
+    )
+    struktura = forms.ModelChoiceField(
+        queryset=Struktura.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Struktura"
+    )
+    role = forms.ChoiceField(
+        choices=[],
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Rol"
+    )
+    password1 = forms.CharField(
+        label='Yangi parol',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Yangi parol'}),
+        required=True,
+        min_length=8
+    )
+    password2 = forms.CharField(
+        label='Yangi parolni tasdiqlang',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Yangi parolni tasdiqlang'}),
+        required=True,
+        min_length=8
+    )
+    is_active = forms.BooleanField(
+        label='Aktiv foydalanuvchi',
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    class Meta:
+        model = Users
+        fields = ('username', 'last_name', 'first_name', 'sharif', 'role', 'struktura', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        target_role = kwargs.pop('target_role', None)
+        super().__init__(*args, **kwargs)
+
+
+
+        if target_role:
+
+            print(f"Initializing UserUpdateForm with target_role: {target_role}")
+            self.fields['role'].choices = [
+                (target_role, dict(Users._meta.get_field('role').choices).get(target_role, target_role))
+            ]
+            self.fields['role'].initial = target_role
+            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
+        else:
+            self.fields['role'].choices = Users._meta.get_field('role').choices
+            self.fields['struktura'].queryset = Struktura.objects.all()
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 or password2:
+            if password1 != password2:
+                raise forms.ValidationError("Parollar mos emas!")
+            if password1 and len(password1) < 8:
+                raise forms.ValidationError("Parol kamida 8 ta belgidan iborat bo‘lishi kerak!")
+        return password2
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        new_password = self.cleaned_data.get("password1")
+        if new_password:
+            user.parol = new_password  # oddiy parol maydoni uchun
+            user.set_password(new_password)  # Django auth uchun
+        if commit:
+            user.save()
+        return user
+
+
+
+class StrukturaCreateForm(forms.ModelForm):
+    class Meta:
+        model = Struktura
+        fields = ['name', 'birlik_turi', 'role', 'is_active']
+
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get("name")
+        birlik_turi = cleaned_data.get("birlik_turi")
+        role = cleaned_data.get("role")
+
+        if not name or not birlik_turi or not role:
+            raise forms.ValidationError("Barcha maydonlar to'ldirilishi shart!")
+
+        return cleaned_data
+    
+class StrukturaUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Struktura
+        fields = ['name', 'birlik_turi', 'role', 'is_active']
+
+ 
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get("name")
+        birlik_turi = cleaned_data.get("birlik_turi")
+        role = cleaned_data.get("role")
+
+        if not name or not birlik_turi or not role:
+            raise forms.ValidationError("Barcha maydonlar to'ldirilishi shart!")
+
+        return cleaned_data

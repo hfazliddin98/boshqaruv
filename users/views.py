@@ -5,9 +5,23 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from users.choices import RoleChoice, ALLOWED_USER_MAP
-from users.models import Users
-from users.forms import KirishForm, UserCreateForm, UserUpdateForm
+from users.models import Struktura, Users
+from users.forms import (
+    KirishForm, UserCreateForm, UserUpdateForm, 
+    FoydalanuvchiCreateForm, FoydalanuvchiUpdateForm,
+    StrukturaCreateForm, StrukturaUpdateForm
+)
 from topshiriq.models import Topshiriq, TopshiriqJavob
+
+
+def xabar(request, xabar_matni):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    context = {
+        'xabar_matni': xabar_matni
+    }
+    return render(request, 'asosiy/xabar.html', context)
 
 
 @csrf_exempt
@@ -240,30 +254,129 @@ def admin_foydalanuvchi_list(request, target_role):
     if request.user.role != 'Admin':
         return HttpResponseForbidden("Siz ushbu sahifani ko'rishga ruxsat bermaysiz.")
 
-    foydalanuvchilar = Users.objects.all()
+    # Superuser bo'lmagan barcha foydalanuvchilarni olish
+    foydalanuvchilar = Users.objects.filter(is_superuser=False)
+    
+
+    
     context = {
-        'foydalanuvchilar': foydalanuvchilar
+        'users': foydalanuvchilar,
+        'target_role': target_role
     }
     return render(request, 'users/admin_foydalanuvchi_list.html', context)
 
 
 def admin_foydalanuvchi_create(request, target_role):
+
+    if request.method == 'POST':
+        form = FoydalanuvchiCreateForm(request.POST or None, target_role=target_role)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = target_role
+            user.yaratgan_user = request.user
+            user.parol = form.cleaned_data['password1']  # Agar ochiq holatda saqlamoqchi bo‘lsangiz
+            user.set_password(form.cleaned_data['password1'])
+            user.save()
+            return redirect('user_list', target_role=target_role)
+    else:
+        form = FoydalanuvchiCreateForm(target_role=target_role)
+
+    context = {
+        'form': form,
+        'target_role': target_role,
+        'RoleChoice': RoleChoice,
+    }
+    return render(request, 'users/admin_foydalanuvchi_create.html', context)
+
+def admin_foydalanuvchi_update(request, target_role, pk):
+    if target_role == RoleChoice.ADMIN.value:
+        
+        user = get_object_or_404(Users, pk=pk)
+        
+
+        if request.method == 'POST':
+            form = FoydalanuvchiUpdateForm(request.POST, instance=user, target_role=target_role)
+            if form.is_valid():
+                user = form.save(commit=False)
+                user.parol = form.cleaned_data['password1']  # Agar ochiq holatda saqlamoqchi bo‘lsangiz
+                user.set_password(form.cleaned_data['password1'])
+                form.save()
+                return redirect('user_list', target_role=target_role)
+        else:
+            form = FoydalanuvchiUpdateForm(instance=user, target_role=target_role)
+    else:
+        xabar_matni = "Siz ushbu roldagi foydalanuvchini tahrirlashga ruxsatingiz yo‘q."
+        return xabar(request, xabar_matni)
+
+    context = {
+        'form': form,
+        'target_role': target_role,
+        'user': user,
+        'RoleChoice': RoleChoice,
+    }
+    return render(request, 'users/admin_foydalanuvchi_update.html', context)
+
+
+def admin_struktura_list(request, target_role):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
     if request.user.role != 'Admin':
-        return HttpResponseForbidden("Siz ushbu sahifani ko'rishga ruxsat bermaysiz.")
+        xabar_matni = "Siz ushbu sahifani ko'rishga ruxsat bermaysiz."
+        return xabar(request, xabar_matni)
 
-    if request.method == 'POST':
-        form = UserCreateForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Foydalanuvchi muvaffaqiyatli yaratildi.")
-            return redirect('admin_foydalanuvchi_list')
-    else:
-        form = UserCreateForm()
+    # Barcha strukturalarni olish
+    strukturalar = Struktura.objects.all()
 
     context = {
-        'form': form
+        'strukturalar': strukturalar,
+        'target_role': target_role
     }
-    return render(request, 'users/admin_foydalanuvchi_create.html', context)
+    return render(request, 'users/admin_struktura_list.html', context)
+
+def admin_struktura_create(request, target_role):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != 'Admin':
+        xabar_matni = "Siz ushbu sahifani ko'rishga ruxsat bermaysiz."
+        return xabar(request, xabar_matni)
+
+    if request.method == 'POST':
+        form = StrukturaCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_struktura_list', target_role)
+    else:
+        form = StrukturaCreateForm()
+
+    context = {
+        'form': form,
+        'target_role': target_role
+    }
+    return render(request, 'users/admin_struktura_create.html', context)
+
+def admin_struktura_update(request, target_role, pk):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != 'Admin':
+        xabar_matni = "Siz ushbu sahifani ko'rishga ruxsat bermaysiz."
+        return xabar(request, xabar_matni)
+
+    struktura = get_object_or_404(Struktura, pk=pk)
+
+    if request.method == 'POST':
+        form = StrukturaUpdateForm(request.POST, instance=struktura)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_struktura_list', target_role)
+    else:
+        form = StrukturaUpdateForm(instance=struktura)
+
+    context = {
+        'form': form,
+        'struktura': struktura,
+        'target_role': target_role
+    }
+    return render(request, 'users/admin_struktura_update.html', context)

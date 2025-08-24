@@ -4,7 +4,7 @@ from users.models import Users, Struktura
 
 @admin.register(Users)
 class UsersAdmin(admin.ModelAdmin):
-    list_display = ['username', 'last_name', 'first_name', 'role', 'is_active']
+    list_display = ['username', 'last_name', 'first_name', 'role', 'is_active', 'is_superuser']
 
 
 @admin.register(Struktura)

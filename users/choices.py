@@ -15,6 +15,15 @@ class RoleChoice(models.TextChoices):
     KOMISSIYA = ("Komissiya", "Komissiya")
 
 
+class TopshiriqJavobStatus(models.TextChoices):
+    JARAYONDA = ("Jarayonda", "Jarayonda")
+    BAJARILDI = ("Bajarildi", "Bajarildi")
+    QISMAN_BAJARILDI = ("Qisman bajarildi", "Qisman bajarildi")
+    KECHIKTIRILDI = ("Kechiktirildi", "Kechiktirildi")
+    BEKOR_QILINDI = ("Bekor qilindi", "Bekor qilindi")
+    QAYTA_ISHLASH = ("Qayta ishlash", "Qayta ishlash")
+
+
 ALLOWED_USER_MAP = {
     RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
     RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
@@ -25,16 +34,6 @@ ALLOWED_USER_MAP = {
     RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
     RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
 }
-
-
-class TopshiriqJavobStatus(models.TextChoices):
-    JARAYONDA = ("Jarayonda", "Jarayonda")
-    BAJARILDI = ("Bajarildi", "Bajarildi")
-    QISMAN_BAJARILDI = ("Qisman bajarildi", "Qisman bajarildi")
-    KECHIKTIRILDI = ("Kechiktirildi", "Kechiktirildi")
-    BEKOR_QILINDI = ("Bekor qilindi", "Bekor qilindi")
-    QAYTA_ISHLASH = ("Qayta ishlash", "Qayta ishlash")
-
 
 # Kimga topshiriq javob berish huquqi bor
 ALLOWED_JAVOB_MAP = {

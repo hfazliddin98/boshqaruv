@@ -82,15 +82,12 @@ class UserCreateForm(UserCreationForm):
         target_role = kwargs.pop('target_role', None)
         super().__init__(*args, **kwargs)
 
+        # Har doim barcha rollar va strukturalarni ko'rsatamiz
+        self.fields['role'].choices = RoleChoice.choices
+        self.fields['struktura'].queryset = Struktura.objects.all()
+        
         if target_role:
-            self.fields['role'].choices = [
-                (target_role, dict(Users._meta.get_field('role').choices).get(target_role, target_role))
-            ]
             self.fields['role'].initial = target_role
-            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
-        else:
-            self.fields['struktura'].queryset = Struktura.objects.all()
-            self.fields['role'].choices = Users._meta.get_field('role').choices
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -226,10 +223,9 @@ class FoydalanuvchiCreateForm(UserCreationForm):
         label="Sharif"
     )
     role = forms.ChoiceField(
-        choices=[],  # choices bo‘sh, __init__da to‘ldiriladi
-        required=True,
+        choices=RoleChoice.choices,
         widget=forms.Select(attrs={'class': 'form-select'}),
-        label="Rol"
+        label="Lavozim/Rol"
     )
     yaratgan_user = forms.ModelChoiceField(
         queryset=Users.objects.filter(is_superuser=False),
@@ -277,15 +273,16 @@ class FoydalanuvchiCreateForm(UserCreationForm):
         target_role = kwargs.pop('target_role', None)
         super().__init__(*args, **kwargs)
 
+        # Har doim barcha rollarni ko'rsatamiz
+        self.fields['role'].choices = RoleChoice.choices
+        
         if target_role:
-            self.fields['role'].choices = [
-                (target_role, dict(Users._meta.get_field('role').choices).get(target_role, target_role))
-            ]
             self.fields['role'].initial = target_role
+            # Tanlangan rolga mos strukturalarni ko'rsatamiz
             self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
         else:
+            # Hech qanday rol tanlanmagan bo'lsa, barcha strukturalarni ko'rsatamiz
             self.fields['struktura'].queryset = Struktura.objects.all()
-            self.fields['role'].choices = Users._meta.get_field('role').choices
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -334,10 +331,9 @@ class FoydalanuvchiUpdateForm(UserChangeForm):
         label="Struktura"
     )
     role = forms.ChoiceField(
-        choices=[],
-        required=True,
+        choices=RoleChoice.choices,
         widget=forms.Select(attrs={'class': 'form-select'}),
-        label="Rol"
+        label="Lavozim/Rol"
     )
     password1 = forms.CharField(
         label='Yangi parol',
@@ -403,10 +399,31 @@ class FoydalanuvchiUpdateForm(UserChangeForm):
 
 
 class StrukturaCreateForm(forms.ModelForm):
+    name = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Struktura nomini kiriting'}),
+        label="Struktura nomi"
+    )
+    birlik_turi = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Birlik turini kiriting'}),
+        label="Birlik turi"
+    )
+    role = forms.ChoiceField(
+        choices=RoleChoice.choices,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Lavozim/Rol"
+    )
+    is_active = forms.BooleanField(
+        label='Aktiv struktura',
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
     class Meta:
         model = Struktura
         fields = ['name', 'birlik_turi', 'role', 'is_active']
-
 
     def clean(self):
         cleaned_data = super().clean()
@@ -420,11 +437,32 @@ class StrukturaCreateForm(forms.ModelForm):
         return cleaned_data
     
 class StrukturaUpdateForm(forms.ModelForm):
+    name = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Struktura nomini kiriting'}),
+        label="Struktura nomi"
+    )
+    birlik_turi = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Birlik turini kiriting'}),
+        label="Birlik turi"
+    )
+    role = forms.ChoiceField(
+        choices=RoleChoice.choices,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Lavozim/Rol"
+    )
+    is_active = forms.BooleanField(
+        label='Aktiv struktura',
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
     class Meta:
         model = Struktura
         fields = ['name', 'birlik_turi', 'role', 'is_active']
 
- 
     def clean(self):
         cleaned_data = super().clean()
         name = cleaned_data.get("name")

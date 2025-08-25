@@ -269,11 +269,11 @@ def admin_foydalanuvchi_list(request, target_role):
 def admin_foydalanuvchi_create(request, target_role):
 
     if request.method == 'POST':
-        form = FoydalanuvchiCreateForm(request.POST or None, target_role=target_role)
+        form = FoydalanuvchiCreateForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.role = target_role
-            user.yaratgan_user = request.user
+            user.role = form.cleaned_data['role']
+            user.yaratgan_user = form.cleaned_data['yaratgan_user']
             user.parol = form.cleaned_data['password1']  # Agar ochiq holatda saqlamoqchi bo‘lsangiz
             user.set_password(form.cleaned_data['password1'])
             user.save()

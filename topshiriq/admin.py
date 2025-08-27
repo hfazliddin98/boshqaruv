@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, TopshiriqReport, Notification
+from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, Xabarnoma
 
 
 class TopshiriqFileInline(admin.TabularInline):
@@ -41,36 +41,9 @@ class TopshiriqJavobFileAdmin(admin.ModelAdmin):
     search_fields = ('javob__title', 'file')
 
 
-@admin.register(TopshiriqReport)
-class TopshiriqReportAdmin(admin.ModelAdmin):
-    list_display = ('topshiriq', 'title', 'status', 'priority', 'yaratuvchi', 'bajaruvchi', 'created_at')
-    list_filter = ('status', 'priority', 'is_archived', 'created_at')
-    search_fields = ('title', 'topshiriq__title', 'yaratuvchi__first_name', 'yaratuvchi__last_name', 'bajaruvchi__first_name', 'bajaruvchi__last_name')
-    date_hierarchy = 'created_at'
-    readonly_fields = ('view_count', 'full_report')
-    
-    fieldsets = (
-        ('Asosiy ma\'lumotlar', {
-            'fields': ('topshiriq', 'javob', 'title', 'summary')
-        }),
-        ('Foydalanuvchilar', {
-            'fields': ('yaratuvchi', 'bajaruvchi', 'tasdiqlovchi')
-        }),
-        ('Holat va boshqarish', {
-            'fields': ('status', 'priority', 'rating', 'comment')
-        }),
-        ('Vaqt ma\'lumotlari', {
-            'fields': ('deadline', 'completed_at', 'approved_at', 'rejected_at')
-        }),
-        ('Qo\'shimcha', {
-            'fields': ('view_count', 'is_archived', 'full_report'),
-            'classes': ('collapse',)
-        })
-    )
 
-
-@admin.register(Notification)
-class NotificationAdmin(admin.ModelAdmin):
+@admin.register(Xabarnoma)
+class XabarnomaAdmin(admin.ModelAdmin):
     list_display = ('id', 'recipient', 'sender', 'notification_type', 'priority', 'is_read', 'created_at')
     list_filter = ('notification_type', 'priority', 'is_read', 'created_at')
     search_fields = ('recipient__username', 'sender__username', 'message')

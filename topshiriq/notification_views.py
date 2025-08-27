@@ -4,13 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import Notification
-from .services import NotificationService
+from .models import Xabarnoma
+from .services import XabarnomaService
 
 @login_required
 def notifications_list(request):
     """Bildirishnomalar ro'yxati"""
-    notifications = request.user.notifications.all()[:50]
+    notifications = request.user.xabarlar.all()[:50]
     
     # Sahifa ma'lumotlari
     paginator = Paginator(notifications, 20)
@@ -25,13 +25,13 @@ def notifications_list(request):
     
     return render(request, 'notifications/list.html', {
         'notifications': notifications_page,
-        'unread_count': request.user.notifications.filter(is_read=False).count(),
+        'unread_count': request.user.xabarlar.filter(is_read=False).count(),
     })
 
 @login_required
 def notification_detail(request, pk):
     """Bildirishnoma detallari va o'qilgan deb belgilash"""
-    notification = get_object_or_404(Notification, pk=pk, recipient=request.user)
+    notification = get_object_or_404(Xabarnoma, pk=pk, recipient=request.user)
     
     # Bildirishnomani o'qilgan deb belgilash
     notification.mark_as_read()
@@ -48,7 +48,7 @@ def notification_detail(request, pk):
 def mark_all_notifications_read(request):
     """Barcha bildirishnomalarni o'qilgan deb belgilash"""
     if request.method == 'POST':
-        count = NotificationService.mark_all_as_read(request.user)
+        count = XabarnomaService.mark_all_as_read(request.user)
         messages.success(request, f"{count} ta bildirishnoma o'qilgan deb belgilandi.")
     
     return redirect('notifications_list')
@@ -56,8 +56,8 @@ def mark_all_notifications_read(request):
 @login_required
 def notification_count_ajax(request):
     """AJAX orqali bildirishnomalar sonini olish"""
-    count = NotificationService.get_unread_count(request.user)
-    recent = NotificationService.get_recent_notifications(request.user, 5)
+    count = XabarnomaService.get_unread_count(request.user)
+    recent = XabarnomaService.get_recent_notifications(request.user, 5)
     
     notifications_data = []
     for notification in recent:

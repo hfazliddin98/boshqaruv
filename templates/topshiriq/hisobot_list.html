@@ -703,7 +703,7 @@
                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                         Jami Javoblar
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_reports }}</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_reports|default:0 }}</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-comment-dots fa-2x text-gray-300"></i>
@@ -721,7 +721,7 @@
                                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                         Ko'rib chiqish kutilmoqda
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.pending_reports }}</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.pending_reports|default:0 }}</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
@@ -739,7 +739,7 @@
                                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                         Tasdiqlangan
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.approved_reports }}</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.approved_reports|default:0 }}</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-check-circle fa-2x text-gray-300"></i>
@@ -757,7 +757,7 @@
                                     <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                         Rad etilgan
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.rejected_reports }}</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.rejected_reports|default:0 }}</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-times-circle fa-2x text-gray-300"></i>
@@ -789,7 +789,7 @@
                             </form>
                             
                             <!-- Excel Export Button -->
-                            <a href="{% url 'export_all_reports' %}{% if current_status %}?status={{ current_status }}{% endif %}" class="btn btn-success btn-sm">
+                            <a href="" class="btn btn-success btn-sm">
                                 <i class="fas fa-file-excel me-1"></i>
                                 Excel Export
                             </a>

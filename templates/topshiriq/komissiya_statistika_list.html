@@ -1,0 +1,1677 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QO'QON DAVLAT UNIVERSITETI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="{% static 'asosiy/favicon.ico' %}">
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Asosiy css -->
+    <link rel="stylesheet" href="{% static 'asosiy/home/asosiy.css' %}">
+
+    <style>
+        .menu-header {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 1rem 1.5rem 0.5rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* === ULTRA MODERN MAIN CONTENT === */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: calc(100vh - var(--navbar-height));
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(248, 250, 252, 0.9) 50%,
+                rgba(241, 245, 249, 0.85) 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: var(--navbar-height);
+            left: var(--sidebar-width);
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .main-content.expanded::before {
+            left: var(--sidebar-collapsed-width);
+        }
+
+        /* Ultra Modern Container */
+        .main-content .container-fluid {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* === Toggle Button === */
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-right: 1rem;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* === Card Styles - Ultra Modern === */
+        .card {
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-body {
+            padding: 1.25rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* === ULTRA MODERN CARD HEADER === */
+        .card-header {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(249, 250, 251, 0.9) 100%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.2);
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(102, 126, 234, 0.02) 0%, 
+                transparent 50%,
+                rgba(118, 75, 162, 0.01) 100%);
+            pointer-events: none;
+        }
+
+        /* Modern Icon Circles - Smaller */
+        .icon-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-circle::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+            transform: rotate(-45deg);
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .icon-circle::before {
+            transform: rotate(45deg);
+        }
+
+        .card:hover .icon-circle {
+            transform: rotate(5deg) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-circle i {
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 3;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .icon-circle i {
+            transform: scale(1.1);
+        }
+
+        /* Modern gradients for different roles */
+        .bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+        .bg-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; }
+        .bg-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important; }
+        .bg-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
+        .bg-danger { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%) !important; }
+
+        /* Modern buttons - Smaller */
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Specific button colors */
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .btn-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+        /* Modern text styles - Smaller */
+        .text-xs {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .h5 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Smaller paragraph text */
+        .card-body p {
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+
+        /* Animated number counter */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .h5 {
+            animation: countUp 0.8s ease;
+        }
+
+        /* Glass effect for cards */
+        .border-left-primary,
+        .border-left-success,
+        .border-left-info,
+        .border-left-warning,
+        .border-left-danger {
+            border-left: none !important;
+            position: relative;
+        }
+
+        /* Hover effects for statistics */
+        .card-body:hover .text-xs {
+            color: #667eea !important;
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Additional modern effects */
+        .card-hover-active {
+            transform: translateY(-8px) scale(1.01) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .card-info {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-footer-action {
+            margin-top: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Loading button states */
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Pulse animation for numbers */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .counter-number {
+            animation: pulse 2s infinite;
+        }
+
+        /* Gradient text for headings */
+        .main-content h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        /* Floating particles background effect */
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Responsive improvements - SM size optimized */
+        @media (max-width: 768px) {
+            .icon-circle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .icon-circle i {
+                font-size: 1rem;
+            }
+            
+            .h5 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+            }
+
+            .text-xs {
+                font-size: 0.6rem;
+            }
+
+            .card-body p {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 0.85rem;
+            }
+
+            .icon-circle {
+                width: 35px;
+                height: 35px;
+            }
+
+            .icon-circle i {
+                font-size: 0.9rem;
+            }
+
+            .h5 {
+                font-size: 1.3rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.3rem;
+            }
+
+            .btn {
+                font-size: 0.6rem;
+                padding: 5px 10px;
+            }
+
+            .card-body p {
+                font-size: 0.7rem;
+                line-height: 1.2;
+            }
+        }
+
+        /* === ULTRA MODERN TABLES === */
+        .table {
+            margin-bottom: 0;
+            background: transparent;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, 
+                rgba(248, 250, 252, 0.95) 0%, 
+                rgba(241, 245, 249, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            color: #334155;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            padding: 12px 16px;
+            position: relative;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.02),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .table th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(102, 126, 234, 0.3) 50%, 
+                transparent 100%);
+        }
+
+        .table tbody tr {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            box-shadow: 
+                0 2px 12px rgba(0, 0, 0, 0.04),
+                0 1px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.08);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.06),
+                0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+
+        .table td {
+            vertical-align: middle;
+            font-size: 13px;
+            padding: 12px 16px;
+            border: none;
+            color: #475569;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .table-responsive {
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            padding: 8px;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.02);
+        }
+
+        /* === ULTRA MODERN BUTTONS === */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 8px 16px;
+            font-size: 13px;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 16px rgba(102, 126, 234, 0.3),
+                0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 16px rgba(74, 222, 128, 0.3),
+                0 2px 8px rgba(74, 222, 128, 0.2);
+        }
+
+        .btn-outline-primary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        /* === ULTRA MODERN BADGES === */
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent, rgba(255, 255, 255, 0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+        }
+
+        .bg-success {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+        }
+
+        .bg-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            color: white !important;
+        }
+
+        .bg-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        }
+
+        .bg-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+        }
+
+        .badge:hover {
+            transform: translateY(-1px) scale(1.05);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* === ULTRA MODERN FORM STYLES === */
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 10px 14px;
+            border: 1px solid rgba(203, 213, 225, 0.5);
+            font-size: 13px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: rgba(102, 126, 234, 0.6);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 
+                0 0 0 3px rgba(102, 126, 234, 0.1),
+                0 2px 8px rgba(102, 126, 234, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .form-select-sm,
+        .form-control-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* === Input groups === */
+        .input-group .form-control:not(:first-child) {
+            border-left: none;
+        }
+
+        .input-group .btn {
+            border-left: none;
+        }
+
+        /* === Gradients and Utilities === */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        }
+
+        .file-upload-area {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bg-light-hover:hover,
+        .file-upload-area:hover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05) !important;
+        }
+
+        .border-dashed {
+            border-style: dashed !important;
+        }
+
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* === File List Styles === */
+        .list-group {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 0.375rem;
+        }
+
+        .list-group-item {
+            padding: 0.75rem 1.25rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .list-group-item:hover {
+            border-left-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+
+        /* === Shadow Utilities === */
+        .shadow-sm {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+
+        .shadow {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* === Text utilities === */
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .font-weight-bold {
+            font-weight: 600 !important;
+        }
+
+        .font-weight-normal {
+            font-weight: 400 !important;
+        }
+
+        /* === ULTRA MODERN PAGINATION === */
+        .pagination {
+            margin: 0;
+            gap: 6px;
+        }
+
+        .pagination .page-item {
+            margin: 0;
+        }
+
+        .pagination .page-link {
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(203, 213, 225, 0.4);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        .pagination .page-link:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 2px 8px rgba(102, 126, 234, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(102, 126, 234, 0.4);
+            color: white;
+            box-shadow: 
+                0 4px 16px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #94a3b8;
+            background: rgba(241, 245, 249, 0.6);
+            border-color: rgba(203, 213, 225, 0.3);
+            cursor: not-allowed;
+        }
+
+        .pagination-sm .page-link {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        /* === Container Overrides === */
+        .container, 
+        .container-fluid {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* === Animation utilities === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* === Loading states === */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        /* === Custom scrollbar === */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* === Additional Styles for Enhanced UI === */
+        .bg-light-warning {
+            background-color: rgba(245, 158, 11, 0.1) !important;
+            border-left: 3px solid rgba(245, 158, 11, 0.6) !important;
+        }
+
+        .bg-light-danger {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+            border-left: 3px solid rgba(239, 68, 68, 0.6) !important;
+        }
+
+        .progress-sm {
+            height: 0.5rem;
+        }
+
+        .icon-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .icon-circle.mx-auto {
+            width: 60px;
+            height: 60px;
+        }
+
+        .list-group-item-action:hover {
+            background-color: rgba(102, 126, 234, 0.05) !important;
+            transform: translateX(5px);
+            transition: all 0.2s ease;
+        }
+
+        /* Chart container styling */
+        #myPieChart {
+            max-width: 120px;
+            max-height: 120px;
+            margin: 0 auto;
+        }
+
+        /* Custom badge styles */
+        .badge.rounded-pill {
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+
+        /* Print styles */
+        @media print {
+            .sidebar { display: none !important; }
+            .main-content { margin-left: 0 !important; }
+            .card { break-inside: avoid; }
+            .btn { display: none !important; }
+        }
+
+        /* === Responsive === */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+                z-index: 1050;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .card-body .row>div {
+                margin-bottom: 1.5rem;
+            }
+            
+            .table-responsive {
+                font-size: 12px;
+            }
+            
+            .btn {
+                font-size: 12px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .input-group {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand span.d-none.d-sm-inline {
+                display: none !important;
+            }
+            
+            .card-header h6 {
+                font-size: 14px;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem 0.25rem;
+                font-size: 12px;
+            }
+            
+            .badge {
+                font-size: 10px;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Navbar -->
+    {% include "asosiy/navbar.html" %}
+
+    <!-- Sidebar -->
+    {% include "asosiy/sidebar.html" %}
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid mt-3">
+            <!-- Page Title with Welcome Message -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>Statistikalar
+                    </h1>                  
+                </div>
+                <div class="text-end">
+                    <button class="btn btn-success btn-sm" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel me-2"></i>Yuklab olish
+                    </button>
+                </div>
+            </div>
+
+            <!-- Date Filters -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-end">
+                                <div class="col-md-3">
+                                    <label for="filterYear" class="form-label text-muted">
+                                        <i class="fas fa-calendar me-1"></i>Yil
+                                    </label>
+                                    <select class="form-select form-select-sm" id="filterYear">
+                                        <option value="">Barcha yillar</option>
+                                        <option value="2024" {% if current_filters.year == '2024' %}selected{% endif %}>2024</option>
+                                        <option value="2025" {% if current_filters.year == '2025' %}selected{% endif %}>2025</option>
+                                        <option value="2026" {% if current_filters.year == '2026' %}selected{% endif %}>2026</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filterMonth" class="form-label text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>Oy
+                                    </label>
+                                    <select class="form-select form-select-sm" id="filterMonth">
+                                        <option value="">Barcha oylar</option>
+                                        <option value="1" {% if current_filters.month == '1' %}selected{% endif %}>Yanvar</option>
+                                        <option value="2" {% if current_filters.month == '2' %}selected{% endif %}>Fevral</option>
+                                        <option value="3" {% if current_filters.month == '3' %}selected{% endif %}>Mart</option>
+                                        <option value="4" {% if current_filters.month == '4' %}selected{% endif %}>Aprel</option>
+                                        <option value="5" {% if current_filters.month == '5' %}selected{% endif %}>May</option>
+                                        <option value="6" {% if current_filters.month == '6' %}selected{% endif %}>Iyun</option>
+                                        <option value="7" {% if current_filters.month == '7' %}selected{% endif %}>Iyul</option>
+                                        <option value="8" {% if current_filters.month == '8' %}selected{% endif %}>Avgust</option>
+                                        <option value="9" {% if current_filters.month == '9' %}selected{% endif %}>Sentyabr</option>
+                                        <option value="10" {% if current_filters.month == '10' %}selected{% endif %}>Oktyabr</option>
+                                        <option value="11" {% if current_filters.month == '11' %}selected{% endif %}>Noyabr</option>
+                                        <option value="12" {% if current_filters.month == '12' %}selected{% endif %}>Dekabr</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filterDay" class="form-label text-muted">
+                                        <i class="fas fa-calendar-day me-1"></i>Kun
+                                    </label>
+                                    <select class="form-select form-select-sm" id="filterDay">
+                                        <option value="">Barcha kunlar</option>
+                                        <!-- Days 1-31 will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary btn-sm flex-fill" onclick="applyDateFilter()">
+                                            <i class="fas fa-filter me-1"></i>Filter
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="clearDateFilter()">
+                                            <i class="fas fa-times me-1"></i>Tozalash
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Summary Alert -->
+            {% if stats.total_tasks == 0 %}
+            <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Ma'lumot!</strong> Hozirda topshiriqlar mavjud emas. Yangi topshiriqlar va hisobotlar kelganida bu yerda ko'rinadi.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+
+            <!-- Main Statistics Cards Row -->
+            <div class="row mb-4">
+                <!-- Total Tasks -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2 fade-in" style="animation-delay: 0.1s;">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        <i class="fas fa-tasks me-1"></i>Jami
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 counter-number">
+                                        {{ stats.total_tasks|default:0 }}
+                                    </div>
+                                    <small class="text-muted">barcha topshiriqlar soni</small>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-info">
+                                        <i class="fas fa-clipboard-list text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Completed Reports -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2 fade-in" style="animation-delay: 0.2s;">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        <i class="fas fa-clipboard-check me-1"></i>Bajarilgan
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 counter-number">
+                                        {{ stats.completed_reports|default:0 }}
+                                    </div>
+                                    <small class="text-success fw-bold">bajarilish yakunlangan</small>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-success">
+                                        <i class="fas fa-clipboard-check text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue Tasks -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-danger shadow h-100 py-2 fade-in" style="animation-delay: 0.3s;">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Kechikkan
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 counter-number">
+                                        {{ stats.overdue_tasks|default:0 }}
+                                    </div>
+                                    <small class="text-danger fw-bold">muddati o'tgan topshiriqlar</small>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-danger">
+                                        <i class="fas fa-times-circle text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Incomplete Reports -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2 fade-in" style="animation-delay: 0.4s;">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        <i class="fas fa-hourglass-start me-1"></i>Bajarilmagan
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 counter-number">
+                                        {{ stats.incomplete_reports|default:0 }}
+                                    </div>
+                                    <small class="text-warning fw-bold">bajarilish kutilayotgan</small>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-warning">
+                                        <i class="fas fa-hourglass-start text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Analysis -->
+            <div class="row">
+                <!-- Performance Chart -->
+                <div class="col-lg-12 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-chart-line me-2"></i>Topshiriqlar Tahlili
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if stats.total_tasks > 0 %}
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h4 class="small font-weight-bold">
+                                        Bajarilgan topshiriqlar 
+                                        <span class="float-right">
+                                            {% if stats.total_tasks > 0 %}
+                                                {% widthratio stats.completed_reports stats.total_tasks 100 %}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        </span>
+                                    </h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {% if stats.total_tasks > 0 %}{% widthratio stats.completed_reports stats.total_tasks 100 %}{% else %}0{% endif %}%"
+                                             aria-valuenow="{% if stats.total_tasks > 0 %}{% widthratio stats.completed_reports stats.total_tasks 100 %}{% else %}0{% endif %}" 
+                                             aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4 class="small font-weight-bold">
+                                        Kechikkan topshiriqlar 
+                                        <span class="float-right">
+                                            {% if stats.total_tasks > 0 %}
+                                                {% widthratio stats.overdue_tasks stats.total_tasks 100 %}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        </span>
+                                    </h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-danger" role="progressbar" 
+                                             style="width: {% if stats.total_tasks > 0 %}{% widthratio stats.overdue_tasks stats.total_tasks 100 %}{% else %}0{% endif %}%"
+                                             aria-valuenow="{% if stats.total_tasks > 0 %}{% widthratio stats.overdue_tasks stats.total_tasks 100 %}{% else %}0{% endif %}" 
+                                             aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Line Chart -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="chart-container" style="position: relative; height: 300px;">
+                                        <canvas id="myLineChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h5 class="card-title text-primary">{{ stats.total_tasks }}</h5>
+                                                <p class="card-text text-muted">Jami topshiriqlar</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h5 class="card-title text-success">
+                                                    {% if stats.total_tasks > 0 %}
+                                                        {% widthratio stats.completed_reports stats.total_tasks 100 %}%
+                                                    {% else %}
+                                                        0%
+                                                    {% endif %}
+                                                </h5>
+                                                <p class="card-text text-muted">Bajarilish darajasi</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h5 class="card-title text-warning">{{ stats.incomplete_reports }}</h5>
+                                                <p class="card-text text-muted">Bajarilmagan</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+                                <h5 class="text-muted">Statistika mavjud emas</h5>
+                                <p class="text-muted">Hisobotlar tahlili uchun ma'lumotlar kerak</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Sidebar toggle functionality
+            $('#sidebarToggle').click(function () {
+                $('#sidebar').toggleClass('collapsed');
+                $('#mainContent').toggleClass('expanded');
+
+                // For mobile view
+                if ($(window).width() < 992) {
+                    $('#sidebar').toggleClass('show');
+                }
+            });
+
+            // Close sidebar when clicking outside on mobile
+            $(document).click(function (e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('#sidebar').length && !$(e.target).is('#sidebarToggle')) {
+                        $('#sidebar').removeClass('show');
+                    }
+                }
+            });
+
+            // Prevent closing when clicking inside sidebar
+            $('#sidebar').click(function (e) {
+                e.stopPropagation();
+            });
+
+            // Active menu item highlight
+            $('.sidebar-menu a').click(function () {
+                $('.sidebar-menu a').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            // Animate numbers on page load
+            $('.counter-number').each(function () {
+                var $this = $(this);
+                var countTo = $this.text();
+                
+                if (countTo && !isNaN(countTo) && countTo > 0) {
+                    $({ countNum: 0 }).animate({
+                        countNum: countTo
+                    }, {
+                        duration: 800,
+                        easing: 'swing',
+                        step: function () {
+                            $this.text(Math.floor(this.countNum));
+                        },
+                        complete: function () {
+                            $this.text(this.countNum);
+                        }
+                    });
+                }
+            });
+
+            // Card hover effects
+            $('.card').hover(function() {
+                $(this).addClass('shadow-lg').removeClass('shadow');
+            }, function() {
+                $(this).addClass('shadow').removeClass('shadow-lg');
+            });
+
+            // Progress bar animation
+            $('.progress-bar').each(function() {
+                var width = $(this).attr('style').match(/width:\s*(\d+)%/);
+                if (width) {
+                    $(this).css('width', '0%');
+                    $(this).animate({
+                        width: width[0]
+                    }, 800);
+                }
+            });
+
+            // Line Chart Configuration - Topshiriq Ma'lumotlari
+            var totalTasks = {{ stats.total_tasks|default:0 }};
+            var completedTasks = {{ stats.completed_reports|default:0 }};
+            var incompleteTasks = {{ stats.incomplete_reports|default:0 }};
+            var overdueTasks = {{ stats.overdue_tasks|default:0 }};
+
+            // Line Chart - Topshiriqlar Tahlili
+            var lineCtx = document.getElementById('myLineChart').getContext('2d');
+            var myLineChart = new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jami Topshiriqlar', 'Bajarilgan', 'Bajarilmagan', 'Kechikkan'],
+                    datasets: [{
+                        label: 'Topshiriqlar Soni',
+                        data: [totalTasks, completedTasks, incompleteTasks, overdueTasks],
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: [
+                            'rgba(99, 102, 241, 1)',  // Jami - indigo
+                            'rgba(34, 197, 94, 1)',   // Bajarilgan - green
+                            'rgba(245, 158, 11, 1)',  // Bajarilmagan - orange  
+                            'rgba(239, 68, 68, 1)'    // Kechikkan - red
+                        ],
+                        pointBorderColor: [
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(34, 197, 94, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        pointRadius: 7,
+                        pointHoverRadius: 9,
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#64748b',
+                                font: {
+                                    size: 12,
+                                    weight: 600
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(255,255,255,0.2)',
+                            borderWidth: 1,
+                            titleFont: {
+                                size: 14,
+                                weight: 600
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' ta topshiriq';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: {
+                                    size: 11
+                                },
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: {
+                                    size: 11,
+                                    weight: 500
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+
+            // Refresh statistics every 5 minutes
+            setInterval(function() {
+                location.reload();
+            }, 300000); // 5 minutes
+
+            // Add tooltip functionality
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        // Date Filter Functions
+        function populateDays() {
+            const monthSelect = document.getElementById('filterMonth');
+            const yearSelect = document.getElementById('filterYear');
+            const daySelect = document.getElementById('filterDay');
+            
+            const selectedMonth = monthSelect.value;
+            const selectedYear = yearSelect.value;
+            const currentDay = '{{ current_filters.day }}'; // Current selected day from backend
+            
+            if (!selectedMonth || !selectedYear) {
+                daySelect.innerHTML = '<option value="">Kun tanlang</option>';
+                return;
+            }
+            
+            const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+            let dayOptions = '<option value="">Barcha kunlar</option>';
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const selected = (currentDay == i) ? 'selected' : '';
+                dayOptions += `<option value="${i}" ${selected}>${i}</option>`;
+            }
+            
+            daySelect.innerHTML = dayOptions;
+        }
+
+        function applyDateFilter() {
+            const year = document.getElementById('filterYear').value;
+            const month = document.getElementById('filterMonth').value;
+            const day = document.getElementById('filterDay').value;
+            
+            // Build filter parameters
+            let filterParams = new URLSearchParams();
+            
+            if (year) filterParams.append('year', year);
+            if (month) filterParams.append('month', month);
+            if (day) filterParams.append('day', day);
+            
+            // Reload page with filters
+            const currentUrl = window.location.pathname;
+            const newUrl = filterParams.toString() ? 
+                `${currentUrl}?${filterParams.toString()}` : currentUrl;
+            
+            window.location.href = newUrl;
+        }
+
+        function clearDateFilter() {
+            // Reset all filter dropdowns
+            document.getElementById('filterYear').value = '';
+            document.getElementById('filterMonth').value = '';
+            document.getElementById('filterDay').value = '';
+            
+            // Reload page without filters
+            window.location.href = window.location.pathname;
+        }
+
+        // Initialize day dropdown when month or year changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const monthSelect = document.getElementById('filterMonth');
+            const yearSelect = document.getElementById('filterYear');
+            
+            if (monthSelect && yearSelect) {
+                // Auto-apply filter when month or year changes
+                monthSelect.addEventListener('change', function() {
+                    populateDays();
+                    applyDateFilter();
+                });
+                
+                yearSelect.addEventListener('change', function() {
+                    populateDays();
+                    applyDateFilter();
+                });
+                
+                // Initialize days on page load if month/year are already selected
+                populateDays();
+            }
+        });
+
+        // Excel Export Function
+        function exportToExcel() {
+            // Get current filter values
+            const year = document.getElementById('filterYear').value;
+            const month = document.getElementById('filterMonth').value;
+            const day = document.getElementById('filterDay').value;
+            
+            // Build filter info for Excel
+            let filterInfo = '';
+            if (year || month || day) {
+                let filterParts = [];
+                if (year) filterParts.push('Yil: ' + year);
+                if (month) {
+                    const monthNames = ['', 'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 
+                                      'Iyul', 'Avgust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
+                    filterParts.push('Oy: ' + monthNames[parseInt(month)]);
+                }
+                if (day) filterParts.push('Kun: ' + day);
+                filterInfo = 'Filter: ' + filterParts.join(', ');
+            } else {
+                filterInfo = 'Filter: Barcha ma\'lumotlar';
+            }
+
+            // Prepare data for Excel export with filter information
+            var data = [
+                ['TOPSHIRIQLAR STATISTIKASI'],
+                ['Tizim: QO\'QON DAVLAT UNIVERSITETI'],
+                ['Yaratilgan vaqt:', new Date().toLocaleString('uz-UZ')],
+                [filterInfo],
+                [''],
+                ['Kategoriya', 'Soni', 'Foiz (%)'],
+                ['Jami Topshiriqlar', {{ stats.total_tasks|default:0 }}, '100%'],
+                ['Bajarilgan', {{ stats.completed_reports|default:0 }}, '{% if stats.total_tasks > 0 %}{% widthratio stats.completed_reports stats.total_tasks 100 %}{% else %}0{% endif %}%'],
+                ['Bajarilmagan', {{ stats.incomplete_reports|default:0 }}, '{% if stats.total_tasks > 0 %}{% widthratio stats.incomplete_reports stats.total_tasks 100 %}{% else %}0{% endif %}%'],
+                ['Kechikkan', {{ stats.overdue_tasks|default:0 }}, '{% if stats.total_tasks > 0 %}{% widthratio stats.overdue_tasks stats.total_tasks 100 %}{% else %}0{% endif %}%']
+            ];
+
+            // Create workbook and worksheet
+            var wb = XLSX.utils.book_new();
+            var ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // Set column widths
+            ws['!cols'] = [
+                {wch: 25}, // Column A
+                {wch: 15}, // Column B  
+                {wch: 15}  // Column C
+            ];
+
+            // Style the header row
+            ws['A1'].s = {
+                font: { bold: true, sz: 14 },
+                alignment: { horizontal: 'center' }
+            };
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Statistikalar');
+
+            // Generate filename with current date and filter info
+            let filename = 'Topshiriqlar_Statistikasi_' + new Date().toISOString().slice(0, 10);
+            
+            // Add filter info to filename if filters are applied
+            if (year || month || day) {
+                let filterSuffix = [];
+                if (year) filterSuffix.push('Y' + year);
+                if (month) filterSuffix.push('M' + month.padStart(2, '0'));
+                if (day) filterSuffix.push('D' + day.padStart(2, '0'));
+                filename += '_Filter_' + filterSuffix.join('_');
+            }
+            
+            filename += '.xlsx';
+
+            // Save the file
+            XLSX.writeFile(wb, filename);
+            
+            // Show success message with filter info
+            let successMessage = 'Excel fayl muvaffaqiyatli yuklab olindi: ' + filename;
+            if (year || month || day) {
+                successMessage += '\nFilter ma\'lumotlari: ' + filterInfo.replace('Filter: ', '');
+            }
+            alert(successMessage);
+        }
+    </script>
+</body>
+
+</html>

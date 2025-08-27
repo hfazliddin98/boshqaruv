@@ -80,7 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'topshiriq.context_processors.notifications_context',
+                'topshiriq.context_processors.xabarlar_context',
                 'users.context_processors.role_choices',
             ],
         },

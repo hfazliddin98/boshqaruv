@@ -184,15 +184,15 @@
                 </li>
             {% elif request.user.role == RoleChoice.KOMISSIYA.value %}
                 <li>
-                    <a href="{% url 'user_list' RoleChoice.KOMISSIYA.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.KOMISSIYA.value %}active{% endif %}">
+                    <a href="{% url 'komissiya_foydalanuvchi_list' RoleChoice.KOMISSIYA.value %}" class="{% if url_name == 'komissiya_foydalanuvchi_list' and request.resolver_match.kwargs.target_role == RoleChoice.KOMISSIYA.value %}active{% endif %}">
                         <i class="fas fa-user"></i>
-                        <span class="sidebar-text">Hodimlar</span>
+                        <span class="sidebar-text">Foydalanuvchilar</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'topshiriq_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                    <a href="{% url 'komissiya_statistika_list' RoleChoice.KOMISSIYA.value %}" class="{% if url_name == 'komissiya_statistika_list' and request.resolver_match.kwargs.target_role == RoleChoice.KOMISSIYA.value %}active{% endif %}">
                         <i class="fas fa-tasks"></i>
-                        <span class="sidebar-text">Hodim topshiriqlari</span>
+                        <span class="sidebar-text">Statistika</span>
                     </a>
                 </li>
             {% endif %}

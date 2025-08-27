@@ -1,14 +1,14 @@
 from django.urls import reverse
 from django.utils import timezone
-from .models import Notification
+from .models import Xabarnoma
 
-class NotificationService:
+class XabarnomaService:
     """Bildirishnoma xizmatlari"""
     
     @staticmethod
     def create_notification(recipient, title, message, notification_type, sender=None, **kwargs):
         """Yangi bildirishnoma yaratish"""
-        return Notification.objects.create(
+        return Xabarnoma.objects.create(
             recipient=recipient,
             sender=sender,
             title=title,
@@ -23,7 +23,7 @@ class NotificationService:
         try:
             action_url = f"/topshiriq/{topshiriq.pk}/"
             
-            NotificationService.create_notification(
+            XabarnomaService.create_notification(
                 recipient=topshiriq.bajaruvchi_user,
                 sender=topshiriq.yaratuvchi_user,
                 title="📋 Yangi topshiriq berildi",
@@ -44,7 +44,7 @@ class NotificationService:
         try:
             action_url = f"/topshiriq/baxolash/{javob.topshiriq.pk}/"
             
-            NotificationService.create_notification(
+            XabarnomaService.create_notification(
                 recipient=javob.topshiriq.yaratuvchi_user,
                 sender=javob.bajaruvchi_user,
                 title="💬 Topshiriq javobi keldi",
@@ -68,7 +68,7 @@ class NotificationService:
             baho_display = topshiriq.get_baxo_display() if topshiriq.baxo else "Noma'lum"
             status_display = topshiriq.get_status_display() if topshiriq.status else "Noma'lum"
             
-            NotificationService.create_notification(
+            XabarnomaService.create_notification(
                 recipient=topshiriq.bajaruvchi_user,
                 sender=topshiriq.yaratuvchi_user,
                 title="⭐ Topshiriq baholandi",
@@ -86,7 +86,7 @@ class NotificationService:
     @staticmethod
     def mark_all_as_read(user):
         """Foydalanuvchining barcha bildirishnomalarini o'qilgan deb belgilash"""
-        unread_notifications = user.notifications.filter(is_read=False)
+        unread_notifications = user.xabarlar.filter(is_read=False)
         count = unread_notifications.count()
         unread_notifications.update(is_read=True, read_at=timezone.now())
         return count
@@ -94,9 +94,9 @@ class NotificationService:
     @staticmethod
     def get_unread_count(user):
         """O'qilmagan bildirishnomalar sonini olish"""
-        return user.notifications.filter(is_read=False).count()
+        return user.xabarlar.filter(is_read=False).count()
     
     @staticmethod
     def get_recent_notifications(user, limit=5):
         """So'nggi bildirishnomalarni olish"""
-        return user.notifications.filter(is_read=False)[:limit]
+        return user.xabarlar.filter(is_read=False)[:limit]

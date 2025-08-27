@@ -135,6 +135,31 @@ def home(request):
             ).count(),
         })
     
+    # KOMISSIYA statistikasi
+    elif request.user.role == RoleChoice.KOMISSIYA.value:
+        context.update({
+            'user_count': Users.objects.filter(
+                is_active=True
+            ).exclude(
+                role__in=[RoleChoice.ADMIN.value, RoleChoice.KOMISSIYA.value]
+            ).count(),
+            'topshiriq_count': Topshiriq.objects.count(),
+            'statistika_count': Users.objects.filter(is_active=True).count() + Topshiriq.objects.count(),
+        })
+    
+    # ADMIN statistikasi
+    elif request.user.role == RoleChoice.ADMIN.value:
+        context.update({
+            'user_count': Users.objects.filter(
+                is_active=True
+            ).exclude(
+                role__in=[RoleChoice.ADMIN.value, RoleChoice.KOMISSIYA.value]
+            ).count(),
+            'struktura_count': Struktura.objects.filter(is_active=True).count(),
+            'admin_topshiriq_count': Topshiriq.objects.count(),
+            'admin_hisobot_count': Topshiriq.objects.filter(javob_yuborildi=True).count(),
+        })
+    
     # HODIM va TYUTOR uchun o'ziga berilgan topshiriqlar
     else:
         context.update({
@@ -380,3 +405,101 @@ def admin_struktura_update(request, target_role, pk):
         'target_role': target_role
     }
     return render(request, 'users/admin_struktura_update.html', context)
+
+
+def komissiya_foydalanuvchi_list(request, target_role):
+    if not request.user.is_authenticated:
+        return redirect('kirish')
+
+    if request.user.role != RoleChoice.KOMISSIYA.value:
+        xabar_matni = "Siz ushbu sahifani ko'rishga ruxsat bermaysiz."
+        return xabar(request, xabar_matni)
+
+    # Barcha foydalanuvchilarni olish (superuser emas)
+    from topshiriq.models import Topshiriq
+    from topshiriq.choices import StatusChoice
+    from django.utils import timezone
+    from django.db.models import Count, Q
+    
+    foydalanuvchilar = Users.objects.filter(is_superuser=False).order_by('role', 'first_name', 'last_name')
+    
+    # Har bir foydalanuvchi uchun statistika qo'shish
+    foydalanuvchilar_statistika_bilan = []
+    joriy_vaqt = timezone.now()
+    
+    for foydalanuvchi in foydalanuvchilar:
+        # Foydalanuvchiga berilgan barcha topshiriqlar
+        foydalanuvchi_topshiriqlar = Topshiriq.objects.filter(bajaruvchi_user=foydalanuvchi)
+        
+        # Statistikalar
+        jami_topshiriqlar = foydalanuvchi_topshiriqlar.count()
+        bajarilgan_topshiriqlar = foydalanuvchi_topshiriqlar.filter(status=StatusChoice.BAJARILDI).count()
+        kechikkan_topshiriqlar = foydalanuvchi_topshiriqlar.filter(
+            Q(status=StatusChoice.KECHIKDI)
+        ).count()
+        bajarilmagan_topshiriqlar = foydalanuvchi_topshiriqlar.filter(
+            status__in=[StatusChoice.YUBORILDI]
+        ).count()
+        muvaffaqiyatsiz_topshiriqlar = foydalanuvchi_topshiriqlar.filter(status=StatusChoice.BAJARILMADI).count()
+        
+        # Foizlarni hisoblash
+        bajarilish_foizi = round((bajarilgan_topshiriqlar / jami_topshiriqlar * 100), 1) if jami_topshiriqlar > 0 else 0
+        kechikish_foizi = round((kechikkan_topshiriqlar / jami_topshiriqlar * 100), 1) if jami_topshiriqlar > 0 else 0
+        bajarilmaganlik_foizi = round((bajarilmagan_topshiriqlar / jami_topshiriqlar * 100), 1) if jami_topshiriqlar > 0 else 0
+        
+        foydalanuvchi_statistika_bilan = {
+            'user': foydalanuvchi,
+            'stats': {
+                'total': jami_topshiriqlar,
+                'completed': bajarilgan_topshiriqlar,
+                'delayed': kechikkan_topshiriqlar,
+                'unfinished': bajarilmagan_topshiriqlar,
+                'failed': muvaffaqiyatsiz_topshiriqlar,
+                'completion_rate': bajarilish_foizi,
+                'delay_rate': kechikish_foizi,
+                'unfinished_rate': bajarilmaganlik_foizi,
+            }
+        }
+        foydalanuvchilar_statistika_bilan.append(foydalanuvchi_statistika_bilan)
+
+    # Umumiy statistikalar
+    jami_barcha_topshiriqlar = sum(foydalanuvchi_data['stats']['total'] for foydalanuvchi_data in foydalanuvchilar_statistika_bilan)
+    jami_bajarilgan_topshiriqlar = sum(foydalanuvchi_data['stats']['completed'] for foydalanuvchi_data in foydalanuvchilar_statistika_bilan)
+    jami_kechikkan_topshiriqlar = sum(foydalanuvchi_data['stats']['delayed'] for foydalanuvchi_data in foydalanuvchilar_statistika_bilan)
+    jami_bajarilmagan_topshiriqlar = sum(foydalanuvchi_data['stats']['unfinished'] for foydalanuvchi_data in foydalanuvchilar_statistika_bilan)
+    
+    # Umumiy foizlarni hisoblash
+    umumiy_bajarilish_foizi = round((jami_bajarilgan_topshiriqlar / jami_barcha_topshiriqlar * 100), 1) if jami_barcha_topshiriqlar > 0 else 0
+    umumiy_kechikish_foizi = round((jami_kechikkan_topshiriqlar / jami_barcha_topshiriqlar * 100), 1) if jami_barcha_topshiriqlar > 0 else 0
+    umumiy_bajarilmaganlik_foizi = round((jami_bajarilmagan_topshiriqlar / jami_barcha_topshiriqlar * 100), 1) if jami_barcha_topshiriqlar > 0 else 0
+    
+    # Samaradorlik bo'yicha statistika
+    ajoyib_foydalanuvchilar = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['stats']['total'] > 0 and foydalanuvchi_data['stats']['completion_rate'] >= 80)
+    yaxshi_foydalanuvchilar = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['stats']['total'] > 0 and 60 <= foydalanuvchi_data['stats']['completion_rate'] < 80)
+    ortacha_foydalanuvchilar = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['stats']['total'] > 0 and 40 <= foydalanuvchi_data['stats']['completion_rate'] < 60)
+    yomon_foydalanuvchilar = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['stats']['total'] > 0 and foydalanuvchi_data['stats']['completion_rate'] < 40)
+    
+    # Rollarga bo'yicha statistika
+    rol_statistikasi = {}
+    for rol_tanlovi in RoleChoice:
+        rol_statistikasi[rol_tanlovi.value] = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['user'].role == rol_tanlovi.value)
+
+    context = {
+        'foydalanuvchilar_malumotlari': foydalanuvchilar_statistika_bilan,
+        'target_role': target_role,
+        'RoleChoice': RoleChoice,
+        'total_users': len(foydalanuvchilar_statistika_bilan),
+        'total_all_tasks': jami_barcha_topshiriqlar,
+        'total_completed_tasks': jami_bajarilgan_topshiriqlar,
+        'total_delayed_tasks': jami_kechikkan_topshiriqlar,
+        'total_unfinished_tasks': jami_bajarilmagan_topshiriqlar,
+        'overall_completion_rate': umumiy_bajarilish_foizi,
+        'overall_delay_rate': umumiy_kechikish_foizi,
+        'overall_unfinished_rate': umumiy_bajarilmaganlik_foizi,
+        'excellent_users': ajoyib_foydalanuvchilar,
+        'good_users': yaxshi_foydalanuvchilar,
+        'average_users': ortacha_foydalanuvchilar,
+        'poor_users': yomon_foydalanuvchilar,
+        'role_stats': rol_statistikasi,
+    }
+    return render(request, 'users/komissiya_foydalanuvchi_list.html', context)

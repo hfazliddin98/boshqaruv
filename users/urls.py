@@ -3,6 +3,7 @@ from users.views import home, kirish, chiqish
 from users.views import user_list, user_create, user_update
 from users.views import admin_foydalanuvchi_list, admin_foydalanuvchi_create, admin_foydalanuvchi_update
 from users.views import admin_struktura_list, admin_struktura_create, admin_struktura_update
+from users.views import komissiya_foydalanuvchi_list
 
 
 
@@ -27,4 +28,6 @@ urlpatterns = [
     path('admin_struktura_create/<str:target_role>/', admin_struktura_create, name='admin_struktura_create'),
     path('admin_struktura_update/<str:target_role>/<uuid:pk>/', admin_struktura_update, name='admin_struktura_update'),
 
+    # komissiya
+    path('komissiya_foydalanuvchi_list/<str:target_role>/', komissiya_foydalanuvchi_list, name='komissiya_foydalanuvchi_list'),
 ]

@@ -1,0 +1,1546 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QO'QON DAVLAT UNIVERSITETI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="{% static 'asosiy/favicon.ico' %}">
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Asosiy css -->
+    <link rel="stylesheet" href="{% static 'asosiy/home/asosiy.css' %}">
+
+    <style>
+        .menu-header {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 1rem 1.5rem 0.5rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* === Main Content === */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: margin-left 0.3s;
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* === Toggle Button === */
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-right: 1rem;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* === Card Styles - Ultra Modern === */
+        .card {
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-body {
+            padding: 1.25rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Modern Icon Circles - Smaller */
+        .icon-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-circle::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+            transform: rotate(-45deg);
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .icon-circle::before {
+            transform: rotate(45deg);
+        }
+
+        .card:hover .icon-circle {
+            transform: rotate(5deg) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-circle i {
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 3;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .icon-circle i {
+            transform: scale(1.1);
+        }
+
+        /* Modern gradients for different roles */
+        .bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+        .bg-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; }
+        .bg-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important; }
+        .bg-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
+        .bg-danger { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%) !important; }
+
+        /* Modern buttons - Smaller */
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Specific button colors */
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .btn-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+        /* Modern text styles - Smaller */
+        .text-xs {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .h5 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Smaller paragraph text */
+        .card-body p {
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+
+        /* Animated number counter */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .h5 {
+            animation: countUp 0.8s ease;
+        }
+
+        /* Glass effect for cards */
+        .border-left-primary,
+        .border-left-success,
+        .border-left-info,
+        .border-left-warning,
+        .border-left-danger {
+            border-left: none !important;
+            position: relative;
+        }
+
+        /* Hover effects for statistics */
+        .card-body:hover .text-xs {
+            color: #667eea !important;
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Additional modern effects */
+        .card-hover-active {
+            transform: translateY(-8px) scale(1.01) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .card-info {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-footer-action {
+            margin-top: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Loading button states */
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Pulse animation for numbers */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .counter-number {
+            animation: pulse 2s infinite;
+        }
+
+        /* Gradient text for headings */
+        .main-content h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        /* Floating particles background effect */
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Responsive improvements - SM size optimized */
+        @media (max-width: 768px) {
+            .icon-circle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .icon-circle i {
+                font-size: 1rem;
+            }
+            
+            .h5 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+            }
+
+            .text-xs {
+                font-size: 0.6rem;
+            }
+
+            .card-body p {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 0.85rem;
+            }
+
+            .icon-circle {
+                width: 35px;
+                height: 35px;
+            }
+
+            .icon-circle i {
+                font-size: 0.9rem;
+            }
+
+            .h5 {
+                font-size: 1.3rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.3rem;
+            }
+
+            .btn {
+                font-size: 0.6rem;
+                padding: 5px 10px;
+            }
+
+            .card-body p {
+                font-size: 0.7rem;
+                line-height: 1.2;
+            }
+        }
+
+        /* === Simple Statistics Design === */
+        .stats-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .stat-number {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        /* Number colors matching progress rings */
+        .stat-completed .stat-number { color: #28a745; }
+        .stat-delayed .stat-number { color: #dc3545; }
+        .stat-unfinished .stat-number { color: #ffc107; }
+
+        .stat-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .stat-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Progress circles with CSS only */
+        .progress-ring {
+            width: 35px;
+            height: 35px;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke-width: 3;
+            fill: transparent;
+            stroke-dasharray: 94; /* 2 * π * 15 = ~94 */
+            stroke-dashoffset: 94;
+            stroke-linecap: round;
+        }
+
+        .progress-ring-background {
+            stroke: #e9ecef;
+        }
+
+        .progress-ring-progress {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+
+        /* Colors for different stats */
+        .stat-completed .progress-ring-progress { stroke: #28a745; }
+        .stat-delayed .progress-ring-progress { stroke: #dc3545; }
+        .stat-unfinished .progress-ring-progress { stroke: #ffc107; }
+
+        .stat-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        .stat-completed .stat-text { color: #28a745; }
+        .stat-delayed .stat-text { color: #dc3545; }
+        .stat-unfinished .stat-text { color: #ffc107; }
+
+        .circular-progress::before {
+            content: '';
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .circular-progress span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Modern Badges */
+        .modern-badge {
+            background: linear-gradient(135deg, var(--badge-color-1), var(--badge-color-2));
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .modern-badge:hover::before {
+            left: 100%;
+        }
+
+        .badge-completed {
+            --badge-color-1: #28a745;
+            --badge-color-2: #20c997;
+        }
+
+        .badge-delayed {
+            --badge-color-1: #dc3545;
+            --badge-color-2: #fd7e14;
+        }
+
+        .badge-unfinished {
+            --badge-color-1: #ffc107;
+            --badge-color-2: #ff8c00;
+        }
+
+        .badge-secondary {
+            --badge-color-1: #6c757d;
+            --badge-color-2: #495057;
+        }
+
+        /* Animated Counter */
+        .animated-counter {
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--counter-color-1), var(--counter-color-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s infinite;
+        }
+
+        .counter-completed {
+            --counter-color-1: #28a745;
+            --counter-color-2: #20c997;
+        }
+
+        .counter-delayed {
+            --counter-color-1: #dc3545;
+            --counter-color-2: #fd7e14;
+        }
+
+        .counter-unfinished {
+            --counter-color-1: #ffc107;
+            --counter-color-2: #ff8c00;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes progressFill {
+            0% { 
+                background: conic-gradient(#e9ecef 0%, #e9ecef 100%);
+                transform: scale(0.8) rotate(-90deg);
+            }
+            100% { 
+                background: conic-gradient(var(--accent-color) var(--percentage, 0%), #e9ecef var(--percentage, 0%));
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes slideIn {
+            0% { 
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            100% { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .stats-card {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .stats-card:nth-child(2n) {
+            animation-delay: 0.1s;
+        }
+
+        .stats-card:nth-child(3n) {
+            animation-delay: 0.2s;
+        }
+
+        /* Hover effects for table cells */
+        .table td.stats-cell {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .table td.stats-cell:hover {
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.04)) !important;
+        }
+
+        /* === Tables === */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #212529;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        .table-responsive {
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.125);
+        }
+
+        /* === Buttons === */
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            font-size: 12px;
+            padding: 0.375rem 0.75rem;
+        }
+
+        /* === Badges === */
+        .badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        /* === Form Styles === */
+        .form-control,
+        .form-select {
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ced4da;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .form-control-lg {
+            padding: 0.75rem 1.25rem;
+            font-size: 1.1rem;
+        }
+
+        /* === Input groups === */
+        .input-group .form-control:not(:first-child) {
+            border-left: none;
+        }
+
+        .input-group .btn {
+            border-left: none;
+        }
+
+        /* === Gradients and Utilities === */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        }
+
+        .file-upload-area {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bg-light-hover:hover,
+        .file-upload-area:hover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05) !important;
+        }
+
+        .border-dashed {
+            border-style: dashed !important;
+        }
+
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* === File List Styles === */
+        .list-group {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 0.375rem;
+        }
+
+        .list-group-item {
+            padding: 0.75rem 1.25rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .list-group-item:hover {
+            border-left-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+
+        /* === Shadow Utilities === */
+        .shadow-sm {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+
+        .shadow {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* === Text utilities === */
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .font-weight-bold {
+            font-weight: 600 !important;
+        }
+
+        .font-weight-normal {
+            font-weight: 400 !important;
+        }
+
+        /* === Pagination === */
+        .pagination {
+            margin: 0;
+        }
+
+        .pagination .page-link {
+            color: var(--primary-color);
+            border-color: #dee2e6;
+            border-radius: 6px;
+            margin: 0 2px;
+            font-size: 14px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        /* === Container Overrides === */
+        .container, 
+        .container-fluid {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* === Animation utilities === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* === Loading states === */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        /* === Custom scrollbar === */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+                z-index: 1050;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .card-body .row>div {
+                margin-bottom: 1.5rem;
+            }
+            
+            .table-responsive {
+                font-size: 12px;
+            }
+            
+            .btn {
+                font-size: 12px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .d-flex.gap-2 {
+                flex-direction: column !important;
+                gap: 0.5rem !important;
+            }
+            
+            .input-group {
+                width: 100% !important;
+            }
+            
+            #roleFilter {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand span.d-none.d-sm-inline {
+                display: none !important;
+            }
+            
+            .card-header h6 {
+                font-size: 14px;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem 0.25rem;
+                font-size: 12px;
+            }
+            
+            .badge {
+                font-size: 10px;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        /* Struktura ustuni uchun maxsus stillar */
+        .struktura-cell {
+            min-width: 150px;
+            position: relative;
+        }
+
+        .struktura-cell:hover .text-truncate {
+            overflow: visible;
+            white-space: normal;
+            position: absolute;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-width: 300px;
+        }
+    </style>
+    
+</head>
+
+<body>
+    <!-- Navbar -->
+    {% include "asosiy/navbar.html" %}
+
+    <!-- Sidebar -->
+    {% include "asosiy/sidebar.html" %}
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-users me-2"></i>Barcha Foydalanuvchilar
+                </h1>
+                <button class="btn btn-success" onclick="exportToExcel()" title="Excel fayl yuklab olish">
+                    <i class="fas fa-file-excel me-2"></i>Yuklab olish
+                </button>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Foydalanuvchilar ro'yxati</h6>
+                    <div class="d-flex gap-2">
+                        <select class="form-select" id="roleFilter" style="width: 200px;">
+                            <option value="">Barcha rollar</option>
+                            <option value="REKTOR">Rektor</option>
+                            <option value="PROREKTOR">Prorektor</option>
+                            <option value="DEKAN">Dekan</option>
+                            <option value="BOLIM_RAHBARI">Bo'lim rahbari</option>
+                            <option value="BOLIM_BOSHLIGI">Bo'lim boshligi</option>
+                            <option value="ZAM_DEKAN">Zam dekan</option>
+                            <option value="KAFEDRA_MUDIRI">Kafedra mudiri</option>
+                            <option value="TYUTOR">Tyutor</option>
+                            <option value="HODIM">Hodim</option>
+                        </select>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Qidirish..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="height: 70vh;">
+                        <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Foydalanuvchi</th>
+                                    <th>Role</th>
+                                    <th><i class="fas fa-building me-1"></i>Struktura</th>
+                                    <th>Holati</th>
+                                    <th>Jami</th>
+                                    <th>Bajarilgan</th>
+                                    <th>Kechikkan</th>
+                                    <th>Bajarilmagan</th>
+                                    <th>Jami bal</th>
+                                    <th>Samaradorlik</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for foydalanuvchi_malumoti in foydalanuvchilar_malumotlari %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    {{ foydalanuvchi_malumoti.user.first_name|first|default:foydalanuvchi_malumoti.user.username|first|upper }}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">{{ foydalanuvchi_malumoti.user.username }}</div>
+                                                <div class="text-muted small">
+                                                    {{ foydalanuvchi_malumoti.user.first_name }} {{ foydalanuvchi_malumoti.user.last_name }}
+                                                    {% if not foydalanuvchi_malumoti.user.first_name and not foydalanuvchi_malumoti.user.last_name %}
+                                                    <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </div>
+                                                {% if foydalanuvchi_malumoti.user.email %}
+                                                <div class="text-muted small">{{ foydalanuvchi_malumoti.user.email }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if foydalanuvchi_malumoti.user.role == 'REKTOR' %}danger{% elif foydalanuvchi_malumoti.user.role == 'PROREKTOR' %}warning{% elif foydalanuvchi_malumoti.user.role == 'DEKAN' %}info{% elif foydalanuvchi_malumoti.user.role == 'KOMISSIYA' %}primary{% else %}secondary{% endif %} bg-opacity-10 text-{% if foydalanuvchi_malumoti.user.role == 'REKTOR' %}danger{% elif foydalanuvchi_malumoti.user.role == 'PROREKTOR' %}warning{% elif foydalanuvchi_malumoti.user.role == 'DEKAN' %}info{% elif foydalanuvchi_malumoti.user.role == 'KOMISSIYA' %}primary{% else %}secondary{% endif %}">
+                                            {{ foydalanuvchi_malumoti.user.get_role_display|default:foydalanuvchi_malumoti.user.role }}
+                                        </span>
+                                    </td>
+                                    <td class="struktura-cell">
+                                        <div class="text-truncate" style="max-width: 150px;" title="{{ foydalanuvchi_malumoti.user.struktura.nomi|default:'Struktura ko\'rsatilmagan' }}">
+                                            {% if foydalanuvchi_malumoti.user.struktura %}
+                                                <i class="fas fa-building me-1 text-muted"></i>
+                                                <span>{{ foydalanuvchi_malumoti.user.struktura.name }}</span>
+                                            {% else %}
+                                                <i class="fas fa-minus me-1 text-muted"></i>
+                                                <span class="text-muted">Ko'rsatilmagan</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if foydalanuvchi_malumoti.user.is_active %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Faol
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times-circle me-1"></i>Faol emas
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="stat-number" style="font-size: 1.5rem; color: #007bff;">{{ foydalanuvchi_malumoti.stats.total }}</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="stats-container stat-completed">
+                                            <div class="stat-number">{{ foydalanuvchi_malumoti.stats.completed }}</div>
+                                            <div class="stat-circle">
+                                                <svg class="progress-ring">
+                                                    <circle class="progress-ring-circle progress-ring-background" cx="17.5" cy="17.5" r="15"></circle>
+                                                    <circle class="progress-ring-circle progress-ring-progress" cx="17.5" cy="17.5" r="15"
+                                                            style="stroke-dashoffset: calc(94 - (94 * {{ foydalanuvchi_malumoti.stats.completion_rate|default:0 }}) / 100);"></circle>
+                                                </svg>
+                                                <span class="stat-text">{{ foydalanuvchi_malumoti.stats.completion_rate|default:0 }}%</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="stats-container stat-delayed">
+                                            <div class="stat-number">{{ foydalanuvchi_malumoti.stats.delayed }}</div>
+                                            <div class="stat-circle">
+                                                <svg class="progress-ring">
+                                                    <circle class="progress-ring-circle progress-ring-background" cx="17.5" cy="17.5" r="15"></circle>
+                                                    <circle class="progress-ring-circle progress-ring-progress" cx="17.5" cy="17.5" r="15"
+                                                            style="stroke-dashoffset: calc(94 - (94 * {{ foydalanuvchi_malumoti.stats.delay_rate|default:0 }}) / 100);"></circle>
+                                                </svg>
+                                                <span class="stat-text">{{ foydalanuvchi_malumoti.stats.delay_rate|default:0 }}%</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="stats-container stat-unfinished">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="stat-number">{{ foydalanuvchi_malumoti.stats.unfinished }}</div>
+                                                {% if foydalanuvchi_malumoti.stats.failed > 0 %}
+                                                <small class="text-muted" style="font-size: 0.8rem;">+{{ foydalanuvchi_malumoti.stats.failed }}</small>
+                                                {% endif %}
+                                            </div>
+                                            <div class="stat-circle">
+                                                <svg class="progress-ring">
+                                                    <circle class="progress-ring-circle progress-ring-background" cx="17.5" cy="17.5" r="15"></circle>
+                                                    <circle class="progress-ring-circle progress-ring-progress" cx="17.5" cy="17.5" r="15"
+                                                            style="stroke-dashoffset: calc(94 - (94 * {{ foydalanuvchi_malumoti.stats.unfinished_rate|default:0 }}) / 100);"></circle>
+                                                </svg>
+                                                <span class="stat-text">{{ foydalanuvchi_malumoti.stats.unfinished_rate|default:0 }}%</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-center">
+                                            <strong class="text-primary" style="font-size: 1.2rem;">
+                                                {{ foydalanuvchi_malumoti.stats.total_score|default:0 }}
+                                            </strong>
+                                            <small class="d-block text-muted">ball</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if foydalanuvchi_malumoti.stats.total > 0 %}
+                                        <div class="text-center">
+                                            {% if foydalanuvchi_malumoti.stats.completion_rate >= 80 %}
+                                            <i class="fas fa-star text-success fa-lg" title="A'lo samaradorlik"></i>
+                                            <small class="d-block text-success">A'lo</small>
+                                            {% elif foydalanuvchi_malumoti.stats.completion_rate >= 60 %}
+                                            <i class="fas fa-thumbs-up text-primary fa-lg" title="Yaxshi samaradorlik"></i>
+                                            <small class="d-block text-primary">Yaxshi</small>
+                                            {% elif foydalanuvchi_malumoti.stats.completion_rate >= 40 %}
+                                            <i class="fas fa-minus-circle text-warning fa-lg" title="O'rta samaradorlik"></i>
+                                            <small class="d-block text-warning">O'rta</small>
+                                            {% else %}
+                                            <i class="fas fa-exclamation-triangle text-danger fa-lg" title="Past samaradorlik"></i>
+                                            <small class="d-block text-danger">Past</small>
+                                            {% endif %}
+                                        </div>
+                                        {% else %}
+                                        <div class="text-center">
+                                            <i class="fas fa-minus text-muted"></i>
+                                            <small class="d-block text-muted">Ma'lumot yo'q</small>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="11" class="text-center text-muted py-4">
+                                        <i class="fas fa-users fa-2x mb-2"></i><br>
+                                        Hech qanday foydalanuvchi topilmadi
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Breakdown -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-pie me-2"></i>Batafsil Ma'lumot
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="border-left-primary bg-light p-3 rounded">
+                                <h6 class="text-primary">Ish Samaradorligi</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li><i class="fas fa-star text-success me-2"></i>A'lo samaradorlik: 
+                                        <strong>{{ excellent_users }} ta</strong>
+                                    </li>
+                                    <li><i class="fas fa-thumbs-up text-primary me-2"></i>Yaxshi samaradorlik: 
+                                        <strong>{{ good_users }} ta</strong>
+                                    </li>
+                                    <li><i class="fas fa-minus-circle text-warning me-2"></i>O'rta samaradorlik: 
+                                        <strong>{{ average_users }} ta</strong>
+                                    </li>
+                                    <li><i class="fas fa-exclamation-triangle text-danger me-2"></i>Past samaradorlik: 
+                                        <strong>{{ poor_users }} ta</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border-left-info bg-light p-3 rounded">
+                                <h6 class="text-info">Rollarga Bo'yicha</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li>
+                                        <span class="badge bg-danger me-2">REKTOR</span>
+                                        <strong>{{ role_stats.REKTOR|default:0 }} ta</strong>
+                                    </li>
+                                    <li>
+                                        <span class="badge bg-warning me-2">PROREKTOR</span>
+                                        <strong>{{ role_stats.PROREKTOR|default:0 }} ta</strong>
+                                    </li>
+                                    <li>
+                                        <span class="badge bg-info me-2">DEKAN</span>
+                                        <strong>{{ role_stats.DEKAN|default:0 }} ta</strong>
+                                    </li>
+                                    <li>
+                                        <span class="badge bg-primary me-2">KOMISSIYA</span>
+                                        <strong>{{ role_stats.KOMISSIYA|default:0 }} ta</strong>
+                                    </li>
+                                    <li>
+                                        <span class="badge bg-secondary me-2">BOSHQALAR</span>
+                                        <strong>{{ role_stats.HODIM|default:0 }} ta</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border-left-success bg-light p-3 rounded">
+                                <h6 class="text-success">Umumiy Natija</h6>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ overall_completion_rate }}%" 
+                                         aria-valuenow="{{ overall_completion_rate }}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    Umumiy bajarilish foizi: 
+                                    <strong class="text-success">{{ overall_completion_rate }}%</strong>
+                                </small>
+                                <div class="mt-2">
+                                    <small class="d-block">
+                                        <i class="fas fa-clock text-warning me-1"></i>
+                                        Kechikish darajasi: 
+                                        <strong class="text-warning">{{ overall_delay_rate }}%</strong>
+                                    </small>
+                                    <small class="d-block">
+                                        <i class="fas fa-times-circle text-danger me-1"></i>
+                                        Bajarilmagan darajasi: 
+                                        <strong class="text-danger">{{ overall_unfinished_rate }}%</strong>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- SheetJS Library for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Sidebar toggle functionality
+            $('#sidebarToggle').click(function () {
+                $('#sidebar').toggleClass('collapsed');
+                $('#mainContent').toggleClass('expanded');
+
+                // For mobile view
+                if ($(window).width() < 992) {
+                    $('#sidebar').toggleClass('show');
+                }
+            });
+
+            // Close sidebar when clicking outside on mobile
+            $(document).click(function (e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('#sidebar').length && !$(e.target).is('#sidebarToggle')) {
+                        $('#sidebar').removeClass('show');
+                    }
+                }
+            });
+
+            // Prevent closing when clicking inside sidebar
+            $('#sidebar').click(function (e) {
+                e.stopPropagation();
+            });
+
+            // Active menu item highlight
+            $('.sidebar-menu a').click(function () {
+                $('.sidebar-menu a').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            // Search and filter functionality
+            function performSearch() {
+                var searchValue = $("#searchInput").val().toLowerCase().trim();
+                var roleFilter = $("#roleFilter").val();
+                
+                $("#dataTable tbody tr").filter(function() {
+                    var $row = $(this);
+                    var rowText = $row.text().toLowerCase();
+                    var roleCell = $row.find('td:nth-child(3)'); // Role ustuni (3-chi ustun)
+                    var roleText = roleCell.text().trim();
+                    
+                    var matchesSearch = rowText.indexOf(searchValue) > -1;
+                    var matchesRole = true;
+                    
+                    if (roleFilter) {
+                        // Rol bo'yicha filtrlash
+                        if (roleFilter === 'REKTOR') {
+                            matchesRole = roleText.includes('Rektor');
+                        } else if (roleFilter === 'PROREKTOR') {
+                            matchesRole = roleText.includes('Prorektor');
+                        } else if (roleFilter === 'DEKAN') {
+                            matchesRole = roleText.includes('Dekan');
+                        } else if (roleFilter === 'BOLIM_RAHBARI') {
+                            matchesRole = roleText.includes("Bo'lim rahbari");
+                        } else if (roleFilter === 'BOLIM_BOSHLIGI') {
+                            matchesRole = roleText.includes("Bo'lim boshligi");
+                        } else if (roleFilter === 'ZAM_DEKAN') {
+                            matchesRole = roleText.includes('Zam dekan');
+                        } else if (roleFilter === 'KAFEDRA_MUDIRI') {
+                            matchesRole = roleText.includes('Kafedra mudiri');
+                        } else if (roleFilter === 'TYUTOR') {
+                            matchesRole = roleText.includes('Tyutor');
+                        } else if (roleFilter === 'HODIM') {
+                            matchesRole = roleText.includes('Hodim');
+                        }
+                    }
+                    
+                    $row.toggle(matchesSearch && matchesRole);
+                });
+            }
+
+            $("#searchInput").on("keyup", function(event) {
+                performSearch();
+                // Enter tugmasi bosilganda ham qidiruv amalga oshiriladi
+                if (event.keyCode === 13) {
+                    performSearch();
+                }
+            });
+
+            $("#searchButton").on("click", function() {
+                performSearch();
+            });
+
+            // Rol filtri o'zgarganida
+            $("#roleFilter").on("change", function() {
+                performSearch();
+            });
+
+            // Role badges animation
+            $(".modern-badge").hover(
+                function() {
+                    $(this).css({
+                        "transform": "scale(1.1) rotate(2deg)",
+                        "box-shadow": "0 4px 15px rgba(0,0,0,0.2)"
+                    });
+                },
+                function() {
+                    $(this).css({
+                        "transform": "scale(1) rotate(0deg)",
+                        "box-shadow": "none"
+                    });
+                }
+            );
+
+            // Simple progress rings animation
+            setTimeout(function() {
+                $(".progress-ring-progress").each(function() {
+                    var $ring = $(this);
+                    var percentage = 0;
+                    
+                    // Get percentage from the stat-text span
+                    var percentText = $ring.closest('.stat-circle').find('.stat-text').text();
+                    if (percentText.includes('%')) {
+                        percentage = parseInt(percentText);
+                    }
+                    
+                    // Calculate stroke-dashoffset for new circle size
+                    var circumference = 94; // 2 * π * r (where r = 15)
+                    var offset = circumference - (circumference * percentage) / 100;
+                    
+                    // Animate the ring
+                    $ring.css('stroke-dashoffset', offset);
+                });
+            }, 500);
+
+            // Only progress circle hover effects (no hover for numbers)
+            $(".stat-circle").hover(
+                function() {
+                    // Progress circle hover effect only
+                },
+                function() {
+                    // Reset hover effect only
+                }
+            );
+
+            // Animated counter effect
+            function animateNumbers() {
+                $('.animated-counter').each(function() {
+                    var $this = $(this);
+                    var target = parseInt($this.text());
+                    var current = 0;
+                    var increment = target / 30;
+                    
+                    var counter = setInterval(function() {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(counter);
+                        }
+                        $this.text(Math.floor(current));
+                    }, 50);
+                });
+            }
+
+            // Start number animation after page load
+            setTimeout(animateNumbers, 800);
+
+            // Table row hover effect
+            $("#dataTable tbody tr").hover(
+                function() {
+                    $(this).addClass("table-active");
+                },
+                function() {
+                    $(this).removeClass("table-active");
+                }
+            );
+        });
+
+        // Excel Export Function
+        function exportToExcel() {
+            // Get current filter values
+            var roleFilter = $("#roleFilter").val();
+            var searchFilter = $("#searchInput").val();
+            
+            // Check if any filters are applied
+            var hasFilters = roleFilter || searchFilter;
+            
+            // Build filter info
+            let filterInfo = '';
+            if (hasFilters) {
+                let filterParts = [];
+                if (roleFilter) filterParts.push('Rol: ' + roleFilter);
+                if (searchFilter) filterParts.push('Qidiruv: ' + searchFilter);
+                filterInfo = 'Filter: ' + filterParts.join(', ');
+            } else {
+                filterInfo = 'Filter: Barcha foydalanuvchilar';
+            }
+
+            // Prepare Excel data - conditionally include statistics
+            var data = [
+                ['FOYDALANUVCHILAR HISOBOTI'],
+                ['Tizim: QO\'QON DAVLAT UNIVERSITETI'],
+                ['Yaratilgan vaqt: ' + new Date().toLocaleString('uz-UZ')],
+                [filterInfo],
+                ['']
+            ];
+
+            // Add general statistics only if no filters are applied
+            if (!hasFilters) {
+                data.push(
+                    ['UMUMIY STATISTIKA'],
+                    ['Jami foydalanuvchilar:', {{ total_users|default:0 }}],
+                    ['A\'lo samaradorlik:', '{{ excellent_users|default:0 }} ta'],
+                    ['Yaxshi samaradorlik:', '{{ good_users|default:0 }} ta'],
+                    ['O\'rta samaradorlik:', '{{ average_users|default:0 }} ta'],
+                    ['Past samaradorlik:', '{{ poor_users|default:0 }} ta'],
+                    ['Umumiy bajarilish foizi:', '{{ overall_completion_rate|default:0 }}%'],
+                    ['Umumiy kechikish foizi:', '{{ overall_delay_rate|default:0 }}%'],
+                    ['Umumiy bajarilmagan foizi:', '{{ overall_unfinished_rate|default:0 }}%'],
+                    ['']
+                );
+            }
+
+            // Add table header
+            data.push(
+                [hasFilters ? 'FILTERLANGAN FOYDALANUVCHILAR RO\'YXATI' : 'FOYDALANUVCHILAR RO\'YXATI'],
+                ['#', 'Foydalanuvchi', 'Ism Familiya', 'Rol', 'Struktura', 'Holati', 'Jami', 'Bajarilgan', 'Kechikkan', 'Bajarilmagan', 'Jami Ball', 'Samaradorlik']
+            );
+
+            // Get visible table rows
+            $("#dataTable tbody tr:visible").each(function(index) {
+                var $row = $(this);
+                if ($row.find('td').length > 1) { // Skip "no data" row
+                    var rowData = [
+                        index + 1,
+                        $row.find('td:eq(1) .fw-bold').text().trim() || '-', // Username
+                        $row.find('td:eq(1) .text-muted.small').first().text().trim() || '-', // Full name
+                        $row.find('td:eq(2) .badge').text().trim() || '-', // Role
+                        $row.find('td:eq(3) span').text().trim() || 'Ko\'rsatilmagan', // Structure
+                        $row.find('td:eq(4) .badge').text().trim() || '-', // Status
+                        $row.find('td:eq(5) .stat-number').text().trim() || '0', // Total
+                        $row.find('td:eq(6) .stat-number').text().trim() || '0', // Completed
+                        $row.find('td:eq(7) .stat-number').text().trim() || '0', // Delayed
+                        $row.find('td:eq(8) .stat-number').text().trim() || '0', // Unfinished
+                        $row.find('td:eq(9) strong').text().trim() || '0', // Total score
+                        $row.find('td:eq(10) small').text().trim() || 'Ma\'lumot yo\'q' // Efficiency
+                    ];
+                    data.push(rowData);
+                }
+            });
+
+            // Create workbook and worksheet
+            var wb = XLSX.utils.book_new();
+            var ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // Set column widths
+            ws['!cols'] = [
+                {wch: 5},   // #
+                {wch: 15},  // Username
+                {wch: 20},  // Full name
+                {wch: 15},  // Role
+                {wch: 25},  // Structure
+                {wch: 10},  // Status
+                {wch: 8},   // Total
+                {wch: 12},  // Completed
+                {wch: 12},  // Delayed
+                {wch: 15},  // Unfinished
+                {wch: 12},  // Total score
+                {wch: 15}   // Efficiency
+            ];
+
+            // Style the header row
+            ws['A1'].s = {
+                font: { bold: true, sz: 16 },
+                alignment: { horizontal: 'center' }
+            };
+
+            // Style the table header - calculate row dynamically
+            var headerRow = hasFilters ? 7 : 17; // If no filters: 17, if filters: 7
+            for (var col = 0; col < 12; col++) {
+                var cellAddress = XLSX.utils.encode_cell({r: headerRow - 1, c: col});
+                if (!ws[cellAddress]) ws[cellAddress] = {};
+                if (!ws[cellAddress].s) ws[cellAddress].s = {};
+                ws[cellAddress].s = {
+                    font: { bold: true },
+                    fill: { fgColor: { rgb: "EEEEEE" } },
+                    alignment: { horizontal: 'center' }
+                };
+            }
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Foydalanuvchilar');
+
+            // Generate filename
+            var filename = 'Foydalanuvchilar_Hisoboti_' + new Date().toISOString().slice(0, 10);
+            if (roleFilter) filename += '_' + roleFilter;
+            filename += '.xlsx';
+
+            // Save the file
+            XLSX.writeFile(wb, filename);
+            
+            // Show success message
+            var visibleRows = $("#dataTable tbody tr:visible").length;
+            if ($("#dataTable tbody tr:visible").find('td[colspan]').length > 0) visibleRows = 0;
+            
+            alert('Excel fayl muvaffaqiyatli yuklab olindi!\n' +
+                  'Fayl nomi: ' + filename + '\n' +
+                  'Foydalanuvchilar soni: ' + visibleRows + ' ta\n' +
+                  (filterInfo !== 'Filter: Barcha foydalanuvchilar' ? filterInfo : ''));
+        }
+    </script>
+</body>
+</html>

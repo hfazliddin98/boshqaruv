@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, Xabarnoma
+from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, Notification
 
 
 class TopshiriqFileInline(admin.TabularInline):
@@ -9,11 +9,18 @@ class TopshiriqFileInline(admin.TabularInline):
 
 @admin.register(Topshiriq)
 class TopshiriqAdmin(admin.ModelAdmin):
-    list_display = ('title', 'yaratuvchi_user', 'bajaruvchi_user', 'status', 'xolat', 'boshlanish_vaqti', 'tugash_vaqti', 'created_at')
+    list_display = ('title', 'yaratuvchi_user', 'bajaruvchi_user', 'status', 'xolat', 'baxo', 'boshlanish_vaqti', 'tugash_vaqti', 'created_at')
     list_filter = ('status', 'xolat', 'yaratuvchi_user__role', 'bajaruvchi_user__role', 'created_at')
     search_fields = ('title', 'body', 'yaratuvchi_user__first_name', 'yaratuvchi_user__last_name', 'bajaruvchi_user__first_name', 'bajaruvchi_user__last_name')
     date_hierarchy = 'created_at'
     inlines = [TopshiriqFileInline]
+    
+    def get_baxo_display(self, obj):
+        """Baxo maydonini tavsifi bilan ko'rsatadi"""
+        if obj.baxo is not None:
+            return obj.get_baxo_description()
+        return "Baholanmagan"
+    get_baxo_display.short_description = 'Baho'
 
 
 class TopshiriqJavobFileInline(admin.TabularInline):
@@ -42,10 +49,10 @@ class TopshiriqJavobFileAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(Xabarnoma)
-class XabarnomaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'recipient', 'sender', 'notification_type', 'priority', 'is_read', 'created_at')
-    list_filter = ('notification_type', 'priority', 'is_read', 'created_at')
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'recipient', 'sender', 'notification_type', 'is_read', 'created_at')
+    list_filter = ('notification_type', 'is_read', 'created_at')
     search_fields = ('recipient__username', 'sender__username', 'message')
     readonly_fields = ('created_at',)
     ordering = ('-created_at',)

@@ -1,11 +1,11 @@
-from .services import XabarnomaService
+from .services import NotificationService
 
 def xabarlar_context(request):
     """Barcha sahifalarda bildirishnomalar ko'rsatish uchun context"""
     if request.user.is_authenticated:
         try:
-            unread_count = XabarnomaService.get_unread_count(request.user)
-            recent_xabarlar = XabarnomaService.get_recent_notifications(request.user, 5)
+            unread_count = NotificationService.get_unread_count(request.user)
+            recent_xabarlar = NotificationService.get_recent_notifications(request.user, 5)
             
             return {
                 'unread_xabarlar_count': unread_count,

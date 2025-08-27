@@ -747,24 +747,6 @@
                                     <small class="form-text text-muted">Misol: IT bo'limi, Moliya bo'limi, Kadrlar bo'limi</small>
                                 </div>
 
-                                <!-- Birlik turi Field -->
-                                <div class="mb-4">
-                                    <label for="id_birlik_turi" class="form-label">
-                                        Birlik turi <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           name="birlik_turi" 
-                                           value="{{ form.birlik_turi.value|default_if_none:'' }}"
-                                           class="form-control {% if form.birlik_turi.errors %}is-invalid{% endif %}"
-                                           id="id_birlik_turi" 
-                                           required
-                                           placeholder="Birlik turini kiriting">
-                                    {% if form.birlik_turi.errors %}
-                                    <div class="invalid-feedback">{{ form.birlik_turi.errors.0 }}</div>
-                                    {% endif %}
-                                    <small class="form-text text-muted">Misol: Bo'lim, Kafedra, Fakultet, Institut</small>
-                                </div>
-
                                 <!-- Role Field -->
                                 <div class="mb-4">
                                     <label for="id_role" class="form-label">

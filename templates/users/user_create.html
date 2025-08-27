@@ -708,7 +708,7 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <h4 class="mb-0">
                                     <i class="fas fa-user-plus me-2"></i>
-                                    Yangi {{target_role|lower}} yaratish
+                                    Yangi {{ target_role_display }} yaratish
                                 </h4>
                             </div>
                         </div>
@@ -781,15 +781,17 @@
                                     </div>
                                 </div>
 
-                                <!-- User Role Field (renamed from Bo'lim) -->
+                                <!-- Role Field -->
                                 <div class="mb-4">
-                                    <label for="id_lavozim" class="form-label">
-                                        User Role <span class="text-danger">*</span>
+                                    <label for="id_role" class="form-label">
+                                        Rol <span class="text-danger">*</span>
                                     </label>
                                     <select name="role" 
                                             class="form-select {% if form.role.errors %}is-invalid{% endif %}" 
                                             id="id_role" 
-                                            required>
+                                            required
+                                            readonly
+                                            disabled>
                                         <option value="">Rolni tanlang</option>
                                         {% for value, label in form.role.field.choices %}
                                         <option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>
@@ -797,9 +799,12 @@
                                         </option>
                                         {% endfor %}
                                     </select>
+                                    <!-- Hidden field to send value -->
+                                    <input type="hidden" name="role" value="{{ target_role }}">
                                     {% if form.role.errors %}
                                     <div class="invalid-feedback">{{ form.role.errors.0 }}</div>
                                     {% endif %}
+                                    <small class="form-text text-muted">Bu rol avtomatik belgilangan</small>
                                 </div>
 
                                 <!-- Struktura Field (renamed from Bo'lim) -->

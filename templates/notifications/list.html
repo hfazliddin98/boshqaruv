@@ -101,11 +101,6 @@
                                             {% if notification.sender %}
                                                 • <i class="fas fa-user me-1"></i>{{ notification.sender.get_full_name }}
                                             {% endif %}
-                                            {% if notification.priority == 'urgent' %}
-                                                • <span class="badge bg-danger">Shoshilinch</span>
-                                            {% elif notification.priority == 'high' %}
-                                                • <span class="badge bg-warning">Muhim</span>
-                                            {% endif %}
                                         </small>
                                     </div>
                                 </div>

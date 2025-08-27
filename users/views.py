@@ -209,9 +209,13 @@ def user_list(request, target_role):
         return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchilarni ko‘ra olmaysiz.")
     users = Users.objects.filter(role=target_role)
 
+    # Target role uchun display nomi
+    target_role_display = dict(RoleChoice.choices).get(target_role, target_role)
+
     context = {
         'users': users,
         'target_role': target_role,
+        'target_role_display': target_role_display,
         'RoleChoice': RoleChoice,
     }
     return render(request, 'users/user_list.html', context)
@@ -221,6 +225,13 @@ def user_create(request, target_role):
     allowed_roles = ALLOWED_USER_MAP.get(request.user.role, [])
     if target_role not in allowed_roles:
         return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchi yaratolmaysiz.")
+
+    # Mapdan filterlash - faqat joriy userga ruxsat etilgan strukturalarni ko'rsatish
+    allowed_struktura_roles = ALLOWED_USER_MAP.get(request.user.role, [])
+    struktura_filter = Struktura.objects.filter(
+        is_active=True,
+        role__in=allowed_struktura_roles
+    ) if allowed_struktura_roles else Struktura.objects.filter(is_active=True)
 
     if request.method == 'POST':
         form = UserCreateForm(request.POST or None, target_role=target_role)
@@ -235,9 +246,13 @@ def user_create(request, target_role):
     else:
         form = UserCreateForm(target_role=target_role)
 
+    # Target role uchun display nomi
+    target_role_display = dict(RoleChoice.choices).get(target_role, target_role)
+
     context = {
         'form': form,
         'target_role': target_role,
+        'target_role_display': target_role_display,
         'RoleChoice': RoleChoice,
     }
     return render(request, 'users/user_create.html', context)
@@ -263,9 +278,13 @@ def user_update(request, target_role, pk):
     else:
         form = UserUpdateForm(instance=user, target_role=target_role)
 
+    # Target role uchun display nomi
+    target_role_display = dict(RoleChoice.choices).get(target_role, target_role)
+
     context = {
         'form': form,
         'target_role': target_role,
+        'target_role_display': target_role_display,
         'user': user,
         'RoleChoice': RoleChoice,
     }

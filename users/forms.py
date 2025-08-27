@@ -82,12 +82,18 @@ class UserCreateForm(UserCreationForm):
         target_role = kwargs.pop('target_role', None)
         super().__init__(*args, **kwargs)
 
-        # Har doim barcha rollar va strukturalarni ko'rsatamiz
-        self.fields['role'].choices = RoleChoice.choices
-        self.fields['struktura'].queryset = Struktura.objects.all()
-        
+        # Faqat target_role ni ko'rsatamiz, boshqa rollarni emas
         if target_role:
+            self.fields['role'].choices = [
+                (target_role, dict(RoleChoice.choices).get(target_role, target_role))
+            ]
             self.fields['role'].initial = target_role
+            # Target role ga mos strukturalarni ko'rsatamiz
+            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
+        else:
+            # Agar target_role berilmagan bo'lsa, barcha rollarni ko'rsatamiz
+            self.fields['role'].choices = RoleChoice.choices
+            self.fields['struktura'].queryset = Struktura.objects.all()
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -404,11 +410,6 @@ class StrukturaCreateForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Struktura nomini kiriting'}),
         label="Struktura nomi"
     )
-    birlik_turi = forms.CharField(
-        max_length=255,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Birlik turini kiriting'}),
-        label="Birlik turi"
-    )
     role = forms.ChoiceField(
         choices=RoleChoice.choices,
         widget=forms.Select(attrs={'class': 'form-select'}),
@@ -423,15 +424,14 @@ class StrukturaCreateForm(forms.ModelForm):
 
     class Meta:
         model = Struktura
-        fields = ['name', 'birlik_turi', 'role', 'is_active']
+        fields = ['name', 'role', 'is_active']
 
     def clean(self):
         cleaned_data = super().clean()
         name = cleaned_data.get("name")
-        birlik_turi = cleaned_data.get("birlik_turi")
         role = cleaned_data.get("role")
 
-        if not name or not birlik_turi or not role:
+        if not name or not role:
             raise forms.ValidationError("Barcha maydonlar to'ldirilishi shart!")
 
         return cleaned_data
@@ -442,11 +442,6 @@ class StrukturaUpdateForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Struktura nomini kiriting'}),
         label="Struktura nomi"
     )
-    birlik_turi = forms.CharField(
-        max_length=255,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Birlik turini kiriting'}),
-        label="Birlik turi"
-    )
     role = forms.ChoiceField(
         choices=RoleChoice.choices,
         widget=forms.Select(attrs={'class': 'form-select'}),
@@ -461,15 +456,14 @@ class StrukturaUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Struktura
-        fields = ['name', 'birlik_turi', 'role', 'is_active']
+        fields = ['name', 'role', 'is_active']
 
     def clean(self):
         cleaned_data = super().clean()
         name = cleaned_data.get("name")
-        birlik_turi = cleaned_data.get("birlik_turi")
         role = cleaned_data.get("role")
 
-        if not name or not birlik_turi or not role:
+        if not name or not role:
             raise forms.ValidationError("Barcha maydonlar to'ldirilishi shart!")
 
         return cleaned_data

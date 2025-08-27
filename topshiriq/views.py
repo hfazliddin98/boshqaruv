@@ -8,12 +8,12 @@ from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from users.models import Users
-from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, Xabarnoma
+from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, Notification
 from .forms import TopshiriqForm, TopshiriqJavobForm, TopshiriqBaxolashForm
-from .services import XabarnomaService
+from .services import NotificationService
 from topshiriq.choices import ALLOWED_TOPSHIRIQ_VIEW_MAP, RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP, ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP
 from users.choices import ALLOWED_USER_MAP
-from topshiriq.choices import StatusChoice, BaxoChoice
+from topshiriq.choices import StatusChoice
 
 # Try to import xlwt, use alternative if not available
 try:

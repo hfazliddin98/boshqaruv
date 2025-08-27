@@ -108,5 +108,11 @@ class TopshiriqBaxolashForm(forms.ModelForm):
         fields = ['status', 'baxo']
         widgets = {
             'status': forms.Select(attrs={'class': 'form-select'}),
-            'baxo': forms.Select(attrs={'class': 'form-select'}),
+            'baxo': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'min': '0', 
+                'max': '100', 
+                'placeholder': 'Baho (0-100)',
+                'step': '1'
+            }),
         }

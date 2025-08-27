@@ -9,6 +9,6 @@ class UsersAdmin(admin.ModelAdmin):
 
 @admin.register(Struktura)
 class StrukturaAdmin(admin.ModelAdmin):
-    list_display = ['name', 'birlik_turi', 'role']
+    list_display = ['name', 'role']
 
 

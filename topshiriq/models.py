@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import AsosiyModel, Users
-from topshiriq.choices import TopshiriqType, StatusChoice, XolatChoice, BaxoChoice
+from topshiriq.choices import StatusChoice, XolatChoice
 from django.conf import settings
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -13,7 +13,7 @@ class Topshiriq(AsosiyModel):
     body = models.TextField(blank=True)
     status = models.CharField(max_length=30, choices=StatusChoice.choices, default=StatusChoice.YUBORILDI)
     xolat = models.CharField(max_length=30, choices=XolatChoice.choices, default=XolatChoice.ODDIY)
-    baxo = models.CharField(max_length=30, choices=BaxoChoice.choices, default=BaxoChoice.QONIQARSIZ)
+    baxo = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=0, help_text="Baho 0 dan 100 gacha qiymat qabul qiladi")
     boshlanish_vaqti = models.DateTimeField(null=True, blank=True)
     tugash_vaqti = models.DateTimeField(null=True, blank=True)
     bajarilgan_vaqti = models.DateTimeField(null=True, blank=True)
@@ -23,6 +23,19 @@ class Topshiriq(AsosiyModel):
 
     def __str__(self):
         return self.title or f"Topshiriq #{self.pk}"
+    
+    def get_baxo_description(self):
+        """Baxo sonini matn tavsifi bilan qaytaradi"""
+        if self.baxo >= 90:
+            return f"{self.baxo} ball (A'lo)"
+        elif self.baxo >= 80:
+            return f"{self.baxo} ball (Yaxshi)"
+        elif self.baxo >= 70:
+            return f"{self.baxo} ball (Qoniqarli)"
+        elif self.baxo >= 60:
+            return f"{self.baxo} ball (O'rtacha)"
+        else:
+            return f"{self.baxo} ball (Qoniqarsiz)"
 
     class Meta:
         indexes = [
@@ -61,24 +74,14 @@ class TopshiriqJavobFile(AsosiyModel):
         return self.file.name
 
 
-class Xabarnoma(AsosiyModel):
+class Notification(AsosiyModel):
     """Foydalanuvchi bildirishnomalari"""
     
     NOTIFICATION_TYPES = [
         ('topshiriq_yangi', 'Yangi topshiriq'),
         ('topshiriq_javob', 'Topshiriq javobi'),
         ('topshiriq_baholandi', 'Topshiriq baholandi'),
-        ('topshiriq_qaytarildi', 'Topshiriq qaytarildi'),
-        ('topshiriq_muddat', 'Muddat yaqinlashdi'),
-        ('hisobot_yangi', 'Yangi hisobot'),
         ('system', 'Tizim xabari'),
-    ]
-    
-    PRIORITY_CHOICES = [
-        ('low', 'Past'),
-        ('normal', 'Oddiy'),
-        ('high', 'Yuqori'),
-        ('urgent', 'Shoshilinch'),
     ]
     
     recipient = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='xabarlar')
@@ -94,11 +97,6 @@ class Xabarnoma(AsosiyModel):
     
     # Holat
     is_read = models.BooleanField('O\'qildi', default=False)
-    read_at = models.DateTimeField('O\'qilgan vaqt', null=True, blank=True)
-    
-    # Qo'shimcha
-    action_url = models.CharField('Havolalar', max_length=500, null=True, blank=True)
-    priority = models.CharField('Muhimlik', max_length=20, choices=PRIORITY_CHOICES, default='normal')
     
     class Meta:
         verbose_name = 'Bildirishnoma'
@@ -118,6 +116,5 @@ class Xabarnoma(AsosiyModel):
         """Bildirishnomani o'qilgan deb belgilash"""
         if not self.is_read:
             self.is_read = True
-            self.read_at = timezone.now()
-            self.save(update_fields=['is_read', 'read_at'])
+            self.save(update_fields=['is_read'])
 

@@ -1,14 +1,14 @@
 from django.urls import reverse
 from django.utils import timezone
-from .models import Xabarnoma
+from .models import Notification
 
-class XabarnomaService:
+class NotificationService:
     """Bildirishnoma xizmatlari"""
     
     @staticmethod
     def create_notification(recipient, title, message, notification_type, sender=None, **kwargs):
         """Yangi bildirishnoma yaratish"""
-        return Xabarnoma.objects.create(
+        return Notification.objects.create(
             recipient=recipient,
             sender=sender,
             title=title,
@@ -21,17 +21,13 @@ class XabarnomaService:
     def notify_new_topshiriq(topshiriq):
         """Yangi topshiriq haqida xabar berish"""
         try:
-            action_url = f"/topshiriq/{topshiriq.pk}/"
-            
-            XabarnomaService.create_notification(
+            NotificationService.create_notification(
                 recipient=topshiriq.bajaruvchi_user,
                 sender=topshiriq.yaratuvchi_user,
                 title="📋 Yangi topshiriq berildi",
                 message=f"Sizga '{topshiriq.title}' nomli yangi topshiriq berildi. Iltimos, topshiriqni ko'rib chiqing.",
                 notification_type='topshiriq_yangi',
-                topshiriq=topshiriq,
-                action_url=action_url,
-                priority='high'
+                topshiriq=topshiriq
             )
             print(f"✅ Yangi topshiriq bildirishnomasi yuborildi: {topshiriq.bajaruvchi_user.get_full_name()}")
             
@@ -42,18 +38,14 @@ class XabarnomaService:
     def notify_topshiriq_javob(javob):
         """Topshiriq javobi haqida xabar berish"""
         try:
-            action_url = f"/topshiriq/baxolash/{javob.topshiriq.pk}/"
-            
-            XabarnomaService.create_notification(
+            NotificationService.create_notification(
                 recipient=javob.topshiriq.yaratuvchi_user,
                 sender=javob.bajaruvchi_user,
                 title="💬 Topshiriq javobi keldi",
                 message=f"'{javob.topshiriq.title}' topshirig'iga {javob.bajaruvchi_user.get_full_name()} tomonidan javob yuborildi. Javobni ko'rib chiqing va baholang.",
                 notification_type='topshiriq_javob',
                 topshiriq=javob.topshiriq,
-                javob=javob,
-                action_url=action_url,
-                priority='high'
+                javob=javob
             )
             print(f"✅ Javob bildirishnomasi yuborildi: {javob.topshiriq.yaratuvchi_user.get_full_name()}")
             
@@ -64,19 +56,16 @@ class XabarnomaService:
     def notify_topshiriq_baholandi(topshiriq):
         """Topshiriq baholandi haqida xabar berish"""
         try:
-            action_url = f"/topshiriq/{topshiriq.pk}/"
-            baho_display = topshiriq.get_baxo_display() if topshiriq.baxo else "Noma'lum"
+            baho_display = topshiriq.get_baxo_description() if topshiriq.baxo is not None else "Noma'lum"
             status_display = topshiriq.get_status_display() if topshiriq.status else "Noma'lum"
             
-            XabarnomaService.create_notification(
+            NotificationService.create_notification(
                 recipient=topshiriq.bajaruvchi_user,
                 sender=topshiriq.yaratuvchi_user,
                 title="⭐ Topshiriq baholandi",
                 message=f"'{topshiriq.title}' topshirig'ingiz baholandi.\n📊 Baho: {baho_display}\n📝 Holat: {status_display}",
                 notification_type='topshiriq_baholandi',
-                topshiriq=topshiriq,
-                action_url=action_url,
-                priority='normal'
+                topshiriq=topshiriq
             )
             print(f"✅ Baholash bildirishnomasi yuborildi: {topshiriq.bajaruvchi_user.get_full_name()}")
             
@@ -88,7 +77,7 @@ class XabarnomaService:
         """Foydalanuvchining barcha bildirishnomalarini o'qilgan deb belgilash"""
         unread_notifications = user.xabarlar.filter(is_read=False)
         count = unread_notifications.count()
-        unread_notifications.update(is_read=True, read_at=timezone.now())
+        unread_notifications.update(is_read=True)
         return count
     
     @staticmethod

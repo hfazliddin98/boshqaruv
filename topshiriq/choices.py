@@ -8,26 +8,16 @@ class XolatChoice(models.TextChoices):
     ORTA = ('O`rta', 'O`rta')
     ODDIY = ('Oddiy', 'Oddiy')
 
-class BaxoChoice(models.TextChoices):
-    QONIQARSIZ = ('Qoniqarsiz', 'Qoniqarsiz')
-    QONIQARLI = ('Qoniqarli', 'Qoniqarli')
-    YAXSHI = ('Yaxshi', 'Yaxshi')
-    ALO = ('Alo', 'Alo')
+
 
 
 class StatusChoice(models.TextChoices):
     YUBORILDI = ('Yuborildi', 'Yuborildi')
-    TEKSHIRILMOQDA = ('Topshirilmoqda', 'Topshirilmoqda')
     BAJARILDI = ('Bajarildi', 'Bajarildi')
     BAJARILMADI = ('Bajarilmadi', 'Bajarilmadi')
     KECHIKDI = ('Kechikdi', 'Kechikdi')
 
-class TopshiriqType(models.TextChoices):
-    YUBORILDI = ('Yuborildi', 'Yuborildi')
-    TEKSHIRILMOQDA = ('Topshirilmoqda', 'Topshirilmoqda')
-    BAJARILDI = ('Bajarildi', 'Bajarildi')
-    BAJARILMADI = ('Bajarilmadi', 'Bajarilmadi')
-    KECHIKDI = ('Kechikdi', 'Kechikdi')
+
 
 
 

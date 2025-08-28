@@ -32,7 +32,8 @@
             margin-left: var(--sidebar-width);
             padding: 1rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: calc(100vh - var(--navbar-height));
+            min-height: 100vh;
+            height: 100vh;
             background: linear-gradient(135deg, 
                 rgba(255, 255, 255, 0.95) 0%, 
                 rgba(248, 250, 252, 0.9) 50%,
@@ -211,20 +212,20 @@
         .bg-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
         .bg-danger { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%) !important; }
 
-        /* Modern buttons - Smaller */
+        /* === MODERN BUTTONS === */
         .btn {
-            border-radius: 25px;
+            border-radius: 10px;
             font-weight: 600;
-            padding: 8px 16px;
+            padding: 10px 18px;
+            font-size: 13px;
             border: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 0.7rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                0 2px 6px rgba(0, 0, 0, 0.06);
         }
 
         .btn::before {
@@ -234,7 +235,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: left 0.5s;
         }
 
@@ -242,16 +243,84 @@
             left: 100%;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 1px solid rgba(102, 126, 234, 0.3);
         }
 
-        /* Specific button colors */
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-        .btn-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 8px 20px rgba(102, 126, 234, 0.3),
+                0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 8px 20px rgba(74, 222, 128, 0.3),
+                0 4px 12px rgba(74, 222, 128, 0.2);
+        }
+
+        .btn-outline-primary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-outline-success {
+            background: rgba(74, 222, 128, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-success:hover {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-outline-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-danger:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 10px;
+            border-radius: 6px;
+        }
+
+        .btn-group-sm > .btn {
+            margin-right: 3px;
+        }
+
+        .btn-group-sm > .btn:last-child {
+            margin-right: 0;
+        }
 
         /* Modern text styles - Smaller */
         .text-xs {
@@ -438,169 +507,143 @@
             margin-bottom: 0;
             background: transparent;
             border-collapse: separate;
-            border-spacing: 0 4px;
+            border-spacing: 0 8px;
+        }
+
+        .table thead {
+            border: none;
+            background: linear-gradient(135deg, 
+                rgba(226, 232, 240, 0.98) 0%, 
+                rgba(203, 213, 225, 0.95) 100%);
+            border-radius: 10px 10px 0 0;
+            border-bottom: 3px solid rgba(102, 126, 234, 0.6);
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .table thead::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(102, 126, 234, 0.8) 50%, 
+                transparent 100%);
+            border-radius: 1px;
+        }
+
+        .table thead tr {
+            border: none;
+            background: transparent;
         }
 
         .table th {
-            background: linear-gradient(135deg, 
-                rgba(248, 250, 252, 0.95) 0%, 
-                rgba(241, 245, 249, 0.9) 100%);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 8px 8px 0 0;
+            background: none;
+            backdrop-filter: none;
+            border: none !important;
             font-weight: 600;
-            color: #334155;
-            font-size: 12px;
+            color: #475569;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.75px;
-            padding: 12px 16px;
-            position: relative;
-            box-shadow: 
-                0 2px 8px rgba(0, 0, 0, 0.02),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.3px;
+            padding: 8px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .table th::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(102, 126, 234, 0.3) 50%, 
-                transparent 100%);
+        .table th:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 0;
+            border-left: none !important;
+        }
+
+        .table th:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 0;
+            border-right: none !important;
+        }
+
+        .table thead th {
+            border-left: none !important;
+            border-right: none !important;
+            border-top: none !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
         }
 
         .table tbody tr {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
             box-shadow: 
-                0 2px 12px rgba(0, 0, 0, 0.04),
-                0 1px 4px rgba(0, 0, 0, 0.02);
+                0 4px 16px rgba(0, 0, 0, 0.08),
+                0 2px 6px rgba(0, 0, 0, 0.04);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .table tbody tr:hover {
-            background: rgba(102, 126, 234, 0.08);
-            transform: translateY(-1px);
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px) scale(1.01);
             box-shadow: 
-                0 4px 20px rgba(0, 0, 0, 0.06),
-                0 2px 8px rgba(102, 126, 234, 0.1);
+                0 8px 25px rgba(102, 126, 234, 0.15),
+                0 4px 12px rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
         }
 
         .table td {
             vertical-align: middle;
-            font-size: 13px;
-            padding: 12px 16px;
+            font-size: 11px;
+            padding: 6px 12px;
             border: none;
             color: #475569;
             font-weight: 500;
             position: relative;
         }
 
+        .table td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            font-weight: 700;
+            color: #667eea;
+            font-size: 10px;
+        }
+
+        .table td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
         .table-responsive {
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(20px);
-            padding: 8px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(25px);
+            padding: 12px;
             box-shadow: 
                 inset 0 1px 0 rgba(255, 255, 255, 0.4),
-                0 4px 16px rgba(0, 0, 0, 0.02);
+                0 6px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        /* === ULTRA MODERN BUTTONS === */
-        .btn {
-            border-radius: 8px;
-            font-weight: 500;
-            padding: 8px 16px;
-            font-size: 13px;
-            border: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-            box-shadow: 
-                0 2px 8px rgba(0, 0, 0, 0.08),
-                0 1px 4px rgba(0, 0, 0, 0.04);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 
-                0 4px 16px rgba(102, 126, 234, 0.3),
-                0 2px 8px rgba(102, 126, 234, 0.2);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-            color: white;
-            border: 1px solid rgba(74, 222, 128, 0.3);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-1px);
-            box-shadow: 
-                0 4px 16px rgba(74, 222, 128, 0.3),
-                0 2px 8px rgba(74, 222, 128, 0.2);
-        }
-
-        .btn-outline-primary {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-outline-primary:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 6px;
-        }
 
         /* === ULTRA MODERN BADGES === */
         .badge {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             position: relative;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 
                 0 2px 8px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -611,9 +654,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            border-radius: 20px;
+            border-radius: 25px;
             padding: 1px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent, rgba(255, 255, 255, 0.1));
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent, rgba(255, 255, 255, 0.2));
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -622,6 +665,7 @@
 
         .bg-success {
             background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+            color: white !important;
         }
 
         .bg-warning {
@@ -631,17 +675,19 @@
 
         .bg-danger {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: white !important;
         }
 
         .bg-secondary {
             background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+            color: white !important;
         }
 
         .badge:hover {
-            transform: translateY(-1px) scale(1.05);
+            transform: translateY(-2px) scale(1.05);
             box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                0 6px 20px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
 
         /* === ULTRA MODERN FORM STYLES === */
@@ -964,7 +1010,7 @@
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div class="container-fluid">
-            <div class="card shadow my-4">
+            <div class="card shadow my-4" style="height: calc(100vh - 2rem);">
                 <!-- Card Header -->
                 <div class="card-header py-3 d-flex justify-content-between align-items-center bg-white border-bottom-0">
                     <div>
@@ -972,61 +1018,33 @@
                             <i class="fas fa-tasks me-2"></i>Topshiriqlar
                         </h1>
                     </div>
-                    <a href="{% url 'topshiriq_create' target_role %}" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Yangi topshiriq
-                    </a>
+                    <div class="d-flex align-items-center">
+                        <div class="position-relative me-3">
+                            <input type="text" class="form-control form-control-sm ps-5" placeholder="Qidirish..." id="searchInput" style="width: 250px;">
+                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        </div>
+                        <a href="{% url 'topshiriq_create' target_role %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Yangi topshiriq
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Card Body -->
-                <div class="card-body pt-0">
-                    <!-- Filter Section -->
-                    <div class="mb-4">
-                        <form method="get" class="row g-3 align-items-end">
-                            <div class="col-md-4">
-                                <label class="form-label small text-muted mb-1">Holati</label>
-                                <select class="form-select form-select-sm" name="xolat">
-                                    <option value="">Barchasi</option>
-                                    {% for choice in status_choices %}
-                                    <option value="{{ choice.0 }}" {% if choice.0 == current_xolat %}selected{% endif %}>
-                                        {{ choice.1 }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small text-muted mb-1">Qidiruv</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control" placeholder="Sarlavha yoki bajaruvchi..." id="searchInput">
-                                    <button class="btn btn-outline-secondary" type="button" id="searchButton">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-md-4 d-flex justify-content-end align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
-                                    <i class="fas fa-filter me-1"></i> Filtrlash
-                                </button>
-                                <a href="{% url 'topshiriq_list' target_role %}" class="btn btn-outline-secondary btn-sm" title="Tozalash">
-                                    <i class="fas fa-sync-alt"></i>
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-
+                <div class="card-body pt-0 d-flex flex-column" style="flex: 1; overflow: hidden;">
                     <!-- Table Section -->
-                    <div class="mt-4">
-                        <div class="table-responsive" style="max-height: 60vh;">
-                            <table class="table table-sm table-hover" id="taskTable">
+                    <div class="flex-grow-1" style="overflow: hidden;">
+                        <div class="table-responsive h-100">
+                            <table class="table table-hover" id="taskTable" style="min-width: 100%; font-size: 15px;">
                                 <thead class="bg-light sticky-top">
                                     <tr>
-                                        <th>#</th>
-                                        <th>Sarlavha</th>
-                                        <th>Bajaruvchi</th>
-                                        <th>Status</th>
-                                        <th>Holati</th>
-                                        <th>Yaratilgan</th>
-                                        <th>Muddat</th>
-                                        <th class="text-end">Amallar</th>
+                                        <th style="width: 4%;">#</th>
+                                        <th style="width: 20%;">Bajaruvchi</th>
+                                        <th style="width: 15%;">Lavozim</th>
+                                        <th style="width: 18%;">Sarlavha</th>
+                                        <th style="width: 27%;">Maqsadi</th>
+                                        <th style="width: 8%;">Status</th>
+                                        <th style="width: 8%;">Holati</th>
+                                        <th class="text-end" style="width: 8%;">Amallar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1034,16 +1052,20 @@
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
                                         <td>
-                                            <div class="fw-bold">{{ topshiriq.title|truncatewords:5 }}</div>
-                                            {% if topshiriq.body %}
-                                            <small class="text-muted">{{ topshiriq.body|truncatewords:8 }}</small>
-                                            {% endif %}
+                                            <div class="fw-bold">{{ topshiriq.bajaruvchi_user.get_full_name|default:"-" }}</div>
                                         </td>
                                         <td>
-                                            <div>
-                                                <div>{{ topshiriq.bajaruvchi_user.get_full_name|default:"N/A" }}</div>
-                                                <small class="text-muted">{{ topshiriq.bajaruvchi_user.get_role_display|default:"" }}</small>
-                                            </div>
+                                            <div>{{ topshiriq.bajaruvchi_user.get_role_display|default:"-" }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold">{{ topshiriq.title|truncatewords:5 }}</div>
+                                        </td>
+                                        <td>
+                                            {% if topshiriq.body %}
+                                            <div class="text-muted">{{ topshiriq.body|truncatewords:6 }}</div>
+                                            {% else %}
+                                            <div class="text-muted">-</div>
+                                            {% endif %}
                                         </td>
                                         <td>
                                             <span class="badge bg-secondary">{{ topshiriq.get_status_display }}</span>
@@ -1053,30 +1075,24 @@
                                                 {{ topshiriq.get_xolat_display }}
                                             </span>
                                         </td>
-                                        <td>
-                                            <small class="text-muted">{{ topshiriq.created_at }}</small>
-                                        </td>
-                                        <td>
-                                            <small class="text-muted">{{ topshiriq.tugash_vaqti }}</small>
-                                        </td>
                                         <td class="text-end">
                                             <div class="btn-group btn-group-sm" role="group">
                                                 {% if topshiriq.javob %}
                                                 <a href="{% url 'topshiriq_javob_update' target_role topshiriq.pk %}" 
-                                                   class="btn btn-outline-success" 
+                                                   class="btn btn-outline-success btn-sm px-1" 
                                                    title="Baxolash">
-                                                    <i class="fa-solid fa-dna"></i>
+                                                    <i class="fa-solid fa-dna" style="font-size: 11px;"></i>
                                                 </a>
                                                 {% endif %}
                                                 <a href="{% url 'topshiriq_update' target_role topshiriq.pk %}" 
-                                                   class="btn btn-outline-primary" 
+                                                   class="btn btn-outline-primary btn-sm px-1" 
                                                    title="Tahrirlash">
-                                                    <i class="fas fa-edit"></i>
+                                                    <i class="fas fa-edit" style="font-size: 11px;"></i>
                                                 </a>
                                                 <a href="{% url 'topshiriq_delete_message' target_role topshiriq.pk %}" 
-                                                   class="btn btn-outline-danger" 
+                                                   class="btn btn-outline-danger btn-sm px-1" 
                                                    title="O'chirish">
-                                                    <i class="fas fa-trash"></i>
+                                                    <i class="fas fa-trash" style="font-size: 11px;"></i>
                                                 </a>
                                             </div>
                                         </td>
@@ -1084,8 +1100,9 @@
                                     {% empty %}
                                     <tr>
                                         <td colspan="8" class="text-center text-muted py-5">
-                                            <i class="fas fa-tasks fa-3x mb-3"></i><br>
-                                            Hech qanday topshiriq topilmadi
+                                            <i class="fas fa-inbox fa-3x mb-3 text-primary"></i><br>
+                                            <h5>Javob yuborilmagan topshiriqlar topilmadi</h5>
+                                            <p class="mb-0">Barcha topshiriqlar javob yuborilgan yoki hech qanday topshiriq mavjud emas.</p>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -1134,33 +1151,66 @@
 
     <!-- JavaScript -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        $(document).ready(function () {
-            // Search functionality
-            $('#searchButton, #searchInput').on('click keyup', function(e) {
-                if (e.type === 'click' || e.keyCode === 13) {
-                    const searchText = $('#searchInput').val().toLowerCase();
-                    $('#taskTable tbody tr').each(function () {
-                        const rowText = $(this).text().toLowerCase();
-                        $(this).toggle(rowText.indexOf(searchText) > -1);
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const tableRows = document.querySelectorAll('#taskTable tbody tr');
+
+            function performSearch() {
+                const searchText = searchInput.value.toLowerCase().trim();
+                
+                tableRows.forEach(function(row) {
+                    if (searchText === '') {
+                        row.style.display = '';
+                        return;
+                    }
+                    
+                    // Get specific columns: Bajaruvchi (2nd td), Lavozim (3rd td), Sarlavha (4th td), Maqsadi (5th td), Holati (7th td)
+                    const cells = row.getElementsByTagName('td');
+                    if (cells.length >= 7) {
+                        const performer = cells[1].textContent.toLowerCase(); // Bajaruvchi
+                        const position = cells[2].textContent.toLowerCase(); // Lavozim
+                        const title = cells[3].textContent.toLowerCase(); // Sarlavha
+                        const purpose = cells[4].textContent.toLowerCase(); // Maqsadi
+                        const status = cells[6].textContent.toLowerCase(); // Holati
+                        
+                        if (title.includes(searchText) || 
+                            performer.includes(searchText) || 
+                            position.includes(searchText) ||
+                            purpose.includes(searchText) ||
+                            status.includes(searchText)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
+            // Search on Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch();
+                }
+            });
+
+            // Real-time search as user types
+            searchInput.addEventListener('input', performSearch);
+
+            // Clear search and show all rows when input is cleared
+            searchInput.addEventListener('focus', function() {
+                if (this.value === '') {
+                    tableRows.forEach(function(row) {
+                        row.style.display = '';
                     });
                 }
             });
-
-            // Clear search on focus
-            $('#searchInput').on('focus', function() {
-                if ($(this).val() === '') {
-                    $('#taskTable tbody tr').show();
-                }
-            });
-
-            // Apply filters from URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            $('select[name="xolat"]').val(urlParams.get('xolat') || '');
         });
     </script>
+</body>
+</body>
 </body>
 
 </html>

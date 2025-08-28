@@ -11,7 +11,7 @@ from users.models import Users
 from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, Notification
 from .forms import TopshiriqForm, TopshiriqJavobForm, TopshiriqBaxolashForm
 from .services import NotificationService
-from topshiriq.choices import ALLOWED_TOPSHIRIQ_VIEW_MAP, RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP, ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP
+from topshiriq.choices import RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP
 from users.choices import ALLOWED_USER_MAP
 from topshiriq.choices import StatusChoice
 
@@ -27,8 +27,8 @@ def topshiriq_list(request, target_role):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
-    # ALLOWED_TOPSHIRIQ_VIEW_MAP orqali ruxsat tekshirish
-    allowed_view_roles = ALLOWED_TOPSHIRIQ_VIEW_MAP.get(request.user.role, [])
+    # ALLOWED_TOPSHIRIQ_MAP orqali ruxsat tekshirish
+    allowed_view_roles = ALLOWED_TOPSHIRIQ_MAP.get(request.user.role, [])
    
     # Agar foydalanuvchi o'z topshiriqlarini ko'rmoqchi bo'lsa (bajaruvchi sifatida)
     if request.user.role == target_role:
@@ -259,20 +259,35 @@ def topshiriq_baxolash(request, target_role, pk):
         javob = None
 
     if request.method == 'POST':
+        # DEBUG: POST ma'lumotlarini ko'rish
+        print("POST data:", request.POST)
+        print("Status from POST:", request.POST.get('status'))
+        print("Baxo from POST:", request.POST.get('baxo'))
+        print("Topshiriq current status:", topshiriq.status)
+        
         form = TopshiriqBaxolashForm(request.POST, instance=topshiriq)
-        if form.is_valid():
-            # Topshiriq statusini yangilash
-            topshiriq.status = form.cleaned_data['status']
-            topshiriq.baxo = form.cleaned_data['baxo']
-            
-            # Qo'shimcha izoh qo'shish
-            izoh = request.POST.get('izoh', '')
-            if izoh:
-                topshiriq.izoh = izoh
-            
-            topshiriq.save()
-            
-            return redirect('hisobot_list')
+        
+        # Form valid bo'lmasa ham ma'lumotlarni saqlash
+        status = request.POST.get('status')
+        baxo = request.POST.get('baxo')
+        
+        # Manual saqlash
+        print("Before save - status:", status, "baxo:", baxo)
+        if status:
+            topshiriq.status = status
+            print("Status updated to:", topshiriq.status)
+        if baxo:
+            try:
+                topshiriq.baxo = int(baxo)
+                print("Baxo updated to:", topshiriq.baxo)
+            except (ValueError, TypeError):
+                topshiriq.baxo = 0
+                print("Baxo set to default 0")
+        
+        topshiriq.save()
+        print("After save - topshiriq status:", topshiriq.status, "baxo:", topshiriq.baxo)
+        
+        return redirect('hisobot_list')
     else:
         form = TopshiriqBaxolashForm(instance=topshiriq)
 
@@ -283,6 +298,7 @@ def topshiriq_baxolash(request, target_role, pk):
         'javob_files': javob_files,
         'target_role': target_role,
         'RoleChoice': RoleChoice,
+        'status_choices': StatusChoice.choices,
     }
     return render(request, 'topshiriq/topshiriq_baxolash.html', context)
 
@@ -343,8 +359,8 @@ def topshiriq_javob_list(request, target_role):
         javoblar = topshiriq_data
         
     else:
-        # ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP bo'yicha ruxsat tekshirish
-        allowed_view_roles = ALLOWED_TOPSHIRIQ_JAVOB_VIEW_MAP.get(request.user.role, [])
+        # ALLOWED_TOPSHIRIQ_JAVOB_MAP bo'yicha ruxsat tekshirish
+        allowed_view_roles = ALLOWED_TOPSHIRIQ_JAVOB_MAP.get(request.user.role, [])
 
 
         # Agar target_role ko'rish ruxsati bo'lmasa
@@ -420,52 +436,45 @@ def topshiriq_detail(request, target_role, pk):
 
 @login_required
 def hisobot_list(request):
-    """Javob yuborilgan topshiriqlarni ko'rish va baholash"""
+    """Javob yuborilgan topshiriqlarni ko'rish va baholash (javob_yuborildi=True)"""
     user = request.user
     
     # Status filter
     status_filter = request.GET.get('status', None)
     
-    # Javob yuborilgan topshiriqlarni olish
-    if user.role == 'Rektor':
-        # Rektor barcha javob yuborilgan topshiriqlarni ko'ra oladi
-        topshiriqlar = Topshiriq.objects.select_related(
-            'bajaruvchi_user', 'yaratuvchi_user'
-        ).filter(javob_yuborildi=True)
-    else:
-        # Boshqa rollar faqat o'zlari yaratgan yoki tegishli topshiriqlar javoblarini ko'radi
-        allowed_roles = ALLOWED_USER_MAP.get(user.role, [])
-        target_roles = [role.value for role in allowed_roles]
-        
-        topshiriqlar = Topshiriq.objects.select_related(
-            'bajaruvchi_user', 'yaratuvchi_user'
-        ).filter(
-            javob_yuborildi=True
-        ).filter(
-            Q(yaratuvchi_user=user) |  # O'zi yaratgan topshiriqlar
-            Q(bajaruvchi_user=user) |  # O'zi bajargan topshiriqlar
-            Q(bajaruvchi_user__role__in=target_roles)  # O'z qo'l ostidagi rollar
-        )
+    # Base filter - faqat javob yuborilgan topshiriqlar
+    base_filter = Q(javob_yuborildi=True)
     
-    # Status filter qo'llash
+    # Rektor va Admin barcha hisobotlarni ko'ra oladi, boshqalar faqat o'z yaratganlarini
+    if user.role in ['Rektor', 'Admin']:
+        topshiriqlar = Topshiriq.objects.select_related(
+            'bajaruvchi_user', 'yaratuvchi_user'
+        ).filter(base_filter)
+    else:
+        # Faqat yaratuvchi user bo'lgan topshiriqlarni ko'rsatish
+        topshiriqlar = Topshiriq.objects.select_related(
+            'bajaruvchi_user', 'yaratuvchi_user'
+        ).filter(base_filter & Q(yaratuvchi_user=user))
+    
+    # Statistics hisobi (filter qo'llanishidan oldin)
+    stats = {
+        'total_reports': topshiriqlar.count(),
+        'approved_reports': topshiriqlar.filter(status=StatusChoice.BAJARILDI.value).count(),  # Bajarildi
+        'delayed_reports': topshiriqlar.filter(status=StatusChoice.KECHIKDI.value).count(),  # Kechikdi
+        'failed_reports': topshiriqlar.filter(status=StatusChoice.BAJARILMADI.value).count(),  # Bajarilmadi
+    }
+ 
+    # Status filter qo'llash (statistika hisobidan keyin)
     if status_filter:
         if status_filter == 'completed':
-            topshiriqlar = topshiriqlar.filter(status='YUBORILDI')
-        elif status_filter == 'approved':
-            topshiriqlar = topshiriqlar.filter(status='QABUL_QILINDI')
-        elif status_filter == 'rejected':
-            topshiriqlar = topshiriqlar.filter(status='QAYTARILDI')
-    
+            topshiriqlar = topshiriqlar.filter(status=StatusChoice.BAJARILDI.value)
+        elif status_filter == 'delayed':
+            topshiriqlar = topshiriqlar.filter(status=StatusChoice.KECHIKDI.value)
+        elif status_filter == 'failed':
+            topshiriqlar = topshiriqlar.filter(status=StatusChoice.BAJARILMADI.value)
+
     # Yangi javoblar birinchi
     topshiriqlar = topshiriqlar.order_by('-bajarilgan_vaqti')
-    
-    # Har bir topshiriq uchun javob ma'lumotlarini qo'shish
-    for topshiriq in topshiriqlar:
-        try:
-            javob = TopshiriqJavob.objects.filter(topshiriq=topshiriq).first()
-            topshiriq.javob = javob
-        except:
-            topshiriq.javob = None
     
     # Pagination
     paginator = Paginator(topshiriqlar, 15)
@@ -478,8 +487,27 @@ def hisobot_list(request):
     except EmptyPage:
         topshiriqlar_page = paginator.page(paginator.num_pages)
     
+    # Har bir topshiriq uchun javob ma'lumotlarini qo'shish (faqat sahifadagi elementlar uchun)
+    topshiriq_ids = [t.id for t in topshiriqlar_page]
+    javoblar_dict = {}
+    
+    # Javoblarni bir marta olib, dictionary ga joylash
+    javoblar = TopshiriqJavob.objects.filter(
+        topshiriq__id__in=topshiriq_ids
+    ).select_related('bajaruvchi_user')
+    
+    for javob in javoblar:
+        javoblar_dict[javob.topshiriq_id] = javob
+    
+    # Har bir topshiriqga javobni biriktirish
+    for topshiriq in topshiriqlar_page:
+        topshiriq.javob = javoblar_dict.get(topshiriq.id)
+    
     context = {
-        'topshiriqlar': topshiriqlar_page,
+        'reports': topshiriqlar_page,  # Template da 'reports' ishlatiladi
+        'topshiriqlar': topshiriqlar_page,  # Backward compatibility uchun
+        'stats': stats,  # Statistika ma'lumotlari
+        'StatusChoice': StatusChoice,
         'RoleChoice': RoleChoice,
         'current_status': status_filter,
     }

@@ -1635,26 +1635,29 @@
                 0 2px 8px rgba(107, 114, 128, 0.2);
         }
 
-        /* Form validation styles */
+        /* Form validation styles - SODDA */
         .is-valid {
             border-color: #22c55e !important;
-            box-shadow: 
-                0 0 0 4px rgba(34, 197, 94, 0.1),
-                0 4px 16px rgba(34, 197, 94, 0.15) !important;
+            background-color: rgba(34, 197, 94, 0.05) !important;
         }
 
         .is-invalid {
             border-color: #ef4444 !important;
-            box-shadow: 
-                0 0 0 4px rgba(239, 68, 68, 0.1),
-                0 4px 16px rgba(239, 68, 68, 0.15) !important;
+            background-color: rgba(239, 68, 68, 0.05) !important;
         }
 
-        .invalid-feedback {
-            color: #ef4444;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-top: 0.5rem;
+        /* Button states - ANIQ */
+        button[disabled] {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+            background: #6c757d !important;
+        }
+
+        button:not([disabled]) {
+            opacity: 1 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
         }
 
         /* Progress indicator */
@@ -1959,8 +1962,8 @@
                                             <span class="badge bg-warning">Kutilmoqda</span>
                                         {% endif %}
                                         
-                                        {% if javob.baho %}
-                                            <span class="badge bg-info ms-1">{{ javob.baho }} ball</span>
+                                        {% if topshiriq.baxo and topshiriq.baxo > 0 %}
+                                            <span class="badge bg-info ms-1">{{ topshiriq.baxo }} ball</span>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -2017,9 +2020,23 @@
                                         <i class="fas fa-check-circle me-2 text-success"></i>
                                         Topshiriq statusi
                                     </label>
-                                    {{ form.status }}
+                                    <select name="status" id="id_status" class="form-select">
+                                        <option value="">Status tanlang</option>
+                                        {% for choice_value, choice_display in status_choices %}
+                                        <option value="{{ choice_value }}" {% if topshiriq.status == choice_value %}selected{% endif %}>
+                                            {{ choice_display }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
                                     <small class="form-text text-muted mt-1">
-                                        Topshiriq qabul qilindi yoki rad etildi
+                                        {% if topshiriq.status %}
+                                            Hozirgi status: <strong>
+                                                {% for choice_value, choice_display in status_choices %}
+                                                    {% if choice_value == topshiriq.status %}{{ choice_display }}{% endif %}
+                                                {% endfor %}
+                                            </strong><br>
+                                        {% endif %}
+                                        Topshiriq bajarilish holatini tanlang
                                     </small>
                                 </div>
                             </div>
@@ -2031,9 +2048,14 @@
                                         <i class="fas fa-star me-2 text-warning"></i>
                                         Baho
                                     </label>
-                                    {{ form.baxo }}
+                                    <input type="number" name="baxo" id="id_baxo" class="form-control" 
+                                           min="0" max="100" step="1" placeholder="Baho (0-100)" 
+                                           value="{{ topshiriq.baxo|default:0 }}">
                                     <small class="form-text text-muted mt-1">
-                                        Topshiriq bajarilishi uchun baho
+                                        Topshiriq bajarilishi uchun baho (0-100 ball)
+                                        {% if topshiriq.baxo > 0 %}
+                                        <br><strong>Hozirgi baho: {{ topshiriq.baxo }} ball</strong>
+                                        {% endif %}
                                     </small>
                                 </div>
                             </div>
@@ -2122,115 +2144,34 @@
             setInterval(updateCountdown, 60000); // Har daqiqada yangilanadi
         });
 
-        // Evaluation form JavaScript
+        // Evaluation form JavaScript - FORM DOIM YUBORILSIN
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('.evaluation-form');
-            const progressBar = document.querySelector('.form-progress-bar');
-            const formInputs = form.querySelectorAll('select, textarea');
+            const evaluationSection = document.querySelector('.content-section .section-body');
+            const form = evaluationSection ? evaluationSection.querySelector('form') : null;
+            
+            if (!form) {
+                return;
+            }
+            
             const submitButton = form.querySelector('button[type="submit"]');
-            
-            // Progress bar update
-            function updateProgress() {
-                const totalFields = formInputs.length;
-                let filledFields = 0;
-                
-                formInputs.forEach(input => {
-                    if (input.value && input.value.trim() !== '') {
-                        filledFields++;
-                        input.classList.add('is-valid');
-                        input.classList.remove('is-invalid');
-                    } else {
-                        input.classList.remove('is-valid');
-                        if (input.hasAttribute('required')) {
-                            input.classList.add('is-invalid');
-                        }
-                    }
-                });
-                
-                const progress = (filledFields / totalFields) * 100;
-                if (progressBar) {
-                    progressBar.style.width = progress + '%';
-                }
-                
-                // Enable/disable submit button
-                if (filledFields >= 2) { // status va baxo majburiy
-                    submitButton.disabled = false;
-                    submitButton.classList.remove('opacity-50');
-                } else {
-                    submitButton.disabled = true;
-                    submitButton.classList.add('opacity-50');
-                }
+            if (submitButton) {
+                // Tugmani doim active qilish
+                submitButton.disabled = false;
+                submitButton.style.opacity = '1';
+                submitButton.style.pointerEvents = 'auto';
             }
             
-            // Add progress bar if not exists
-            if (!progressBar) {
-                const progressDiv = document.createElement('div');
-                progressDiv.className = 'form-progress';
-                progressDiv.innerHTML = '<div class="form-progress-bar"></div>';
-                form.insertBefore(progressDiv, form.firstChild);
-                updateProgress();
-            }
-            
-            // Event listeners
-            formInputs.forEach(input => {
-                input.addEventListener('change', updateProgress);
-                input.addEventListener('input', updateProgress);
-                input.addEventListener('blur', function() {
-                    if (this.hasAttribute('required') && !this.value.trim()) {
-                        this.classList.add('is-invalid');
-                        this.classList.remove('is-valid');
-                    }
-                });
-            });
-            
-            // Form submission
+            // Form submit
             form.addEventListener('submit', function(e) {
-                let isValid = true;
-                const requiredFields = form.querySelectorAll('[name="status"], [name="baxo"]');
-                
-                requiredFields.forEach(field => {
-                    if (!field.value || field.value.trim() === '') {
-                        field.classList.add('is-invalid');
-                        field.classList.remove('is-valid');
-                        isValid = false;
-                        
-                        // Add error message if not exists
-                        if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('invalid-feedback')) {
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'invalid-feedback';
-                            errorDiv.textContent = 'Bu maydon majburiy';
-                            field.parentNode.insertBefore(errorDiv, field.nextSibling);
-                        }
-                    } else {
-                        const errorMsg = field.parentNode.querySelector('.invalid-feedback');
-                        if (errorMsg) {
-                            errorMsg.remove();
-                        }
-                    }
-                });
-                
-                if (!isValid) {
-                    e.preventDefault();
-                    
-                    // Animate invalid fields
-                    const invalidFields = form.querySelectorAll('.is-invalid');
-                    invalidFields.forEach(field => {
-                        field.style.animation = 'shake 0.5s ease-in-out';
-                        setTimeout(() => {
-                            field.style.animation = '';
-                        }, 500);
-                    });
-                    
-                    return false;
+                // Loading holati
+                if (submitButton) {
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Yuklanmoqda...';
+                    submitButton.disabled = true;
                 }
                 
-                // Show loading state
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Yuklanmoqda...';
-                submitButton.disabled = true;
+                // Form ni yuborish (validation yo'q)
+                return true;
             });
-            
-            // Initialize progress
-            updateProgress();
         });
 
         // Add shake animation

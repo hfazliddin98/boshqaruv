@@ -714,30 +714,12 @@
                 </div>
 
                 <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-warning shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                        Ko'rib chiqish kutilmoqda
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.pending_reports|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-success shadow h-100 py-2">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Tasdiqlangan
+                                        Bajarildi
                                     </div>
                                     <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.approved_reports|default:0 }}</div>
                                 </div>
@@ -750,14 +732,33 @@
                 </div>
 
                 <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Kechikdi
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.delayed_reports|default:0 }}</div>
+                                    <!-- Debug: {{ stats.delayed_reports }} -->
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-danger shadow h-100 py-2">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                        Rad etilgan
+                                        Bajarilmadi
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.rejected_reports|default:0 }}</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.failed_reports|default:0 }}</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-times-circle fa-2x text-gray-300"></i>
@@ -774,7 +775,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold text-primary">
                             <i class="fas fa-reply me-2"></i>
-                            Topshiriq javoblari
+                            Topshiriqlar
                         </h6>
                         
                         <div class="d-flex align-items-center">
@@ -782,9 +783,9 @@
                             <form method="GET" class="d-flex me-3">
                                 <select name="status" class="form-select form-select-sm me-2" onchange="this.form.submit()">
                                     <option value="">Barcha holatlar</option>
-                                    <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Ko'rib chiqish kutilmoqda</option>
-                                    <option value="approved" {% if current_status == 'approved' %}selected{% endif %}>Tasdiqlangan</option>
-                                    <option value="rejected" {% if current_status == 'rejected' %}selected{% endif %}>Rad etilgan</option>
+                                    <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Bajarildi</option>
+                                    <option value="delayed" {% if current_status == 'delayed' %}selected{% endif %}>Kechikdi</option>
+                                    <option value="failed" {% if current_status == 'failed' %}selected{% endif %}>Bajarilmadi</option>
                                 </select>
                             </form>
                             
@@ -799,13 +800,13 @@
                 <div class="card-body">
                     {% if reports %}
                     <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
+                        <table class="table table-bordered table-sm" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Topshiriq</th>
                                     <th>Bajaruvchi</th>
-                                    <th>Javob bergan vaqt</th>
+                                    <th>Javob yuborilgan vaqt</th>
                                     <th>Holat</th>
                                     <th>Baho</th>
                                     <th class="text-center">Amallar</th>
@@ -819,15 +820,10 @@
                                         <div class="font-weight-bold">{{ topshiriq.title|truncatechars:40 }}</div>
                                         {% if topshiriq.javob %}
                                             {% if topshiriq.javob.title %}
-                                            <small class="text-muted">Javob: {{ topshiriq.javob.title|truncatechars:30 }}</small>
+                                            <small class="text-muted mt-1 d-block">Javob: {{ topshiriq.javob.title|truncatechars:30 }}</small>
                                             {% elif topshiriq.javob.body %}
-                                            <small class="text-muted">{{ topshiriq.javob.body|truncatechars:30|striptags }}</small>
+                                            <small class="text-muted mt-1 d-block">{{ topshiriq.javob.body|truncatechars:30|striptags }}</small>
                                             {% endif %}
-                                        {% else %}
-                                        <small class="text-muted">
-                                            <i class="fas fa-check-circle me-1 text-success"></i>
-                                            Javob yuborilgan
-                                        </small>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -845,20 +841,20 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if topshiriq.status == 'YUBORILDI' %}
-                                        <span class="badge bg-warning text-dark">
-                                            <i class="fas fa-hourglass-half me-1"></i>
-                                            Ko'rib chiqilmoqda
-                                        </span>
-                                        {% elif topshiriq.status == 'QABUL_QILINDI' %}
+                                        {% if topshiriq.status == 'Bajarildi' %}
                                         <span class="badge bg-success">
                                             <i class="fas fa-check-circle me-1"></i>
-                                            Tasdiqlangan
+                                            Bajarildi
                                         </span>
-                                        {% elif topshiriq.status == 'QAYTARILDI' %}
+                                        {% elif topshiriq.status == 'Kechikdi' %}
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Kechikdi
+                                        </span>
+                                        {% elif topshiriq.status == 'Bajarilmadi' %}
                                         <span class="badge bg-danger">
                                             <i class="fas fa-times-circle me-1"></i>
-                                            Rad etilgan
+                                            Bajarilmadi
                                         </span>
                                         {% else %}
                                         <span class="badge bg-secondary">
@@ -867,12 +863,18 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if topshiriq.report and topshiriq.report.rating %}
-                                        <div class="rating-stars" title="Baho: {{ topshiriq.report.rating }}/5">
-                                            {% for i in "12345" %}
-                                            <i class="fas fa-star {% if forloop.counter <= topshiriq.report.rating %}text-warning{% else %}text-muted{% endif %}" style="font-size: 14px;"></i>
-                                            {% endfor %}
-                                            <small class="text-muted ms-1">({{ topshiriq.report.rating }})</small>
+                                        {% if topshiriq.baxo and topshiriq.baxo > 0 %}
+                                        <div class="rating-display" title="Baho: {{ topshiriq.baxo }} ball">
+                                            <span class="badge bg-primary">{{ topshiriq.baxo }} ball</span>
+                                            {% if topshiriq.baxo >= 85 %}
+                                                <small class="text-success ms-1">(A'lo)</small>
+                                            {% elif topshiriq.baxo >= 70 %}
+                                                <small class="text-primary ms-1">(Yaxshi)</small>
+                                            {% elif topshiriq.baxo >= 60 %}
+                                                <small class="text-warning ms-1">(Qoniqarli)</small>
+                                            {% else %}
+                                                <small class="text-danger ms-1">(Qoniqarsiz)</small>
+                                            {% endif %}
                                         </div>
                                         {% else %}
                                         <span class="text-muted">

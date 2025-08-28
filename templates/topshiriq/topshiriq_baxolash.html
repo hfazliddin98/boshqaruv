@@ -2022,19 +2022,13 @@
                                     </label>
                                     <select name="status" id="id_status" class="form-select">
                                         <option value="">Status tanlang</option>
-                                        {% for choice_value, choice_display in status_choices %}
-                                        <option value="{{ choice_value }}" {% if topshiriq.status == choice_value %}selected{% endif %}>
-                                            {{ choice_display }}
-                                        </option>
-                                        {% endfor %}
+                                        <option value="Bajarildi" {% if topshiriq.status == 'Bajarildi' %}selected{% endif %}>Bajarildi</option>
+                                        <option value="Kechikdi" {% if topshiriq.status == 'Kechikdi' %}selected{% endif %}>Kechikdi</option>
+                                        <option value="Bajarilmadi" {% if topshiriq.status == 'Bajarilmadi' %}selected{% endif %}>Bajarilmadi</option>
                                     </select>
                                     <small class="form-text text-muted mt-1">
                                         {% if topshiriq.status %}
-                                            Hozirgi status: <strong>
-                                                {% for choice_value, choice_display in status_choices %}
-                                                    {% if choice_value == topshiriq.status %}{{ choice_display }}{% endif %}
-                                                {% endfor %}
-                                            </strong><br>
+                                            Hozirgi status: <strong>{{ topshiriq.get_status_display }}</strong><br>
                                         {% endif %}
                                         Topshiriq bajarilish holatini tanlang
                                     </small>

@@ -298,7 +298,6 @@ def topshiriq_baxolash(request, target_role, pk):
         'javob_files': javob_files,
         'target_role': target_role,
         'RoleChoice': RoleChoice,
-        'status_choices': StatusChoice.choices,
     }
     return render(request, 'topshiriq/topshiriq_baxolash.html', context)
 
@@ -442,19 +441,12 @@ def hisobot_list(request):
     # Status filter
     status_filter = request.GET.get('status', None)
     
-    # Base filter - faqat javob yuborilgan topshiriqlar
-    base_filter = Q(javob_yuborildi=True)
-    
-    # Rektor va Admin barcha hisobotlarni ko'ra oladi, boshqalar faqat o'z yaratganlarini
-    if user.role in ['Rektor', 'Admin']:
-        topshiriqlar = Topshiriq.objects.select_related(
-            'bajaruvchi_user', 'yaratuvchi_user'
-        ).filter(base_filter)
-    else:
-        # Faqat yaratuvchi user bo'lgan topshiriqlarni ko'rsatish
-        topshiriqlar = Topshiriq.objects.select_related(
-            'bajaruvchi_user', 'yaratuvchi_user'
-        ).filter(base_filter & Q(yaratuvchi_user=user))
+    # Faqat javob yuborilgan va yaratuvchi user bo'lgan topshiriqlarni olish
+    base_filter = Q(javob_yuborildi=True) & Q(yaratuvchi_user=user)
+
+    topshiriqlar = Topshiriq.objects.select_related(
+        'bajaruvchi_user', 'yaratuvchi_user'
+    ).filter(base_filter)
     
     # Statistics hisobi (filter qo'llanishidan oldin)
     stats = {

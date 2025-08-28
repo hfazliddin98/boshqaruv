@@ -611,6 +611,17 @@
             background: #a8a8a8;
         }
 
+        /* === Custom Select Styles === */
+        #taskFilter {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #taskFilter option {
+            padding: 8px 12px;
+        }
+
         /* === Responsive === */
         @media (max-width: 992px) {
             .sidebar {
@@ -660,6 +671,23 @@
             .input-group {
                 width: 100% !important;
             }
+
+            /* Header responsive */
+            .card-header .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
+
+            .card-header .d-flex > div:last-child {
+                align-self: stretch;
+                justify-content: space-between;
+            }
+
+            .card-header .d-flex .gap-2 {
+                flex-wrap: wrap;
+                gap: 10px !important;
+            }
         }
 
         @media (max-width: 576px) {
@@ -681,6 +709,20 @@
                 font-size: 10px;
                 padding: 0.25rem 0.5rem;
             }
+
+            /* Header mobile adjustments */
+            .card-header h1 {
+                font-size: 1.2rem !important;
+            }
+
+            .card-header .form-select-sm {
+                min-width: 160px;
+                font-size: 12px;
+            }
+
+            .card-header label {
+                font-size: 12px;
+            }
         }
     </style>
 
@@ -694,64 +736,59 @@
         <div class="container-fluid">
             <div class="card shadow mb-4">
                 <div class="card-header py-4">
-                    <div>
-                        <h1 class="h3 m-0 font-weight-bold text-white">
-                            <i class="fas fa-tasks me-3"></i> 
-                            {{target_role|capfirst}} topshiriqlari
-                        </h1>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h3 m-0 font-weight-bold text-white">
+                                <i class="fas fa-tasks me-3"></i> 
+                                {{target_role|capfirst}} topshiriqlari
+                            </h1>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="taskFilter" class="form-label text-white me-2 mb-0">Filter:</label>
+                            <select id="taskFilter" class="form-select form-select-sm" style="min-width: 150px;">
+                                <option value="kutilayotgan" {% if filter_type == 'kutilayotgan' or not filter_type %}selected{% endif %}>
+                                    🕐 Kutilayotgan
+                                </option>
+                                <option value="bajarilgan" {% if filter_type == 'bajarilgan' %}selected{% endif %}>
+                                    ✅ Bajarilgan
+                                </option>
+                                <option value="all" {% if filter_type == 'all' %}selected{% endif %}>
+                                    📋 Barchasi
+                                </option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
                 <div class="card-body p-4">
-                    <ul class="nav nav-tabs" id="taskTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="yuborilmagan-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#yuborilmagan" type="button" role="tab">
-                                <i class="fas fa-hourglass-half me-2"></i>
-                                Kutilmoqda
-                                <span class="count-badge" id="yuborilmagan-count">0</span>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="yuborilgan-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#yuborilgan" type="button" role="tab">
-                                <i class="fas fa-check-double me-2"></i>
-                                Bajarilgan
-                                <span class="count-badge" id="yuborilgan-count">0</span>
-                            </button>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content" id="taskTabsContent">
-                        <!-- Kutilmoqda -->
-                        <div class="tab-pane fade show active" id="yuborilmagan" role="tabpanel">
-                            <div class="table-responsive" style="max-height: 60vh;">
-                                <table class="table table-sm table-hover">
-                                    <thead class="sticky-top">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Sarlavha</th>
-                                            <th>Yaratuvchi</th>
-                                            <th>Muhimlik</th>
-                                            <th>Yaratilgan</th>
-                                            <th>Muddat</th>
-                                            <th class="text-end">Amallar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for topshiriq in topshiriq_data %}
-                                        {% if not topshiriq.javob_yuborildi %}
-                                        <tr class="javob-yuborilmagan">
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>
-                                                <div class="fw-bold task-title">{{ topshiriq.title }}</div>
-                                                {% if topshiriq.body %}
-                                                <small class="text-muted task-description">{{ topshiriq.body|truncatewords:5 }}</small>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="user-avatar">
+                    <!-- Table -->
+                    <div class="table-responsive" style="max-height: 70vh;">
+                        <table class="table table-sm table-hover">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Sarlavha</th>
+                                    <th>Yaratuvchi</th>
+                                    <th>Muhimlik</th>
+                                    <th>Yaratilgan</th>
+                                    <th>Muddat</th>
+                                    <th>Holat</th>
+                                    <th class="text-end">Amallar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for topshiriq in topshiriq_data %}
+                                <tr class="{% if topshiriq.javob_yuborildi %}javob-yuborildi{% else %}javob-yuborilmagan{% endif %}">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="fw-bold task-title">{{ topshiriq.title }}</div>
+                                        {% if topshiriq.body %}
+                                        <small class="text-muted task-description">{{ topshiriq.body|truncatewords:5 }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar">
                                                         {{ topshiriq.yaratuvchi_user.first_name.0|default:"?" }}{{ topshiriq.yaratuvchi_user.last_name.0|default:"" }}
                                                     </div>
                                                     <div class="user-info">
@@ -767,12 +804,25 @@
                                             </td>
                                             <td><div class="date-badge">{{ topshiriq.created_at|date:"d.m.Y" }}</div></td>
                                             <td><div class="date-badge text-warning">{{ topshiriq.tugash_vaqti|date:"d.m.Y"|default:"∞" }}</div></td>
+                                            <td>
+                                                {% if topshiriq.javob_yuborildi %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>Bajarilgan
+                                                </span>
+                                                {% else %}
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-hourglass-half me-1"></i>Kutilmoqda
+                                                </span>
+                                                {% endif %}
+                                            </td>
                                             <td class="text-end">
                                                 <div class="btn-group btn-group-sm">
+                                                    {% if not topshiriq.javob_yuborildi %}
                                                     <a href="{% url 'topshiriq_javob_create' target_role topshiriq.pk %}"
                                                        class="btn btn-success" title="Javob yuborish">
                                                         <i class="fa fa-reply fa-sm"></i>
                                                     </a>
+                                                    {% endif %}
                                                     <a href="{% url 'topshiriq_detail' target_role topshiriq.pk %}"
                                                        class="btn btn-outline-info" title="Ko'rish">
                                                         <i class="fa fa-eye fa-sm"></i>
@@ -780,89 +830,26 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        {% endif %}
                                         {% empty %}
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
-                                                <i class="fas fa-thumbs-up fa-2x mb-2 text-success"></i><br>
-                                                <h6>Zo'r!</h6>
-                                                <small>Barcha topshiriqlar bajarilgan!</small>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                                <h6>Topshiriq mavjud emas</h6>
+                                                <small>
+                                                    {% if filter_type == 'bajarilgan' %}
+                                                        Hali bajarilgan topshiriqlar yo'q
+                                                    {% elif filter_type == 'kutilayotgan' %}
+                                                        Kutilayotgan topshiriqlar yo'q
+                                                    {% else %}
+                                                        Sizga topshiriq berilmagan
+                                                    {% endif %}
+                                                </small>
                                             </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
-                                </table>
                             </div>
-                        </div>
 
-                        <!-- Bajarilgan -->
-                        <div class="tab-pane fade" id="yuborilgan" role="tabpanel">
-                            <div class="table-responsive" style="max-height: 60vh;">
-                                <table class="table table-sm table-hover">
-                                    <thead class="sticky-top">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Sarlavha</th>
-                                            <th>Yaratuvchi</th>
-                                            <th>Holat</th>
-                                            <th>Yaratilgan</th>
-                                            <th>Bajarilgan</th>
-                                            <th class="text-end">Amallar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for topshiriq in topshiriq_data %}
-                                        {% if topshiriq.javob_yuborildi %}
-                                        <tr class="javob-yuborilgan">
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>
-                                                <div class="fw-bold task-title">{{ topshiriq.title }}</div>
-                                                {% if topshiriq.body %}
-                                                <small class="text-muted task-description">{{ topshiriq.body|truncatewords:5 }}</small>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="user-avatar">
-                                                        {{ topshiriq.yaratuvchi_user.first_name.0|default:"?" }}{{ topshiriq.yaratuvchi_user.last_name.0|default:"" }}
-                                                    </div>
-                                                    <div class="user-info">
-                                                        <div class="user-name">{{ topshiriq.yaratuvchi_user.get_full_name|default:"N/A" }}</div>
-                                                        <div class="user-role">{{ topshiriq.yaratuvchi_user.role|default:"" }}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-success">
-                                                    <i class="fas fa-check me-1"></i>
-                                                    {{ topshiriq.get_status_display }}
-                                                </span>
-                                            </td>
-                                            <td><div class="date-badge">{{ topshiriq.created_at|date:"d.m.Y" }}</div></td>
-                                            <td><div class="date-badge">{{ topshiriq.bajarilgan_vaqti|date:"d.m.Y"|default:"N/A" }}</div></td>
-                                            <td class="text-end">
-                                                <a href="{% url 'topshiriq_detail' target_role topshiriq.pk %}"
-                                                   class="btn btn-outline-info btn-sm" title="Ko'rish">
-                                                    <i class="fa fa-eye fa-sm"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                        {% empty %}
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
-                                                <i class="fas fa-clipboard-list fa-2x mb-2"></i><br>
-                                                <h6>Hali topshiriq yo'q</h6>
-                                                <small>Bajarilgan topshiriqlar bu yerda ko'rinadi</small>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- Pagination -->
                     {% if topshiriq_data.has_other_pages %}
                     <div class="d-flex justify-content-between align-items-center mt-4">
@@ -876,7 +863,7 @@
                             <ul class="pagination pagination-sm mb-0">
                                 {% if topshiriq_data.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ topshiriq_data.previous_page_number }}" aria-label="Oldingi">
+                                    <a class="page-link" href="?page={{ topshiriq_data.previous_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}" aria-label="Oldingi">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
@@ -889,14 +876,14 @@
                                     </li>
                                     {% elif page_num > topshiriq_data.number|add:'-3' and page_num < topshiriq_data.number|add:'3' %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                                        <a class="page-link" href="?page={{ page_num }}{% if filter_type %}&filter={{ filter_type }}{% endif %}">{{ page_num }}</a>
                                     </li>
                                     {% endif %}
                                 {% endfor %}
                                 
                                 {% if topshiriq_data.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ topshiriq_data.next_page_number }}" aria-label="Keyingi">
+                                    <a class="page-link" href="?page={{ topshiriq_data.next_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}" aria-label="Keyingi">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
@@ -915,20 +902,45 @@
 
     <script>
         $(document).ready(function () {
-            // Count tasks for badges
-            const yuborilmaganCount = $('#yuborilmagan tbody tr').length - ($('#yuborilmagan tbody tr td[colspan]').length);
-            const yuborilganCount = $('#yuborilgan tbody tr').length - ($('#yuborilgan tbody tr td[colspan]').length);
-            
-            $('#yuborilmagan-count').text(yuborilmaganCount);
-            $('#yuborilgan-count').text(yuborilganCount);
+            // Sidebar toggle functionality
+            $('#sidebarToggle').click(function () {
+                $('#sidebar').toggleClass('collapsed');
+                $('#mainContent').toggleClass('expanded');
 
-            // Hide empty message rows if there are actual tasks
-            if (yuborilmaganCount > 0) {
-                $('#yuborilmagan tbody tr td[colspan]').parent().hide();
-            }
-            if (yuborilganCount > 0) {
-                $('#yuborilgan tbody tr td[colspan]').parent().hide();
-            }
+                // For mobile view
+                if ($(window).width() < 992) {
+                    $('#sidebar').toggleClass('show');
+                }
+            });
+
+            // Close sidebar when clicking outside on mobile
+            $(document).click(function (e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('#sidebar').length && !$(e.target).is('#sidebarToggle')) {
+                        $('#sidebar').removeClass('show');
+                    }
+                }
+            });
+
+            // Prevent closing when clicking inside sidebar
+            $('#sidebar').click(function (e) {
+                e.stopPropagation();
+            });
+
+            // Active menu item highlight
+            $('.sidebar-menu a').click(function () {
+                $('.sidebar-menu a').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            // Filter dropdown change handler - avtomatik filterlash
+            $('#taskFilter').change(function() {
+                const filterValue = $(this).val();
+                const currentUrl = new URL(window.location);
+                currentUrl.searchParams.set('filter', filterValue);
+                currentUrl.searchParams.delete('page'); // Reset to first page when filtering
+                window.location.href = currentUrl.toString();
+            });
         });
     </script>
 </body>

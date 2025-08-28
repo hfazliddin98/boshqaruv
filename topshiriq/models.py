@@ -18,7 +18,7 @@ class Topshiriq(AsosiyModel):
     tugash_vaqti = models.DateTimeField(null=True, blank=True)
     bajarilgan_vaqti = models.DateTimeField(null=True, blank=True)
     javob_yuborildi = models.BooleanField(default=False)  
-    urinishlar_soni = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)], default=0)  
+    urinishlar_soni = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)], default=0)  
     izoh = models.TextField(blank=True)
 
     def __str__(self):
@@ -60,6 +60,7 @@ class TopshiriqJavob(AsosiyModel):
     bajaruvchi_user = models.ForeignKey(Users, on_delete=models.PROTECT)
     title = models.CharField(max_length=255, blank=True)
     body = models.TextField(blank=True)
+    urinishlar_soni = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)], default=1)  
     izoh = models.TextField(blank=True)
 
     def __str__(self):

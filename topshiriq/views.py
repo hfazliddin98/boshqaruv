@@ -201,7 +201,6 @@ def topshiriq_javob_create(request, target_role, pk):
     # Javob allaqachon yuborilgan bo'lsa
     existing_javob = TopshiriqJavob.objects.filter(topshiriq=topshiriq, bajaruvchi_user=request.user).first()
     if existing_javob:
-        messages.warning(request, "Siz bu topshiriqqa allaqachon javob yuborib bo'lgansiz.")
         return redirect('topshiriq_bajaruvchi_list', target_role=target_role)
     
     if request.method == 'POST':
@@ -210,14 +209,17 @@ def topshiriq_javob_create(request, target_role, pk):
             javob = form.save(commit=False)
             javob.topshiriq = topshiriq
             javob.bajaruvchi_user = request.user
+            javob.urinishlar_soni = topshiriq.urinishlar_soni
             javob.save()
             
             # Fayllarni saqlash (agar yuklangan bo'lsa)
             for f in request.FILES.getlist('files'):
                 TopshiriqJavobFile.objects.create(javob=javob, file=f)
             
-            # Signal avtomatik ravishda topshiriq va hisobot holatini yangilaydi
-            messages.success(request, "Javob muvaffaqiyatli yuborildi va hisobot yaratildi!")
+            # Topshiriq javob yuborildi holatini yangilash
+            topshiriq.javob_yuborildi = True
+            topshiriq.bajarilgan_vaqti = timezone.now()
+            topshiriq.save()
             
             return redirect('topshiriq_bajaruvchi_list', target_role=target_role)
     else:
@@ -289,8 +291,22 @@ def topshiriq_bajaruvchi_list(request, target_role):
     if not request.user.is_authenticated:
         return redirect('kirish')
 
-    # Foydalanuvchiga biriktirilgan topshiriqlar
-    topshiriq_data = Topshiriq.objects.filter(bajaruvchi_user=request.user).select_related('yaratuvchi_user').order_by('-created_at')
+    # Filter parametrini olish
+    filter_type = request.GET.get('filter', 'kutilayotgan')  # default: kutilayotgan topshiriqlar
+    
+    # Foydalanuvchiga biriktirilgan topshiriqlar - base queryset
+    base_queryset = Topshiriq.objects.filter(bajaruvchi_user=request.user).select_related('yaratuvchi_user').order_by('-created_at')
+    
+    # Filter bo'yicha filterlash
+    if filter_type == 'bajarilgan':
+        # Bajarilgan topshiriqlar - javob yuborilgan
+        topshiriq_data = base_queryset.filter(javob_yuborildi=True)
+    elif filter_type == 'kutilayotgan':
+        # Kutilayotgan topshiriqlar - javob yuborilmagan
+        topshiriq_data = base_queryset.filter(javob_yuborildi=False)
+    else:
+        # Barcha topshiriqlar
+        topshiriq_data = base_queryset
 
     # Pagination
     paginator = Paginator(topshiriq_data, 10)  # Her sahifada 10 ta
@@ -306,6 +322,7 @@ def topshiriq_bajaruvchi_list(request, target_role):
     context = {
         'topshiriq_data': topshiriq_data,
         'target_role': target_role,
+        'filter_type': filter_type,
         'RoleChoice': RoleChoice,
     }
     return render(request, 'topshiriq/topshiriq_bajaruvchi_list.html', context)

@@ -76,42 +76,22 @@ class TopshiriqJavobFile(AsosiyModel):
 
 
 class Notification(AsosiyModel):
-    """Foydalanuvchi bildirishnomalari"""
-    
-    NOTIFICATION_TYPES = [
-        ('topshiriq_yangi', 'Yangi topshiriq'),
-        ('topshiriq_javob', 'Topshiriq javobi'),
-        ('topshiriq_baholandi', 'Topshiriq baholandi'),
-        ('system', 'Tizim xabari'),
-    ]
-    
-    recipient = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='xabarlar')
-    sender = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True, blank=True, related_name='yuborilgan_xabarlar')
-    
-    title = models.CharField('Sarlavha', max_length=255)
-    message = models.TextField('Xabar matni')
-    notification_type = models.CharField('Tur', max_length=30, choices=NOTIFICATION_TYPES)
-    
-    # Bog'lanish obyektlari
-    topshiriq = models.ForeignKey(Topshiriq, on_delete=models.CASCADE, null=True, blank=True)
-    javob = models.ForeignKey(TopshiriqJavob, on_delete=models.CASCADE, null=True, blank=True)
-    
-    # Holat
-    is_read = models.BooleanField('O\'qildi', default=False)
-    
+    users = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='bildirishnomalar')
+    topshiriq = models.ForeignKey(Topshiriq, on_delete=models.CASCADE, related_name='bildirishnomalar')
+    is_read = models.BooleanField("O'qildi", default=False)
+
     class Meta:
         verbose_name = 'Bildirishnoma'
         verbose_name_plural = 'Bildirishnomalar'
         ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['recipient', 'is_read']),
-            models.Index(fields=['notification_type']),
+            models.Index(fields=['users', 'is_read']),
+            models.Index(fields=['topshiriq']),
             models.Index(fields=['created_at']),
-            models.Index(fields=['sender']),
         ]
     
     def __str__(self):
-        return f"{self.title} - {self.recipient.get_full_name()}"
+        return f"{self.topshiriq.title} - {self.users.get_full_name()}"
     
     def mark_as_read(self):
         """Bildirishnomani o'qilgan deb belgilash"""

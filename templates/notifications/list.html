@@ -1,193 +1,1363 @@
-{% extends "asosiy/base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bildirishnomalar - QO'QON DAVLAT UNIVERSITETI</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Asosiy css -->
+    <link rel="stylesheet" href="{% static 'asosiy/home/asosiy.css' %}">>
 
-{% block title %}Bildirishnomalar{% endblock %}
+    <style>
+        /* === CSS Variables === */
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 60px;
+            --navbar-height: 60px;
+            --primary-color: #0d6efd;
+        }
 
-{% block content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-0 text-gray-800">
-                <i class="fas fa-bell me-2"></i>Bildirishnomalar
-            </h1>
-            <p class="mb-0 text-muted">Sizga yuborilgan barcha bildirishnomalar</p>
-        </div>
-        {% if unread_count > 0 %}
-        <div>
-            <form method="post" action="{% url 'mark_all_notifications_read' %}" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-check-double me-1"></i>
-                    Barchasini o'qilgan deb belgilash ({{ unread_count }})
-                </button>
-            </form>
-        </div>
-        {% endif %}
-    </div>
+        .menu-header {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 1rem 1.5rem 0.5rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    <!-- Statistika -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card border-left-primary shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-circle bg-primary me-3">
-                            <i class="fas fa-bell text-white"></i>
-                        </div>
-                        <div>
-                            <div class="h5 mb-0 text-gray-800">{{ notifications.paginator.count }}</div>
-                            <div class="text-xs text-primary">Jami bildirishnomalar</div>
-                        </div>
-                    </div>
+        /* === Notification Specific Styles === */
+        .notification-item {
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            padding: 1rem;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(2px);
+        }
+
+        .unread-notification {
+            background-color: rgba(13, 110, 253, 0.05);
+            border-left-color: #0d6efd;
+        }
+
+        .read-notification {
+            border-left-color: #dee2e6;
+        }
+
+        .notification-icon .icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .notification-content h6 {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .unread-notification .notification-content h6 {
+            color: #212529;
+            font-weight: 600;
+        }
+
+        .notification-actions {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification-item:hover .notification-actions {
+            opacity: 1;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* === Main Content === */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: margin-left 0.3s;
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* === Toggle Button === */
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-right: 1rem;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* === Card Styles - Ultra Modern === */
+        .card {
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-body {
+            padding: 1.25rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Modern Icon Circles - Smaller */
+        .icon-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-circle::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+            transform: rotate(-45deg);
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .icon-circle::before {
+            transform: rotate(45deg);
+        }
+
+        .card:hover .icon-circle {
+            transform: rotate(5deg) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-circle i {
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 3;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .icon-circle i {
+            transform: scale(1.1);
+        }
+
+        /* Modern gradients for different roles */
+        .bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+        .bg-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; }
+        .bg-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important; }
+        .bg-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
+        .bg-danger { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%) !important; }
+
+        /* Modern buttons - Smaller */
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Specific button colors */
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .btn-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+        /* Modern text styles - Smaller */
+        .text-xs {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .h5 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Smaller paragraph text */
+        .card-body p {
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+
+        /* Animated number counter */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .h5 {
+            animation: countUp 0.8s ease;
+        }
+
+        /* Glass effect for cards */
+        .border-left-primary,
+        .border-left-success,
+        .border-left-info,
+        .border-left-warning,
+        .border-left-danger {
+            border-left: none !important;
+            position: relative;
+        }
+
+        /* Hover effects for statistics */
+        .card-body:hover .text-xs {
+            color: #667eea !important;
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Additional modern effects */
+        .card-hover-active {
+            transform: translateY(-8px) scale(1.01) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .card-info {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-footer-action {
+            margin-top: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Loading button states */
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Pulse animation for numbers */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .counter-number {
+            animation: pulse 2s infinite;
+        }
+
+        /* Gradient text for headings */
+        .main-content h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        /* Floating particles background effect */
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Responsive improvements - SM size optimized */
+        @media (max-width: 768px) {
+            .icon-circle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .icon-circle i {
+                font-size: 1rem;
+            }
+            
+            .h5 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+            }
+
+            .text-xs {
+                font-size: 0.6rem;
+            }
+
+            .card-body p {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 0.85rem;
+            }
+
+            .icon-circle {
+                width: 35px;
+                height: 35px;
+            }
+
+            .icon-circle i {
+                font-size: 0.9rem;
+            }
+
+            .h5 {
+                font-size: 1.3rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.3rem;
+            }
+
+            .btn {
+                font-size: 0.6rem;
+                padding: 5px 10px;
+            }
+
+            .card-body p {
+                font-size: 0.7rem;
+                line-height: 1.2;
+            }
+        }
+
+        /* === Tables === */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #212529;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        /* === Buttons === */
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            font-size: 12px;
+            padding: 0.375rem 0.75rem;
+        }
+
+        /* === Badges === */
+        .badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        /* === Form Styles === */
+        .form-control,
+        .form-select {
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ced4da;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .form-control-lg {
+            padding: 0.75rem 1.25rem;
+            font-size: 1.1rem;
+        }
+
+        /* === Input groups === */
+        .input-group .form-control:not(:first-child) {
+            border-left: none;
+        }
+
+        .input-group .btn {
+            border-left: none;
+        }
+
+        /* === Gradients and Utilities === */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        }
+
+        .file-upload-area {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bg-light-hover:hover,
+        .file-upload-area:hover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05) !important;
+        }
+
+        .border-dashed {
+            border-style: dashed !important;
+        }
+
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* === File List Styles === */
+        .list-group {
+            max-height: none; /* Reset height to default */
+            overflow-y: auto; /* Enable vertical scrolling if needed */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            border-radius: 0.375rem;
+        }
+
+        .list-group-item {
+            padding: 0.75rem 1.25rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .list-group-item:hover {
+            border-left-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+
+        /* === Shadow Utilities === */
+        .shadow-sm {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+
+        .shadow {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* === Text utilities === */
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .font-weight-bold {
+            font-weight: 600 !important;
+        }
+
+        .font-weight-normal {
+            font-weight: 400 !important;
+        }
+
+        /* === Pagination === */
+        .pagination {
+            margin: 0;
+        }
+
+        .pagination .page-link {
+            color: var(--primary-color);
+            border-color: #dee2e6;
+            border-radius: 6px;
+            margin: 0 2px;
+            font-size: 14px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        /* === Container Overrides === */
+        .container, 
+        .container-fluid {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* === Animation utilities === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* === Loading states === */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+                z-index: 1050;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .card-body .row>div {
+                margin-bottom: 1.5rem;
+            }
+            
+            .btn {
+                font-size: 12px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .input-group {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand span.d-none.d-sm-inline {
+                display: none !important;
+            }
+            
+            .card-header h6 {
+                font-size: 14px;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem 0.25rem;
+                font-size: 12px;
+            }
+            
+            .badge {
+                font-size: 10px;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    {% include "asosiy/navbar.html" %}
+    {% include "asosiy/sidebar.html" %}
+
+    <main class="main-content" id="mainContent">
+        <!-- CSRF token for AJAX requests -->
+        <form style="display: none;">
+            {% csrf_token %}
+        </form>
+        
+        <div class="container-fluid py-4">
+            
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1 text-gray-800">
+                        <i class="fas fa-bell me-2 text-primary"></i>
+                        Bildirishnomalar
+                    </h1>
+                </div>
+                <div>
+                    <form method="post" action="{% url 'mark_all_notifications_read' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-check-double me-1"></i>Barchasini o'qilgan deb belgilash
+                        </button>
+                    </form>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-left-warning shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-circle bg-warning me-3">
-                            <i class="fas fa-envelope text-white"></i>
-                        </div>
-                        <div>
-                            <div class="h5 mb-0 text-gray-800">{{ unread_count }}</div>
-                            <div class="text-xs text-warning">O'qilmagan</div>
-                        </div>
+
+            <!-- Notifications List -->
+            <div class="card shadow mb-4" style="min-height: 600px;">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-bell me-2"></i>
+                            Bildirishnomalar ro'yxati
+                        </h6>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Bildirishnomalar ro'yxati -->
-    <div class="card shadow">
-        <div class="card-body">
-            {% if notifications %}
-                <div class="list-group list-group-flush">
-                    {% for notification in notifications %}
-                    <div class="list-group-item list-group-item-action {% if not notification.is_read %}bg-light border-left border-primary border-3{% endif %}">
-                        <a href="{% url 'notification_detail' notification.pk %}" class="text-decoration-none text-dark">
+                <div class="card-body">
+                    <div class="list-group list-group-flush" id="notificationsList">
+                        
+                        {% for notification in notification_data %}
+                        <!-- Bildirishnoma #{{ notification.id }} -->
+                        <div class="list-group-item list-group-item-action notification-item {% if not notification.is_read %}unread-notification{% else %}read-notification{% endif %}" data-id="{{ notification.id }}">
                             <div class="d-flex w-100 justify-content-between align-items-start">
                                 <div class="d-flex">
                                     <div class="notification-icon me-3 mt-1">
-                                        {% if notification.notification_type == 'topshiriq_yangi' %}
-                                            <div class="icon-circle bg-primary" style="width: 40px; height: 40px;">
-                                                <i class="fas fa-plus text-white"></i>
-                                            </div>
-                                        {% elif notification.notification_type == 'topshiriq_javob' %}
-                                            <div class="icon-circle bg-success" style="width: 40px; height: 40px;">
-                                                <i class="fas fa-reply text-white"></i>
-                                            </div>
-                                        {% elif notification.notification_type == 'topshiriq_baholandi' %}
-                                            <div class="icon-circle bg-warning" style="width: 40px; height: 40px;">
-                                                <i class="fas fa-star text-white"></i>
-                                            </div>
-                                        {% else %}
-                                            <div class="icon-circle bg-info" style="width: 40px; height: 40px;">
-                                                <i class="fas fa-bell text-white"></i>
-                                            </div>
-                                        {% endif %}
+                                        <div class="icon-circle bg-{% if notification.type == 'task' %}primary{% elif notification.type == 'approval' %}success{% elif notification.type == 'warning' %}warning{% elif notification.type == 'important' %}danger{% elif notification.type == 'system' %}info{% elif notification.type == 'user' %}success{% elif notification.type == 'rating' %}warning{% elif notification.type == 'cancelled' %}secondary{% else %}info{% endif %}">
+                                            <i class="fas {% if notification.type == 'task' %}fa-tasks{% elif notification.type == 'approval' %}fa-check-circle{% elif notification.type == 'warning' %}fa-exclamation-triangle{% elif notification.type == 'important' %}fa-exclamation{% elif notification.type == 'system' %}fa-cogs{% elif notification.type == 'user' %}fa-user-plus{% elif notification.type == 'rating' %}fa-star{% elif notification.type == 'cancelled' %}fa-ban{% else %}fa-bell{% endif %} text-white"></i>
+                                        </div>
                                     </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1 fw-bold">
-                                            {{ notification.title }}
-                                            {% if not notification.is_read %}
-                                                <span class="badge bg-danger ms-2">Yangi</span>
-                                            {% endif %}
-                                        </h6>
-                                        <p class="mb-1 text-muted">{{ notification.message }}</p>
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>{{ notification.created_at|timesince }} oldin
-                                            {% if notification.sender %}
-                                                • <i class="fas fa-user me-1"></i>{{ notification.sender.get_full_name }}
-                                            {% endif %}
-                                        </small>
+                                    <div class="notification-content flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="mb-1 {% if not notification.is_read %}fw-bold{% endif %}">{{ notification.title }}</h6>
+                                            <small class="text-muted">{{ notification.created_at|timesince }} oldin</small>
+                                        </div>
+                                        <p class="mb-1 text-muted">{{ notification.message|truncatewords:20 }}</p>
+                                        <div class="d-flex align-items-center">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="text-end">
-                                    {% if not notification.is_read %}
-                                        <span class="badge bg-primary rounded-pill">Yangi</span>
-                                    {% endif %}
                                 </div>
                             </div>
-                        </a>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Pagination -->
-                {% if notifications.has_other_pages %}
-                <nav aria-label="Sahifalar" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        {% if notifications.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ notifications.previous_page_number }}">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                        {% endif %}
+                        </div>
+                        {% empty %}
                         
-                        {% for num in notifications.paginator.page_range %}
-                            {% if notifications.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ num }}</span>
-                                </li>
-                            {% elif num > notifications.number|add:'-3' and num < notifications.number|add:'3' %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                </li>
-                            {% endif %}
+                        <!-- Bo'sh holatda ko'rsatiladigan xabar -->
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.3; color: #6c757d;"></i>
+                            </div>
+                            <h5 class="text-muted mb-2">Sizga tegishli bildirishnomalar yo'q</h5>
+                            <p class="text-muted mb-0">Yangi bildirishnomalar kelganda bu yerda ko'rinadi</p>
+                        </div>
+
                         {% endfor %}
                         
-                        {% if notifications.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ notifications.next_page_number }}">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="mt-4">
+                        
+                        {% if notifications.has_other_pages %}
+                        <nav aria-label="Bildirishnomalar sahifalar">
+                            <ul class="pagination justify-content-center mb-0">
+                                {% if notifications.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.previous_page_number }}">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Oldingi
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Oldingi
+                                    </span>
+                                </li>
+                                {% endif %}
+
+                                {% for num in notifications.paginator.page_range %}
+                                    {% if num == notifications.number %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                    {% elif num > notifications.number|add:'-3' and num < notifications.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if notifications.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.next_page_number }}">
+                                        Keyingi
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        Keyingi
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
                         {% endif %}
-                    </ul>
-                </nav>
-                {% endif %}
-
-            {% else %}
-                <div class="text-center py-5">
-                    <i class="fas fa-bell-slash display-4 text-muted mb-3"></i>
-                    <h4 class="text-muted">Bildirishnomalar yo'q</h4>
-                    <p class="text-muted">Sizga hali hech qanday bildirishnoma yuborilmagan.</p>
+                    </div>
                 </div>
-            {% endif %}
+            </div>
+
         </div>
-    </div>
-</div>
+    </main>
 
-<style>
-.notification-item.notification-unread {
-    background-color: #f8f9fa !important;
-    border-left: 3px solid #007bff !important;
-}
+    <!-- JavaScript Files -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'asosiy/home/asosiy.js' %}"></script>
 
-.notification-icon {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
+    <!-- Notification specific scripts -->
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNotificationHandlers();
+            initializePagination();
+            
+            // Ensure page title remains consistent
+            document.title = 'Bildirishnomalar - QO\'QON DAVLAT UNIVERSITETI';
+            
+            // Set active state in navbar if it exists
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            navLinks.forEach(link => {
+                if (link.href && link.href.includes('/notifications/')) {
+                    link.classList.add('active');
+                }
+            });
+        });
 
-.icon-circle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
+        // Initialize notification handlers
+        function initializeNotificationHandlers() {
+            // Mark as read functionality
+            document.querySelectorAll('.mark-read-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const notification = this.closest('.notification-item');
+                    markAsRead(notification);
+                });
+            });
 
-.list-group-item:hover {
-    background-color: #f8f9fa !important;
-    transform: translateX(5px);
-    transition: all 0.3s ease;
-}
-</style>
-{% endblock %}
+            // Delete functionality
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (confirm('Ushbu bildirishnomani o\'chirish istaysizmi?')) {
+                        const notification = this.closest('.notification-item');
+                        deleteNotification(notification);
+                    }
+                });
+            });
+
+            // Notification click handler
+            document.querySelectorAll('.notification-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (!this.classList.contains('read-notification')) {
+                        markAsRead(this);
+                    }
+                });
+            });
+        }
+
+        // Mark notification as read
+        function markAsRead(notificationId) {
+            // AJAX so'rov yuborish
+            fetch(`/notifications/mark-read/${notificationId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // UI ni yangilash
+                    const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                    if (notification) {
+                        notification.classList.remove('unread-notification');
+                        notification.classList.add('read-notification');
+                        
+                        // "Yangi" badge removed from UI
+                        // if (newBadge && newBadge.textContent === 'Yangi') {
+                        //     newBadge.style.animation = 'fadeOut 0.3s ease';
+                        //     setTimeout(() => newBadge.remove(), 300);
+                        // }
+                        
+                        // Mark as read tugmasini yashirish
+                        const markReadBtn = notification.querySelector('.btn-outline-primary');
+                        if (markReadBtn) {
+                            markReadBtn.style.animation = 'fadeOut 0.3s ease';
+                            setTimeout(() => markReadBtn.remove(), 300);
+                        }
+                    }
+                    showToast('Bildirishnoma o\'qilgan deb belgilandi', 'success');
+                } else {
+                    showToast('Xatolik yuz berdi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Xatolik yuz berdi', 'error');
+            });
+        }
+
+        // Delete notification
+        function deleteNotification(notificationId) {
+            if (confirm('Ushbu bildirishnomani o\'chirish istaysizmi?')) {
+                fetch(`/notifications/delete/${notificationId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                        if (notification) {
+                            notification.style.animation = 'slideOut 0.3s ease';
+                            setTimeout(() => {
+                                notification.remove();
+                                // Agar bildirishnomalar yo'q bo'lsa, empty state ko'rsatish
+                                checkEmptyState();
+                            }, 300);
+                        }
+                        showToast('Bildirishnoma o\'chirildi', 'info');
+                    } else {
+                        showToast('Xatolik yuz berdi', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Xatolik yuz berdi', 'error');
+                });
+            }
+        }
+
+        // Mark all as read
+        function markAllAsRead() {
+            if (confirm('Barcha bildirishnomalarni o\'qilgan deb belgilashni istaysizmi?')) {
+                fetch('/notifications/mark-all-read/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Sahifani qayta yuklash
+                        location.reload();
+                    } else {
+                        showToast('Xatolik yuz berdi', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Xatolik yuz berdi', 'error');
+                });
+            }
+        }
+
+        // Check if notifications list is empty
+        function checkEmptyState() {
+            const notificationsList = document.getElementById('notificationsList');
+            const notifications = notificationsList.querySelectorAll('.notification-item');
+            
+            if (notifications.length === 0) {
+                notificationsList.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Bildirishnomalar topilmadi</h5>
+                        <p class="text-muted">Hozircha sizga tegishli bildirishnomalar mavjud emas.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Show toast message
+        function showToast(message, type = 'info') {
+            const toastType = type === 'error' ? 'danger' : type;
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${toastType} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 150);
+            }, 3000);
+        }
+
+        // New response handling functions
+        function respondToNotification(notificationId) {
+            // Show response modal or redirect to response page
+            const notification = document.querySelector(`[data-id="${notificationId}"]`);
+            if (notification) {
+                // Simulate response action
+                showToast('Javob berish oynasi ochilmoqda...', 'info');
+                // In real implementation, this would open a modal or redirect
+                console.log(`Opening response form for notification ${notificationId}`);
+            }
+        }
+
+        function confirmNotification(notificationId) {
+            if (confirm('Ushbu bildirishnomani tasdiqlaysizmi?')) {
+                const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                if (notification) {
+                    // Add confirmed badge
+                    const badgeContainer = notification.querySelector('.d-flex.align-items-center');
+                    const confirmBadge = document.createElement('span');
+                    confirmBadge.className = 'badge bg-success ms-1';
+                    confirmBadge.textContent = 'Tasdiqlangan';
+                    badgeContainer.appendChild(confirmBadge);
+                    
+                    // Remove the confirm button
+                    const confirmBtn = notification.querySelector('.btn-outline-primary');
+                    if (confirmBtn) {
+                        confirmBtn.remove();
+                    }
+                    
+                    showToast('Bildirishnoma tasdiqlandi', 'success');
+                }
+            }
+        }
+
+        function viewResponse(notificationId) {
+            // Show response details
+            const notification = document.querySelector(`[data-id="${notificationId}"]`);
+            if (notification) {
+                showToast('Javob tafsilotlari ko\'rsatilmoqda...', 'info');
+                // In real implementation, this would show response details
+                console.log(`Viewing response for notification ${notificationId}`);
+            }
+        }
+
+        // View task details
+        function viewTask(notificationId) {
+            // Open task details page or modal
+            const notification = document.querySelector(`[data-id="${notificationId}"]`);
+            if (notification) {
+                const title = notification.querySelector('h6').textContent;
+                showToast(`"${title}" topshirig'i ochildi`, 'success');
+                // In real implementation, this would redirect to task details page
+                console.log(`Opening task details for notification ${notificationId}`);
+                
+                // Simulate opening task (could redirect to actual task page)
+                setTimeout(() => {
+                    // window.location.href = `/topshiriq/view/${notificationId}/`;
+                }, 1000);
+            }
+        }
+
+        // Pagination functionality
+        function initializePagination() {
+            // Handle per-page dropdown changes - allow normal navigation
+            document.querySelectorAll('.dropdown-menu a').forEach(link => {
+                // Remove preventDefault to allow normal navigation
+                link.addEventListener('click', function(e) {
+                    // Allow normal page navigation
+                    // The server will handle the per_page parameter
+                });
+            });
+
+            // Handle page navigation clicks - allow normal navigation  
+            document.querySelectorAll('.pagination .page-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.closest('.page-item').classList.contains('disabled') || 
+                        this.closest('.page-item').classList.contains('active')) {
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    // Allow normal page navigation
+                    // The server will handle the page parameter and navbar updates
+                });
+            });
+        }
+
+        // Animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0.5; }
+                to { opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    <!-- JavaScript Files -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'asosiy/home/asosiy.js' %}"></script>
+
+    <!-- Notification specific scripts -->
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationStats();
+            initializeNotificationHandlers();
+        });
+
+        // Update statistics
+        function updateNotificationStats() {
+            const allNotifications = document.querySelectorAll('.notification-item');
+            const unreadNotifications = document.querySelectorAll('.unread-notification');
+            const readNotifications = document.querySelectorAll('.read-notification');
+            
+            // Get today's notifications (sample logic)
+            const todayNotifications = Array.from(allNotifications).filter(item => {
+                const timeText = item.querySelector('small').textContent;
+                return timeText.includes('daqiqa') || timeText.includes('soat');
+            });
+
+            // Update counters with animation
+            animateCounter(document.getElementById('totalNotifications'), allNotifications.length);
+            animateCounter(document.getElementById('unreadNotifications'), unreadNotifications.length);
+            animateCounter(document.getElementById('readNotifications'), readNotifications.length);
+            animateCounter(document.getElementById('todayNotifications'), todayNotifications.length);
+        }
+
+        // Animate counter
+        function animateCounter(element, targetValue) {
+            if (!element) return;
+            
+            const currentValue = parseInt(element.textContent) || 0;
+            const increment = targetValue > currentValue ? 1 : -1;
+            const duration = 1000;
+            const steps = Math.abs(targetValue - currentValue);
+            const stepDuration = steps > 0 ? duration / steps : 0;
+            
+            let current = currentValue;
+            const timer = setInterval(() => {
+                current += increment;
+                element.textContent = current;
+                
+                if (current === targetValue) {
+                    clearInterval(timer);
+                }
+            }, stepDuration);
+        }
+
+        // Initialize notification handlers
+        function initializeNotificationHandlers() {
+            // Mark all as read button
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', markAllAsRead);
+            }
+
+            // Individual notification clicks
+            document.querySelectorAll('.notification-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('button')) {
+                        handleNotificationClick(this);
+                    }
+                });
+            });
+        }
+
+        // Mark single notification as read
+        function markAsRead(notificationId) {
+            const notification = document.querySelector(`[data-id="${notificationId}"]`);
+            if (notification && notification.classList.contains('unread-notification')) {
+                notification.classList.remove('unread-notification');
+                notification.classList.add('read-notification');
+                
+                // "Yangi" badge removed from UI
+                // const newBadge = notification.querySelector('.badge.bg-primary');
+                // if (newBadge && newBadge.textContent === 'Yangi') {
+                //     newBadge.style.animation = 'fadeOut 0.3s ease';
+                //     setTimeout(() => newBadge.remove(), 300);
+                // }
+                
+                updateNotificationStats();
+                showToast('Bildirishnoma o\'qilgan deb belgilandi', 'success');
+            }
+        }
+
+        // Delete notification
+        function deleteNotification(notificationId) {
+            if (confirm('Bildirishnomani o\'chirmoqchimisiz?')) {
+                const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                if (notification) {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => {
+                        notification.remove();
+                        updateNotificationStats();
+                        showToast('Bildirishnoma o\'chirildi', 'info');
+                    }, 300);
+                }
+            }
+        }
+
+        // Mark all as read
+        function markAllAsRead() {
+            const unreadNotifications = document.querySelectorAll('.unread-notification');
+            
+            unreadNotifications.forEach(notification => {
+                notification.classList.remove('unread-notification');
+                notification.classList.add('read-notification');
+                
+                // "Yangi" badge removed from UI
+                // const newBadge = notification.querySelector('.badge.bg-primary');
+                // if (newBadge && newBadge.textContent === 'Yangi') {
+                //     newBadge.style.animation = 'fadeOut 0.3s ease';
+                //     setTimeout(() => newBadge.remove(), 300);
+                // }
+            });
+            
+            updateNotificationStats();
+            showToast('Barcha bildirishnomalar o\'qilgan deb belgilandi', 'success');
+        }
+
+        // Handle notification click
+        function handleNotificationClick(notification) {
+            // Add ripple effect
+            createRipple(notification, event);
+            
+            // Mark as read if unread
+            if (notification.classList.contains('unread-notification')) {
+                const notificationId = notification.getAttribute('data-id');
+                markAsRead(notificationId);
+            }
+        }
+
+        // Create ripple effect
+        function createRipple(element, event) {
+            const ripple = document.createElement('span');
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            
+            ripple.style.cssText = `
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(13, 110, 253, 0.3);
+                width: ${size}px;
+                height: ${size}px;
+                left: ${event.clientX - rect.left - size / 2}px;
+                top: ${event.clientY - rect.top - size / 2}px;
+                animation: ripple 0.6s ease-out;
+                pointer-events: none;
+                z-index: 1000;
+            `;
+            
+            element.style.position = 'relative';
+            element.style.overflow = 'hidden';
+            element.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // Show toast message
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 150);
+            }, 3000);
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.8); }
+            }
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(-100%); }
+            }
+            @keyframes ripple {
+                from { transform: scale(0); opacity: 1; }
+                to { transform: scale(1); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

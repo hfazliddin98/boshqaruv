@@ -184,7 +184,6 @@
             font-size: 2rem;
             font-weight: 800;
             margin-bottom: 1.2rem;
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #ff4757 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -192,12 +191,29 @@
                 0 1px 0 rgba(255,255,255,0.3),
                 0 2px 0 rgba(255,255,255,0.2),
                 0 3px 0 rgba(255,255,255,0.1),
-                0 4px 0 rgba(255,255,255,0.05),
-                0 0 3px rgba(231, 76, 60, 0.3),
-                0 1px 2px rgba(192, 57, 43, 0.4),
-                0 2px 3px rgba(255, 71, 87, 0.3);
+                0 4px 0 rgba(255,255,255,0.05);
             transform: perspective(300px) rotateX(10deg);
             animation: titleGlow 4s ease-in-out infinite;
+        }
+        
+        /* Success Style */
+        .message-title.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 50%, #17a2b8 100%);
+        }
+        
+        /* Warning Style */
+        .message-title.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 50%, #e83e8c 100%);
+        }
+        
+        /* Error Style */
+        .message-title.error {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #c0392b 100%);
+        }
+        
+        /* Default Style */
+        .message-title.default {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #ff4757 100%);
         }
 
         @keyframes titleGlow {
@@ -219,14 +235,36 @@
             line-height: 1.6;
             margin-bottom: 2rem;
             font-weight: 500;
-            color: #721c24;
             position: relative;
             padding: 1.5rem;
-            background: rgba(231, 76, 60, 0.08);
             border-radius: 15px;
             border: 1px solid rgba(231, 76, 60, 0.2);
             backdrop-filter: blur(8px);
             animation: textFade 6s ease-in-out infinite;
+        }
+        
+        .message-text.success {
+            color: #155724;
+            background: rgba(40, 167, 69, 0.08);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+        
+        .message-text.warning {
+            color: #856404;
+            background: rgba(255, 193, 7, 0.08);
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+        
+        .message-text.error {
+            color: #721c24;
+            background: rgba(220, 53, 69, 0.08);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        
+        .message-text.default {
+            color: #721c24;
+            background: rgba(231, 76, 60, 0.08);
+            border: 1px solid rgba(231, 76, 60, 0.2);
         }
 
         @keyframes textFade {
@@ -273,7 +311,6 @@
             font-weight: 600;
             padding: 12px 30px;
             border: none;
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none;
@@ -282,6 +319,25 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             overflow: hidden;
+        }
+        
+        .back-btn.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        
+        .back-btn.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        }
+        
+        .back-btn.error {
+            background: linear-gradient(135deg, #dc3545 0%, #c0392b 100%);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+        
+        .back-btn.default {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
         }
 
@@ -409,12 +465,20 @@
 
         <div class="message-container">
             <div class="message-icon">
-                <i class="fas fa-bell"></i>
+                {% if xatolik_turi == 'Muvaffaqiyat' %}
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                {% elif xatolik_turi == 'Ogohlantirish' %}
+                    <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                {% elif xatolik_turi == 'Xato' %}
+                    <i class="fas fa-times-circle" style="color: #dc3545;"></i>
+                {% else %}
+                    <i class="fas fa-bell"></i>
+                {% endif %}
             </div>
             
-            <h1 class="message-title">{{ xatolik_turi|default:"XABAR"|upper }}</h1>
+            <h1 class="message-title {% if xatolik_turi == 'Muvaffaqiyat' %}success{% elif xatolik_turi == 'Ogohlantirish' %}warning{% elif xatolik_turi == 'Xato' %}error{% else %}default{% endif %}">{{ xatolik_turi|default:"XABAR"|upper }}</h1>
             
-            <p class="message-text">
+            <p class="message-text {% if xatolik_turi == 'Muvaffaqiyat' %}success{% elif xatolik_turi == 'Ogohlantirish' %}warning{% elif xatolik_turi == 'Xato' %}error{% else %}default{% endif %}">
                 {{ xabar_matni|default:"Hech qanday xabar yo'q." }}
             </p>
             
@@ -424,7 +488,7 @@
             </div>
             {% endif %}
             
-            <a href="{% url 'home' %}" class="back-btn">
+            <a href="{% url 'home' %}" class="back-btn {% if xatolik_turi == 'Muvaffaqiyat' %}success{% elif xatolik_turi == 'Ogohlantirish' %}warning{% elif xatolik_turi == 'Xato' %}error{% else %}default{% endif %}">
                 <i class="fas fa-home me-3"></i>
                 Bosh Sahifaga Qaytish
             </a>

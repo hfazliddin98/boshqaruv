@@ -99,6 +99,12 @@
                     </a>
                 </li>
                 <li>
+                     <a href="{% url 'topshiriq_bajaruvchi_list' RoleChoice.PROREKTOR.value %}" class="">
+                        <i class="fas fa-book"></i>
+                        <span class="sidebar-text">Prorektor topshiriqlari</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_BOSHLIGI.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.BOLIM_BOSHLIGI.value %}active{% endif %}">
                         <i class="fas fa-tasks"></i>
                         <span class="sidebar-text">Bo‘lim topshiriqlari</span>
@@ -115,6 +121,12 @@
                     <a href="{% url 'user_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
                         <i class="fas fa-user"></i>
                         <span class="sidebar-text">Hodimlar</span>
+                    </a>
+                </li>
+                <li>
+                     <a href="{% url 'topshiriq_bajaruvchi_list' RoleChoice.BOLIM_RAHBARI.value %}" class="">
+                        <i class="fas fa-book"></i>
+                        <span class="sidebar-text">Bolim rahbari topshiriqlari</span>
                     </a>
                 </li>
                 <li>
@@ -168,6 +180,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.DEKAN.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Dekan topshiriqlari</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{% url 'topshiriq_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
                         <i class="fas fa-tasks"></i>
                         <span class="sidebar-text">Hodim topshiriqlari</span>
@@ -184,6 +202,12 @@
                     <a href="{% url 'user_list' RoleChoice.HODIM.value %}" class="{% if url_name == 'user_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
                         <i class="fas fa-user"></i>
                         <span class="sidebar-text">Hodimlar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'topshiriq_list' RoleChoice.DEKAN.value %}" class="{% if url_name == 'topshiriq_list' and request.resolver_match.kwargs.target_role == RoleChoice.HODIM.value %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="sidebar-text">Dekan topshiriqlari</span>
                     </a>
                 </li>
                 <li>

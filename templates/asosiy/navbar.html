@@ -1,4 +1,86 @@
 {% load static %}
+
+<style>
+    .notification-dropdown {
+        border: none !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+        border-radius: 12px !important;
+    }
+
+    .notification-item:hover .p-3 {
+        background-color: #f8f9fa !important;
+        border-radius: 8px;
+        margin: 2px 8px;
+    }
+
+    .notification-unread {
+        background: linear-gradient(90deg, rgba(13, 110, 253, 0.05) 0%, rgba(13, 110, 253, 0.02) 100%) !important;
+        border-left: 4px solid #0d6efd !important;
+    }
+
+    .notification-badge {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    .icon-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .notification-title {
+        color: #2c3e50 !important;
+    }
+
+    .notification-message {
+        color: #6c757d !important;
+    }
+
+    .notification-time {
+        color: #adb5bd !important;
+    }
+
+    .min-width-0 {
+        min-width: 0;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .notification-dropdown {
+            width: 340px !important;
+            max-width: 95vw !important;
+            right: 10px !important;
+            left: auto !important;
+        }
+        
+        .notification-item .p-3 {
+            padding: 1rem !important;
+        }
+        
+        .notification-title {
+            font-size: 0.85rem !important;
+        }
+        
+        .notification-message {
+            font-size: 0.75rem !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .notification-dropdown {
+            width: 320px !important;
+            max-width: 90vw !important;
+        }
+    }
+</style>
+
 <nav class="navbar navbar-expand navbar-light">
     <div class="container-fluid">
         <button class="sidebar-toggle" id="sidebarToggle">
@@ -14,7 +96,7 @@
         <ul class="navbar-nav ms-auto align-items-center">
             <!-- Bildirishnomalar -->
             <li class="nav-item dropdown">
-                <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
                     <i class="fas fa-bell fs-5"></i>
                     {% if unread_notifications_count > 0 %}
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" id="notificationCount">
@@ -23,61 +105,45 @@
                     </span>
                     {% endif %}
                 </a>
-                <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
-                    <h6 class="dropdown-header d-flex justify-content-between align-items-center">
-                        <span>Bildirishnomalar</span>
-                        {% if unread_notifications_count > 0 %}
-                        <small>{{ unread_notifications_count }} ta yangi</small>
-                        {% endif %}
-                    </h6>
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 360px; max-width: 90vw; max-height: 500px; overflow-y: auto; border: none; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); border-radius: 12px;">
                     
-                    {% if recent_notifications %}
+                    {% if unread_notifications_count > 0 %}
                         {% for notification in recent_notifications %}
-                        <div class="dropdown-item notification-item {% if not notification.is_read %}notification-unread{% endif %}">
-                            <a href="{% url 'notification_detail' notification.pk %}" class="text-decoration-none text-dark">
-                                <div class="d-flex">
-                                    <div class="notification-icon me-3">
-                                        {% if notification.notification_type == 'topshiriq_yangi' %}
-                                            <i class="fas fa-plus-circle text-primary"></i>
-                                        {% elif notification.notification_type == 'topshiriq_javob' %}
-                                            <i class="fas fa-reply text-success"></i>
-                                        {% elif notification.notification_type == 'topshiriq_baholandi' %}
-                                            <i class="fas fa-star text-warning"></i>
-                                        {% else %}
-                                            <i class="fas fa-bell text-info"></i>
-                                        {% endif %}
-                                    </div>
-                                    <div class="notification-content flex-grow-1">
-                                        <div class="notification-title fw-bold">{{ notification.title }}</div>
-                                        <div class="notification-message text-muted small">{{ notification.message|truncatechars:80 }}</div>
-                                        <div class="notification-time text-muted small">
-                                            <i class="fas fa-clock me-1"></i>{{ notification.created_at|timesince }} oldin
+                        {% if not notification.is_read %}
+                        <div class="dropdown-item notification-item p-0 notification-unread" style="border: none; background: none;">
+                            <a href="{% url 'notification_detail' notification.pk %}" class="text-decoration-none d-block" style="color: inherit;">
+                                <div class="p-3" style="border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease;">
+                                    <div class="d-flex align-items-start">
+                                        <div class="notification-icon me-3 flex-shrink-0">
+                                            <div class="icon-circle bg-primary text-white shadow-sm" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-tasks" style="font-size: 0.75rem;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="notification-content flex-grow-1 min-width-0">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <h6 class="notification-title fw-bold mb-0" style="font-size: 0.9rem; line-height: 1.3; color: #2c3e50;">
+                                                    {{ notification.topshiriq.title }}
+                                                </h6>
+                                                <span class="badge bg-danger rounded-pill flex-shrink-0 ms-2" style="font-size: 0.65rem; padding: 0.25em 0.5em;">Yangi</span>
+                                            </div>
+                                            <div class="notification-time text-muted d-flex align-items-center" style="font-size: 0.75rem;">
+                                                <i class="fas fa-clock me-1" style="font-size: 0.7rem;"></i>
+                                                {{ notification.created_at|timesince }} oldin
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         </div>
-                        {% endfor %}
-                        <div class="dropdown-divider"></div>
-                        <div class="dropdown-item text-center">
-                            <a href="{% url 'notifications_list' %}" class="text-decoration-none">
-                                <i class="fas fa-eye me-1"></i>Barchasini ko'rish
-                            </a>
-                        </div>
-                        {% if unread_notifications_count > 0 %}
-                        <div class="dropdown-item text-center">
-                            <form method="post" action="{% url 'mark_all_notifications_read' %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link text-decoration-none p-0">
-                                    <i class="fas fa-check-double me-1"></i>Barchasini o'qilgan deb belgilash
-                                </button>
-                            </form>
-                        </div>
                         {% endif %}
+                        {% endfor %}
                     {% else %}
-                        <div class="dropdown-item text-center text-muted py-4">
-                            <i class="fas fa-bell-slash fs-1 mb-3 d-block"></i>
-                            Yangi bildirishnomalar yo'q
+                        <div class="dropdown-item text-center text-muted py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.3; color: #6c757d;"></i>
+                            </div>
+                            <h6 class="text-muted mb-2" style="font-size: 1rem;">Bildirishnomalar yo'q</h6>
+                            <p class="text-muted mb-0" style="font-size: 0.85rem;">Yangi xabarlar bu yerda paydo bo'ladi</p>
                         </div>
                     {% endif %}
                 </div>
@@ -102,7 +168,8 @@
                     </li>
                     <li>
                         <a class="dropdown-item" href="{% url 'chiqish' %}"><i class="fas fa-sign-out-alt me-2"></i>
-                            Chiqish</a>
+                            Chiqish
+                        </a>
                     </li>
                 </ul>
             </li>

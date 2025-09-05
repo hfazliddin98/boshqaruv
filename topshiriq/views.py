@@ -6,14 +6,14 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 from users.models import Users
-from .models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, Notification
-from .forms import TopshiriqForm, TopshiriqJavobForm, TopshiriqBaxolashForm
-from .services import NotificationService
-from topshiriq.choices import RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP
 from users.choices import ALLOWED_USER_MAP
+from topshiriq.models import Topshiriq, TopshiriqFile, TopshiriqJavob, TopshiriqJavobFile, Notification
+from topshiriq.forms import TopshiriqForm, TopshiriqJavobForm, TopshiriqBaxolashForm
+from topshiriq.services import NotificationService
+from topshiriq.choices import RoleChoice, ALLOWED_TOPSHIRIQ_MAP, ALLOWED_TOPSHIRIQ_JAVOB_MAP
 from topshiriq.choices import StatusChoice
+
 
 # Try to import xlwt, use alternative if not available
 try:
@@ -81,6 +81,29 @@ def topshiriq_create(request, target_role):
             # Fayllarni saqlash
             for f in request.FILES.getlist('files'):
                 TopshiriqFile.objects.create(topshiriq=task, file=f)
+
+            # Bajaruvchiga notification yuborish
+            try:
+                notification_service = NotificationService()
+                notification_service.create_notification(
+                    recipient=task.bajaruvchi_user,
+                    sender=request.user,
+                    title=f"Yangi topshiriq: {task.title[:50]}",
+                    message=f"{request.user.get_full_name() or request.user.username} tomonidan sizga yangi topshiriq berildi: '{task.title}'. Muddat: {task.tugash_vaqti.strftime('%d.%m.%Y %H:%M') if task.tugash_vaqti else 'Belgilanmagan'}",
+                    notification_type='topshiriq_yangi',
+                    topshiriq=task
+                )
+                # Muvaffaqiyatli xabarni xabar sahifasida ko'rsatish
+                return render(request, 'asosiy/xabar.html', {
+                    'xatolik_turi': 'Muvaffaqiyat',
+                    'xabar_matni': f"'{task.title}' topshirig'i muvaffaqiyatli yaratildi va bajaruvchiga xabar yuborildi!",
+                })
+            except Exception as e:
+                # Xabar yuborishda xato bo'lsa ham topshiriq yaratildi
+                return render(request, 'asosiy/xabar.html', {
+                    'xatolik_turi': 'Ogohlantirish',  
+                    'xabar_matni': f"'{task.title}' topshirig'i yaratildi, lekin bajaruvchiga xabar yuborishda xato: {str(e)}",
+                })
 
             return redirect('topshiriq_list', target_role=target_role)
     else:
@@ -221,6 +244,28 @@ def topshiriq_javob_create(request, target_role, pk):
             topshiriq.bajarilgan_vaqti = timezone.now()
             topshiriq.save()
             
+            # Yaratuvchiga javob keldi bildirishnomasi yuborish
+            try:
+                notification_service = NotificationService()
+                notification_service.create_notification(
+                    recipient=topshiriq.yaratuvchi_user,
+                    sender=request.user,
+                    title=f"Javob keldi: {topshiriq.title[:50]}",
+                    message=f"{request.user.get_full_name() or request.user.username} tomonidan '{topshiriq.title}' topshirig'iga javob yuborildi. Javobni ko'rib chiqing va baholang.",
+                    notification_type='topshiriq_javob',
+                    topshiriq=topshiriq
+                )
+                
+                # Bajaruvchidan shu topshiriq bilan bog'liq barcha bildirishnomalarni o'chirish
+                Notification.objects.filter(
+                    recipient=request.user,
+                    topshiriq=topshiriq,
+                    notification_type='topshiriq_yangi'
+                ).delete()
+                
+            except Exception as e:
+                print(f"Javob notification yuborishda xato: {str(e)}")
+            
             return redirect('topshiriq_bajaruvchi_list', target_role=target_role)
     else:
         form = TopshiriqJavobForm()
@@ -259,12 +304,6 @@ def topshiriq_baxolash(request, target_role, pk):
         javob = None
 
     if request.method == 'POST':
-        # DEBUG: POST ma'lumotlarini ko'rish
-        print("POST data:", request.POST)
-        print("Status from POST:", request.POST.get('status'))
-        print("Baxo from POST:", request.POST.get('baxo'))
-        print("Topshiriq current status:", topshiriq.status)
-        
         form = TopshiriqBaxolashForm(request.POST, instance=topshiriq)
         
         # Form valid bo'lmasa ham ma'lumotlarni saqlash
@@ -272,20 +311,40 @@ def topshiriq_baxolash(request, target_role, pk):
         baxo = request.POST.get('baxo')
         
         # Manual saqlash
-        print("Before save - status:", status, "baxo:", baxo)
         if status:
             topshiriq.status = status
-            print("Status updated to:", topshiriq.status)
         if baxo:
             try:
                 topshiriq.baxo = int(baxo)
-                print("Baxo updated to:", topshiriq.baxo)
             except (ValueError, TypeError):
                 topshiriq.baxo = 0
-                print("Baxo set to default 0")
         
         topshiriq.save()
-        print("After save - topshiriq status:", topshiriq.status, "baxo:", topshiriq.baxo)
+        
+        # Bajaruvchiga baholash bildirishnomasi yuborish
+        try:
+            notification_service = NotificationService()
+            baho_display = topshiriq.get_baxo_description() if hasattr(topshiriq, 'get_baxo_description') else "Noma'lum"
+            status_display = topshiriq.get_status_display() if topshiriq.status else "Noma'lum"
+            
+            notification_service.create_notification(
+                recipient=topshiriq.bajaruvchi_user,
+                sender=request.user,
+                title=f"Baholandi: {topshiriq.title[:50]}",
+                message=f"'{topshiriq.title}' topshirig'ingiz baholandi. Baho: {topshiriq.baxo if topshiriq.baxo else 'Berilmagan'} ({baho_display}), Holat: {status_display}",
+                notification_type='topshiriq_baholandi',
+                topshiriq=topshiriq
+            )
+            
+            # Yaratuvchidan shu topshiriq bilan bog'liq javob bildirishnomalarini o'chirish
+            Notification.objects.filter(
+                recipient=request.user,
+                topshiriq=topshiriq,
+                notification_type='topshiriq_javob'
+            ).delete()
+            
+        except Exception as e:
+            print(f"Baholash notification yuborishda xato: {str(e)}")
         
         return redirect('hisobot_list')
     else:
@@ -585,3 +644,92 @@ def komissiya_statistika_list(request, target_role):
     return render(request, 'topshiriq/komissiya_statistika_list.html', context)
 
 
+
+
+@login_required
+def notifications_list(request):
+    """Bildirishnomalar ro'yxati"""
+    notifications = Notification.objects.filter(users=request.user).order_by('-created_at')
+    
+    # Sahifa ma'lumotlari
+    paginator = Paginator(notifications, 20)
+    page = request.GET.get('page')
+    
+    try:
+        notifications_page = paginator.page(page)
+    except PageNotAnInteger:
+        notifications_page = paginator.page(1)
+    except EmptyPage:
+        notifications_page = paginator.page(paginator.num_pages)
+    
+    return render(request, 'notifications/list.html', {
+        'notifications': notifications_page,
+        'unread_count': request.user.bildirishnomalar.filter(is_read=False).count(),
+    })
+
+@login_required
+def notification_detail(request, pk):
+    """Bildirishnoma detallari va o'qilgan deb belgilash"""
+    notification = get_object_or_404(Notification, pk=pk, users=request.user)
+    
+    # Bildirishnomani o'qilgan deb belgilash
+    notification.mark_as_read()
+    
+    # Topshiriqqa yo'naltirish
+    if notification.topshiriq:
+        topshiriq = notification.topshiriq
+        
+        # User rolini aniqlash
+        from users.choices import RoleChoice
+        user_role_mapping = {
+            'REKTOR': 'rektor',
+            'PROREKTOR': 'prorektor', 
+            'DEKAN': 'dekan',
+            'PRODDEKAN': 'proddekan',
+            'KAFEDRA_MUDIRI': 'kafedra_mudiri',
+            'USTOZ': 'ustoz'
+        }
+        target_role = user_role_mapping.get(request.user.role, 'ustoz')
+        
+        # Agar bajaruvchi bo'lsa bajaruvchi sahifasiga, yaratuvchi bo'lsa baholash sahifasiga
+        if request.user == topshiriq.bajaruvchi_user:
+            return redirect('topshiriq_bajaruvchi_list', target_role=target_role)
+        elif request.user == topshiriq.yaratuvchi_user:
+            return redirect('topshiriq_baxolash', target_role=target_role, pk=topshiriq.pk)
+    
+    # Agar topshiriq bog'lanmagan bo'lsa, bildirishnomalar sahifasiga qaytish
+    return redirect('notifications_list')
+
+@login_required
+def mark_all_notifications_read(request):
+    """Barcha bildirishnomalarni o'qilgan deb belgilash"""
+    if request.method == 'POST':
+        count = NotificationService.mark_all_as_read(request.user)
+        # Xabar sahifasiga yo'naltirish
+        return render(request, 'asosiy/xabar.html', {
+            'xatolik_turi': 'Muvaffaqiyat',
+            'xabar_matni': f"{count} ta bildirishnoma o'qilgan deb belgilandi.",
+        })
+    
+    return redirect('notifications_list')
+
+@login_required
+def notification_count_ajax(request):
+    """AJAX orqali bildirishnomalar sonini olish"""
+    count = NotificationService.get_unread_count(request.user)
+    recent = NotificationService.get_recent_notifications(request.user, 5)
+    
+    notifications_data = []
+    for notification in recent:
+        notifications_data.append({
+            'id': notification.id,
+            'title': notification.topshiriq.title,
+            'message': notification.topshiriq.body[:100] if notification.topshiriq.body else '',
+            'created_at': notification.created_at.strftime('%d.%m.%Y %H:%M'),
+            'is_read': notification.is_read,
+        })
+    
+    return JsonResponse({
+        'count': count,
+        'notifications': notifications_data
+    })

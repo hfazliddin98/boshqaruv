@@ -11,7 +11,8 @@ class RoleChoice(models.TextChoices):
     ZAM_DEKAN = ("Zam dekan", "Zam dekan")
     KAFEDRA_MUDIRI = ("Kafedra mudiri", "Kafedra mudiri")
     TYUTOR = ("Tyutor", "Tyutor")
-    HODIM = ("Hodim", "Hodim")
+    KAFEDRA_HODIM = ("Kafedra hodim", "Kafedra hodim")
+    BOLIM_HODIM = ("Bo'lim hodim", "Bo'lim hodim")
     KOMISSIYA = ("Komissiya", "Komissiya")
 
 
@@ -25,13 +26,13 @@ class TopshiriqJavobStatus(models.TextChoices):
 
 
 ALLOWED_USER_MAP = {
-    RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
+    RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.KAFEDRA_HODIM, RoleChoice.BOLIM_HODIM, RoleChoice.KOMISSIYA],
     RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
     RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
     RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
-    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.BOLIM_HODIM],
     RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
-    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.KAFEDRA_HODIM],
     RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
 }
 
@@ -40,20 +41,20 @@ ALLOWED_JAVOB_MAP = {
     RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
     RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
     RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
-    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.BOLIM_HODIM],
     RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
-    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.KAFEDRA_HODIM],
     RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
-    RoleChoice.TYUTOR: [RoleChoice.HODIM],
 }
 
 # Kimga javob ko'rish huquqi bor (yuqori lavozimlar pastki lavozimlar javoblarini ko'ra oladi)
 ALLOWED_VIEW_JAVOB_MAP = {
-    RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM, RoleChoice.KOMISSIYA],
-    RoleChoice.REKTOR: [RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM],
-    RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM],
-    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI, RoleChoice.HODIM],
-    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.HODIM],
-    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
-    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR, RoleChoice.HODIM],
+    RoleChoice.ADMIN: [RoleChoice.REKTOR, RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.KAFEDRA_HODIM, RoleChoice.BOLIM_HODIM, RoleChoice.KOMISSIYA],
+    RoleChoice.REKTOR: [RoleChoice.PROREKTOR, RoleChoice.DEKAN, RoleChoice.BOLIM_RAHBARI, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.KAFEDRA_HODIM, RoleChoice.BOLIM_HODIM],
+    RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN, RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.KAFEDRA_HODIM, RoleChoice.BOLIM_HODIM],
+    RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI, RoleChoice.BOLIM_HODIM],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.BOLIM_HODIM],
+    RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN, RoleChoice.TYUTOR, RoleChoice.KAFEDRA_HODIM],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.KAFEDRA_HODIM],
+    RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR, RoleChoice.KAFEDRA_HODIM],
 }

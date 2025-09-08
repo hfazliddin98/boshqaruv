@@ -19,7 +19,7 @@ class AsosiyModel(models.Model):
 
 class Struktura(AsosiyModel):
     name = models.CharField(max_length=255, unique=True)
-    role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.HODIM)
+    role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.BOLIM_HODIM)
 
     def __str__(self):
         return self.name
@@ -30,7 +30,7 @@ class Users(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sharif = models.CharField(max_length=255, blank=True)
     struktura = models.ForeignKey(Struktura, on_delete=models.SET_NULL, blank=True, null=True)
-    role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.HODIM)
+    role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.BOLIM_HODIM)
     yaratgan_user = models.ForeignKey(
         'self',
         on_delete=models.SET_NULL,

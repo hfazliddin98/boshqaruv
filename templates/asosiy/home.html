@@ -708,493 +708,832 @@
 
             <div class="row">
                 {% if request.user.role == RoleChoice.ADMIN.value %}
-                <!-- Foydalanuvchilar Card -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-primary mb-2">
-                                        <i class="fas fa-users-cog me-2"></i>Foydalanuvchilar
+                    <!-- Foydalanuvchilar Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-primary mb-2">
+                                            <i class="fas fa-users-cog me-2"></i>Foydalanuvchilar
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ user_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Jami foydalanuvchilar
+                                        </p>
                                     </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ user_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Jami foydalanuvchilar
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-primary">
-                                    <i class="fas fa-users-cog text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="#" class="btn btn-primary w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Struktura Card -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="200">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-success mb-2">
-                                        <i class="fas fa-sitemap me-2"></i>Struktura
-                                    </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ struktura_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Tashkiliy struktura
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-success">
-                                    <i class="fas fa-sitemap text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="#" class="btn btn-success w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Topshiriqlar Card -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="300">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-warning mb-2">
-                                        <i class="fas fa-tasks me-2"></i>Topshiriqlar
-                                    </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ admin_topshiriq_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Jami topshiriqlar
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-warning">
-                                    <i class="fas fa-tasks text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="#" class="btn btn-warning w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hisobotlar Card -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="400">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-info mb-2">
-                                        <i class="fas fa-chart-line me-2"></i>Hisobotlar
-                                    </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ admin_hisobot_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Jami hisobotlar
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-info">
-                                    <i class="fas fa-chart-line text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="#" class="btn btn-info w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {% elif request.user.role == RoleChoice.REKTOR.value %}
-                <!-- Prorektorlar Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-primary mb-2">
-                                        <i class="fas fa-users me-2"></i>Prorektorlar
-                                    </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ prorektor_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Jami prorektorlar soni
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-primary">
-                                    <i class="fas fa-users text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="{% url 'user_list' RoleChoice.PROREKTOR.value %}" class="btn btn-primary w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Topshiriqlar Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-success mb-2">
-                                        <i class="fas fa-book me-2"></i>Topshiriqlar
-                                    </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ topshiriq_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Jami yaratilgan topshiriqlar
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-success">
-                                    <i class="fas fa-book text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="{% url 'topshiriq_list' RoleChoice.PROREKTOR.value %}" class="btn btn-success w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hisobotlar Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-info mb-2">
-                                        <i class="fas fa-chart-bar me-2"></i>Hisobotlar
-                                    </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ hisobot_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Jami tayyor hisobotlar
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-info">
-                                    <i class="fas fa-chart-bar text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="{% url 'hisobot_list' %}" class="btn btn-info w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {% elif request.user.role == RoleChoice.PROREKTOR.value %}
-                <!-- Bo'lim rahbarlari Card -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-primary shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Bo'lim rahbarlari</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_rahbar_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
                                     <div class="icon-circle bg-primary">
-                                        <i class="fas fa-user-tie text-white"></i>
+                                        <i class="fas fa-users-cog text-white"></i>
                                     </div>
                                 </div>
+                                <div class="card-footer-action">
+                                    <a href="#" class="btn btn-primary w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
                             </div>
-                            <a href="{% url 'user_list' RoleChoice.BOLIM_RAHBARI.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
 
-                <!-- Dekanlar Card -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Dekanlar</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dekan_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
+                    <!-- Struktura Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="200">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-success mb-2">
+                                            <i class="fas fa-sitemap me-2"></i>Struktura
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ struktura_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Tashkiliy struktura
+                                        </p>
+                                    </div>
                                     <div class="icon-circle bg-success">
-                                        <i class="fas fa-user-graduate text-white"></i>
+                                        <i class="fas fa-sitemap text-white"></i>
                                     </div>
                                 </div>
+                                <div class="card-footer-action">
+                                    <a href="#" class="btn btn-success w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
                             </div>
-                            <a href="{% url 'user_list' RoleChoice.DEKAN.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
 
-                <!-- Bo'lim topshiriqlari Card -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-warning shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                        Bo'lim topshiriqlari</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_topshiriq_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
+                    <!-- Topshiriqlar Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="300">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-warning mb-2">
+                                            <i class="fas fa-tasks me-2"></i>Topshiriqlar
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ admin_topshiriq_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Jami topshiriqlar
+                                        </p>
+                                    </div>
                                     <div class="icon-circle bg-warning">
                                         <i class="fas fa-tasks text-white"></i>
                                     </div>
                                 </div>
+                                <div class="card-footer-action">
+                                    <a href="#" class="btn btn-warning w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
                             </div>
-                            <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_RAHBARI.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
 
-                <!-- Hisobotlar Card -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-info shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                        Hisobotlar</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hisobot_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
+                    <!-- Hisobotlar Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="400">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-info mb-2">
+                                            <i class="fas fa-chart-line me-2"></i>Hisobotlar
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ admin_hisobot_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Jami hisobotlar
+                                        </p>
+                                    </div>
                                     <div class="icon-circle bg-info">
-                                        <i class="fas fa-chart-bar text-white"></i>
+                                        <i class="fas fa-chart-line text-white"></i>
                                     </div>
                                 </div>
+                                <div class="card-footer-action">
+                                    <a href="#" class="btn btn-info w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
                             </div>
-                            <a href="{% url 'hisobot_list' %}" class="btn btn-sm btn-info mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
 
-                {% elif request.user.role == RoleChoice.BOLIM_RAHBARI.value %}
-                <!-- Bo'lim boshliqlari Card -->
-                <div class="col-xl-6 col-md-6 mb-4">
-                    <div class="card border-left-primary shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Bo'lim boshliqlari</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_boshlik_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
+                {% elif request.user.role == RoleChoice.REKTOR.value %}
+                    <!-- Prorektorlar Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-primary mb-2">
+                                            <i class="fas fa-users me-2"></i>Prorektorlar
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ prorektor_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Jami prorektorlar soni
+                                        </p>
+                                    </div>
                                     <div class="icon-circle bg-primary">
                                         <i class="fas fa-users text-white"></i>
                                     </div>
                                 </div>
+                                <div class="card-footer-action">
+                                    <a href="{% url 'user_list' RoleChoice.PROREKTOR.value %}" class="btn btn-primary w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
                             </div>
-                            <a href="{% url 'user_list' RoleChoice.BOLIM_BOSHLIGI.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
 
-                <!-- Bo'lim topshiriqlari Card -->
-                <div class="col-xl-6 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Bo'lim topshiriqlari</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_topshiriq_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
+                    <!-- Topshiriqlar Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-success mb-2">
+                                            <i class="fas fa-book me-2"></i>Topshiriqlar
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ topshiriq_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Jami yaratilgan topshiriqlar
+                                        </p>
+                                    </div>
                                     <div class="icon-circle bg-success">
-                                        <i class="fas fa-tasks text-white"></i>
+                                        <i class="fas fa-book text-white"></i>
                                     </div>
                                 </div>
+                                <div class="card-footer-action">
+                                    <a href="{% url 'topshiriq_list' RoleChoice.PROREKTOR.value %}" class="btn btn-success w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
                             </div>
-                            <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_BOSHLIGI.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Hisobotlar Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-info mb-2">
+                                            <i class="fas fa-chart-bar me-2"></i>Hisobotlar
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ hisobot_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Jami tayyor hisobotlar
+                                        </p>
+                                    </div>
+                                    <div class="icon-circle bg-info">
+                                        <i class="fas fa-chart-bar text-white"></i>
+                                    </div>
+                                </div>
+                                <div class="card-footer-action">
+                                    <a href="{% url 'hisobot_list' %}" class="btn btn-info w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif request.user.role == RoleChoice.PROREKTOR.value %}
+                    <!-- Bo'lim rahbarlari Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Bo'lim rahbarlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_rahbar_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-user-tie text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'user_list' RoleChoice.BOLIM_RAHBARI.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dekanlar Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Dekanlar</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dekan_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-success">
+                                            <i class="fas fa-user-graduate text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'user_list' RoleChoice.DEKAN.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bo'lim topshiriqlari Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Bo'lim topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_RAHBARI.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hisobotlar Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Hisobotlar</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hisobot_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-info">
+                                            <i class="fas fa-chart-bar text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'hisobot_list' %}" class="btn btn-sm btn-info mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif request.user.role == RoleChoice.BOLIM_RAHBARI.value %}
+                    <!-- Bo'lim boshliqlari Card -->
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Bo'lim boshliqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_boshlik_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-users text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'user_list' RoleChoice.BOLIM_BOSHLIGI.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prorektor topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Prorektor topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ prorektor_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-success">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.PROREKTOR.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bo'lim topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Bo'lim topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-success">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_BOSHLIGI.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
 
                 {% elif request.user.role == RoleChoice.DEKAN.value %}
-                <!-- Kafedra mudirlari Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card border-left-primary shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Kafedra mudirlari</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kafedra_mudiri_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="icon-circle bg-primary">
-                                        <i class="fas fa-user-tie text-white"></i>
+                    <!-- Kafedra mudirlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Kafedra mudirlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kafedra_mudiri_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-user-tie text-white"></i>
+                                        </div>
                                     </div>
                                 </div>
+                                <a href="{% url 'user_list' RoleChoice.KAFEDRA_MUDIRI.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                             </div>
-                            <a href="{% url 'user_list' RoleChoice.KAFEDRA_MUDIRI.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
 
-                <!-- Zam. dekanlar Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Zam. dekanlar</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ zam_dekan_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="icon-circle bg-success">
-                                        <i class="fas fa-user text-white"></i>
+                    <!-- Zam. dekanlar Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Zam. dekanlar</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ zam_dekan_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-success">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
                                     </div>
                                 </div>
+                                <a href="{% url 'user_list' RoleChoice.ZAM_DEKAN.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                             </div>
-                            <a href="{% url 'user_list' RoleChoice.ZAM_DEKAN.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
 
-                <!-- Kafedra topshiriqlari Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card border-left-warning shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                        Kafedra topshiriqlari</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kafedra_topshiriq_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="icon-circle bg-warning">
-                                        <i class="fas fa-tasks text-white"></i>
+                    <!-- Prorektor topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Prorektor topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ prorektor_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
                                     </div>
                                 </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.PROREKTOR.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                             </div>
-                            <a href="{% url 'topshiriq_list' RoleChoice.KAFEDRA_MUDIRI.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Kafedra topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Kafedra topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kafedra_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.KAFEDRA_MUDIRI.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Zam dekan topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Zam dekan topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ zam_dekan_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.ZAM_DEKAN.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif request.user.role == RoleChoice.BOLIM_BOSHLIGI.value %}
+                    <!-- Hodimlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Hodimlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-user-tie text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'user_list' RoleChoice.BOLIM_HODIM.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bolim rahbari topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Bolim rahbari topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ bolim_rahbari_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_RAHBARI.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hodim topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Hodim topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_HODIM.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif request.user.role == RoleChoice.ZAM_DEKAN.value %}
+
+                    <!-- Tyutor Card  -->
+                     <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Tyutorlar
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ tyutor_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-user-tie text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'user_list' RoleChoice.TYUTOR.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dekan topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Dekan topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dekan_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.DEKAN.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tyutor topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Tyutor topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ tyutor_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.TYUTOR.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+
+                {% elif request.user.role == RoleChoice.KAFEDRA_MUDIRI.value %}
+
+                    <!-- Hodimlar Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Hodimlar</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-user-tie text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'user_list' RoleChoice.KAFEDRA_HODIM.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dekan topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Dekan topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dekan_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.DEKAN.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hodimlar topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Hodimlar topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.KAFEDRA_HODIM.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif request.user.role == RoleChoice.KAFEDRA_HODIM.value %}
+
+                    <!-- Hodimlar Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Hodimlar</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-user-tie text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'user_list' RoleChoice.KAFEDRA_HODIM.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kafedra topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Kafedra topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kafedra_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.DEKAN.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hodimlar topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Hodimlar topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.KAFEDRA_HODIM.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif request.user.role == RoleChoice.BOLIM_HODIM.value %}
+
+                    <!-- Hodimlar Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Hodimlar</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-user-tie text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'user_list' RoleChoice.BOLIM_HODIM.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bo'lim topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Kafedra topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kafedra_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_BOSHLIGI.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hodimlar topshiriqlari Card -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Hodimlar topshiriqlari</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_topshiriq_count|default:0 }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-tasks text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'topshiriq_list' RoleChoice.BOLIM_HODIM.value %}" class="btn btn-sm btn-warning mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
 
                 {% elif request.user.role == RoleChoice.KOMISSIYA.value %}
-                <!-- Foydalanuvchilar Card -->
-                <div class="col-xl-6 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-primary mb-2">
-                                        <i class="fas fa-users me-2"></i>Foydalanuvchilar
+                    <!-- Foydalanuvchilar Card -->
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-primary mb-2">
+                                            <i class="fas fa-users me-2"></i>Foydalanuvchilar
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ user_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Jami foydalanuvchilar
+                                        </p>
                                     </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ user_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Jami foydalanuvchilar
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-primary">
-                                    <i class="fas fa-users text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="{% url 'komissiya_foydalanuvchi_list' RoleChoice.KOMISSIYA.value %}" class="btn btn-primary w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Statistika Card -->
-                <div class="col-xl-6 col-md-6 mb-4">
-                    <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="200">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="card-info flex-grow-1">
-                                    <div class="text-xs text-success mb-2">
-                                        <i class="fas fa-chart-bar me-2"></i>Statistika
-                                    </div>
-                                    <div class="h5 mb-1 counter-number" data-target="{{ topshiriq_count|default:0 }}">0</div>
-                                    <p class="mb-0 text-muted">
-                                        Jami topshiriqlar soni
-                                    </p>
-                                </div>
-                                <div class="icon-circle bg-success">
-                                    <i class="fas fa-chart-bar text-white"></i>
-                                </div>
-                            </div>
-                            <div class="card-footer-action">
-                                <a href="{% url 'komissiya_statistika_list' RoleChoice.KOMISSIYA.value %}" class="btn btn-success w-100">
-                                    Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {% else %}
-                <!-- Hodimlar Card -->
-                <div class="col-xl-6 col-md-6 mb-4">
-                    <div class="card border-left-primary shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Hodimlar</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hodim_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
                                     <div class="icon-circle bg-primary">
-                                        <i class="fas fa-user text-white"></i>
+                                        <i class="fas fa-users text-white"></i>
                                     </div>
                                 </div>
-                            </div>
-                            {% if request.user.role != RoleChoice.HODIM.value and request.user.role != RoleChoice.TYUTOR.value %}
-                            <a href="{% url 'user_list' RoleChoice.HODIM.value %}" class="btn btn-sm btn-primary mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
-                            {% endif %}
+                                <div class="card-footer-action">
+                                    <a href="{% url 'komissiya_foydalanuvchi_list' RoleChoice.KOMISSIYA.value %}" class="btn btn-primary w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>  
                         </div>
                     </div>
-                </div>
 
-                <!-- Topshiriqlar Card -->
-                <div class="col-xl-6 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Topshiriqlar</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ topshiriq_count|default:0 }}</div>
-                                </div>
-                                <div class="col-auto">
+                    <!-- Statistika Card -->
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <div class="card modern-card h-100" data-aos="fade-up" data-aos-delay="200">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="card-info flex-grow-1">
+                                        <div class="text-xs text-success mb-2">
+                                            <i class="fas fa-chart-bar me-2"></i>Statistika
+                                        </div>
+                                        <div class="h5 mb-1 counter-number" data-target="{{ topshiriq_count|default:0 }}">0</div>
+                                        <p class="mb-0 text-muted">
+                                            Jami topshiriqlar soni
+                                        </p>
+                                    </div>
                                     <div class="icon-circle bg-success">
-                                        <i class="fas fa-tasks text-white"></i>
+                                        <i class="fas fa-chart-bar text-white"></i>
                                     </div>
                                 </div>
+                                <div class="card-footer-action">
+                                    <a href="{% url 'komissiya_statistika_list' RoleChoice.KOMISSIYA.value %}" class="btn btn-success w-100">
+                                        Batafsil ko'rish <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
                             </div>
-                            {% if request.user.role == RoleChoice.HODIM.value %}
-                            <a href="{% url 'topshiriq_list' RoleChoice.HODIM.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
-                            {% elif request.user.role == RoleChoice.TYUTOR.value %}
-                            <a href="{% url 'topshiriq_list' RoleChoice.TYUTOR.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
-                            {% else %}
-                            <a href="{% url 'topshiriq_list' RoleChoice.HODIM.value %}" class="btn btn-sm btn-success mt-3 d-block">Batafsil <i class="fas fa-arrow-right ms-1"></i></a>
-                            {% endif %}
                         </div>
                     </div>
-                </div>
+
                 {% endif %}
             </div>
         </div>

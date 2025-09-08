@@ -84,15 +84,7 @@ def topshiriq_create(request, target_role):
 
             # Bajaruvchiga notification yuborish
             try:
-                notification_service = NotificationService()
-                notification_service.create_notification(
-                    recipient=task.bajaruvchi_user,
-                    sender=request.user,
-                    title=f"Yangi topshiriq: {task.title[:50]}",
-                    message=f"{request.user.get_full_name() or request.user.username} tomonidan sizga yangi topshiriq berildi: '{task.title}'. Muddat: {task.tugash_vaqti.strftime('%d.%m.%Y %H:%M') if task.tugash_vaqti else 'Belgilanmagan'}",
-                    notification_type='topshiriq_yangi',
-                    topshiriq=task
-                )
+                NotificationService.notify_new_topshiriq(task)
                 # Muvaffaqiyatli xabarni xabar sahifasida ko'rsatish
                 return render(request, 'asosiy/xabar.html', {
                     'xatolik_turi': 'Muvaffaqiyat',
@@ -246,21 +238,15 @@ def topshiriq_javob_create(request, target_role, pk):
             
             # Yaratuvchiga javob keldi bildirishnomasi yuborish
             try:
-                notification_service = NotificationService()
-                notification_service.create_notification(
-                    recipient=topshiriq.yaratuvchi_user,
-                    sender=request.user,
-                    title=f"Javob keldi: {topshiriq.title[:50]}",
-                    message=f"{request.user.get_full_name() or request.user.username} tomonidan '{topshiriq.title}' topshirig'iga javob yuborildi. Javobni ko'rib chiqing va baholang.",
-                    notification_type='topshiriq_javob',
-                    topshiriq=topshiriq
-                )
+                # Javob objektini yaratish
+                javob = TopshiriqJavob.objects.filter(topshiriq=topshiriq, bajaruvchi_user=request.user).last()
+                if javob:
+                    NotificationService.notify_topshiriq_javob(javob)
                 
                 # Bajaruvchidan shu topshiriq bilan bog'liq barcha bildirishnomalarni o'chirish
                 Notification.objects.filter(
-                    recipient=request.user,
-                    topshiriq=topshiriq,
-                    notification_type='topshiriq_yangi'
+                    users=request.user,
+                    topshiriq=topshiriq
                 ).delete()
                 
             except Exception as e:
@@ -323,18 +309,7 @@ def topshiriq_baxolash(request, target_role, pk):
         
         # Bajaruvchiga baholash bildirishnomasi yuborish
         try:
-            notification_service = NotificationService()
-            baho_display = topshiriq.get_baxo_description() if hasattr(topshiriq, 'get_baxo_description') else "Noma'lum"
-            status_display = topshiriq.get_status_display() if topshiriq.status else "Noma'lum"
-            
-            notification_service.create_notification(
-                recipient=topshiriq.bajaruvchi_user,
-                sender=request.user,
-                title=f"Baholandi: {topshiriq.title[:50]}",
-                message=f"'{topshiriq.title}' topshirig'ingiz baholandi. Baho: {topshiriq.baxo if topshiriq.baxo else 'Berilmagan'} ({baho_display}), Holat: {status_display}",
-                notification_type='topshiriq_baholandi',
-                topshiriq=topshiriq
-            )
+            NotificationService.notify_topshiriq_baholandi(topshiriq)
             
             # Yaratuvchidan shu topshiriq bilan bog'liq javob bildirishnomalarini o'chirish
             Notification.objects.filter(

@@ -111,12 +111,12 @@ def home(request):
     elif request.user.role in [RoleChoice.BOLIM_BOSHLIGI.value, RoleChoice.KAFEDRA_MUDIRI.value]:
         context.update({
             'hodim_count': Users.objects.filter(
-                role=RoleChoice.HODIM.value,
+                role=RoleChoice.KAFEDRA_HODIM.value,
                 yaratgan_user=request.user
             ).count(),
             'topshiriq_count': Topshiriq.objects.filter(
                 yaratuvchi_user=request.user,
-                bajaruvchi_user__role=RoleChoice.HODIM.value,
+                bajaruvchi_user__role=RoleChoice.KAFEDRA_HODIM.value,
                 javob_yuborildi=False
             ).count(),
         })
@@ -125,12 +125,12 @@ def home(request):
     elif request.user.role == RoleChoice.ZAM_DEKAN.value:
         context.update({
             'hodim_count': Users.objects.filter(
-                role=RoleChoice.HODIM.value,
+                role=RoleChoice.TYUTOR.value,
                 yaratgan_user=request.user
             ).count(),
             'topshiriq_count': Topshiriq.objects.filter(
                 yaratuvchi_user=request.user,
-                bajaruvchi_user__role=RoleChoice.HODIM.value,
+                bajaruvchi_user__role=RoleChoice.TYUTOR.value,
                 javob_yuborildi=False
             ).count(),
         })

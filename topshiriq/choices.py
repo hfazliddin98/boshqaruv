@@ -34,9 +34,9 @@ ALLOWED_TOPSHIRIQ_MAP = {
     RoleChoice.REKTOR: [RoleChoice.PROREKTOR],
     RoleChoice.PROREKTOR: [RoleChoice.BOLIM_RAHBARI, RoleChoice.DEKAN],
     RoleChoice.BOLIM_RAHBARI: [RoleChoice.BOLIM_BOSHLIGI],
-    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.HODIM],
+    RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.BOLIM_HODIM],
     RoleChoice.DEKAN: [RoleChoice.KAFEDRA_MUDIRI, RoleChoice.ZAM_DEKAN],
-    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.HODIM],
+    RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.KAFEDRA_HODIM],
     RoleChoice.ZAM_DEKAN: [RoleChoice.TYUTOR],
 }
 
@@ -46,8 +46,9 @@ ALLOWED_TOPSHIRIQ_JAVOB_MAP = {
     RoleChoice.BOLIM_RAHBARI: [RoleChoice.PROREKTOR],
     RoleChoice.DEKAN: [RoleChoice.PROREKTOR],
     RoleChoice.BOLIM_BOSHLIGI: [RoleChoice.BOLIM_RAHBARI],
-    RoleChoice.HODIM: [RoleChoice.BOLIM_BOSHLIGI, RoleChoice.KAFEDRA_MUDIRI],
+    RoleChoice.BOLIM_HODIM: [RoleChoice.BOLIM_BOSHLIGI],
     RoleChoice.KAFEDRA_MUDIRI: [RoleChoice.DEKAN],
+    RoleChoice.KAFEDRA_HODIM: [RoleChoice.KAFEDRA_MUDIRI],
     RoleChoice.ZAM_DEKAN: [RoleChoice.DEKAN],
     RoleChoice.TYUTOR: [RoleChoice.ZAM_DEKAN],
 }

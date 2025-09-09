@@ -18,7 +18,7 @@ class AsosiyModel(models.Model):
 
 
 class Struktura(AsosiyModel):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     role = models.CharField(max_length=30, choices=RoleChoice.choices, default=RoleChoice.BOLIM_HODIM)
 
     def __str__(self):

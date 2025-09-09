@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 from users.models import Users, Struktura
 
 
@@ -8,7 +9,7 @@ class UsersAdmin(admin.ModelAdmin):
 
 
 @admin.register(Struktura)
-class StrukturaAdmin(admin.ModelAdmin):
+class StrukturaAdmin(ImportExportModelAdmin):
     list_display = ['name', 'role']
 
 

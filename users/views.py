@@ -207,7 +207,7 @@ def user_list(request, target_role):
     allowed_roles = ALLOWED_USER_MAP.get(request.user.role, [])
     if target_role not in allowed_roles:
         return HttpResponseForbidden("Siz ushbu roldagi foydalanuvchilarni ko‘ra olmaysiz.")
-    users = Users.objects.filter(role=target_role)
+    users = Users.objects.filter(role=target_role).filter(yaratgan_user=request.user)
 
     # Target role uchun display nomi
     target_role_display = dict(RoleChoice.choices).get(target_role, target_role)

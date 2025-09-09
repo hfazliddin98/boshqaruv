@@ -23,6 +23,11 @@ class Struktura(AsosiyModel):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = 'Struktura'
+        verbose_name_plural = 'Strukturalar'
+        ordering = ['role']
 
 
 
@@ -43,4 +48,9 @@ class Users(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    class Meta:
+        verbose_name = 'Foydalanuvchi'
+        verbose_name_plural = 'Foydalanuvchilar'
+        ordering = ['-date_joined']
 

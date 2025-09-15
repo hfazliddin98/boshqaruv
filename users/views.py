@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import Http404, HttpResponseForbidden
+from django.http import Http404, HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -321,7 +321,7 @@ def admin_foydalanuvchi_create(request, target_role):
             user.parol = form.cleaned_data['password1']  # Agar ochiq holatda saqlamoqchi bo‘lsangiz
             user.set_password(form.cleaned_data['password1'])
             user.save()
-            return redirect('user_list', target_role=target_role)
+            return redirect('admin_foydalanuvchi_list', target_role=target_role)
     else:
         form = FoydalanuvchiCreateForm(target_role=target_role)
 
@@ -345,7 +345,7 @@ def admin_foydalanuvchi_update(request, target_role, pk):
                 user.parol = form.cleaned_data['password1']  # Agar ochiq holatda saqlamoqchi bo‘lsangiz
                 user.set_password(form.cleaned_data['password1'])
                 form.save()
-                return redirect('user_list', target_role=target_role)
+                return redirect('admin_foydalanuvchi_list', target_role=target_role)
         else:
             form = FoydalanuvchiUpdateForm(instance=user, target_role=target_role)
     else:
@@ -522,3 +522,89 @@ def komissiya_foydalanuvchi_list(request, target_role):
         'role_stats': rol_statistikasi,
     }
     return render(request, 'users/komissiya_foydalanuvchi_list.html', context)
+
+
+# AJAX Views
+def get_struktura_by_role(request, role):
+    """Tanlangan rolga mos strukturalarni qaytarish (AJAX uchun)"""
+    if request.method == 'GET':
+        try:
+            # Debug uchun barcha strukturalarni ko'ramiz
+            all_strukturalar = Struktura.objects.all()
+            print(f"Barcha strukturalar: {all_strukturalar.count()}")
+            
+            # Role bo'yicha filter (is_active filterni hozircha olib tashlaymiz)
+            strukturalar = Struktura.objects.filter(role=role)
+            print(f"Role '{role}' uchun strukturalar: {strukturalar.count()}")
+            
+            for s in strukturalar:
+                print(f"  - {s.name} (is_active: {s.is_active})")
+            
+            data = {
+                'strukturalar': [
+                    {
+                        'id': str(struktura.id),
+                        'name': struktura.name
+                    }
+                    for struktura in strukturalar
+                ]
+            }
+            return JsonResponse(data)
+        except Exception as e:
+            print(f"AJAX xatosi: {e}")
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Faqat GET so\'rovlar qabul qilinadi'}, status=405)
+
+
+def get_form_data_example(request):
+    """Form ma'lumotlarini olish misoli"""
+    if request.method == 'POST':
+        # 1. Django form orqali
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            # Cleaned data dan olish (validatsiyadan o'tgan)
+            selected_role = form.cleaned_data.get('role')
+            selected_struktura = form.cleaned_data.get('struktura')
+            username = form.cleaned_data.get('username')
+            is_active = form.cleaned_data.get('is_active', False)
+            
+            # 2. To'g'ridan-to'g'ri request.POST dan olish
+            raw_role = request.POST.get('role')
+            raw_struktura_id = request.POST.get('struktura')
+            raw_username = request.POST.get('username')
+            raw_is_active = request.POST.get('is_active') == 'on'  # Checkbox uchun
+            
+            # 3. Multiple select uchun
+            # selected_items = request.POST.getlist('multiple_field_name')
+            
+            # Ma'lumotlarni qayta ishlash
+            print(f"Tanlangan rol: {selected_role}")
+            print(f"Tanlangan struktura: {selected_struktura}")
+            print(f"Foydalanuvchi aktiv: {is_active}")
+            
+            # Ajax response
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Ma\'lumotlar muvaffaqiyatli saqlandi',
+                    'data': {
+                        'role': selected_role,
+                        'struktura': selected_struktura.name if selected_struktura else None,
+                        'username': username,
+                        'is_active': is_active
+                    }
+                })
+            
+            # Oddiy redirect
+            return redirect('success_page')
+        
+        else:
+            # Form xatoliklari
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': form.errors
+                })
+    
+    return JsonResponse({'error': 'Noto\'g\'ri so\'rov'}, status=400)

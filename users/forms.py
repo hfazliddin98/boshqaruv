@@ -174,18 +174,16 @@ class UserUpdateForm(UserChangeForm):
         target_role = kwargs.pop('target_role', None)
         super().__init__(*args, **kwargs)
 
-
-
+        # Har doim barcha rollarni ko'rsatamiz
+        self.fields['role'].choices = RoleChoice.choices
+        
         if target_role:
-
-            print(f"Initializing UserUpdateForm with target_role: {target_role}")
-            self.fields['role'].choices = [
-                (target_role, dict(Users._meta.get_field('role').choices).get(target_role, target_role))
-            ]
+            print(f"Initializing FoydalanuvchiUpdateForm with target_role: {target_role}")
             self.fields['role'].initial = target_role
+            # Tanlangan rolga mos strukturalarni ko'rsatamiz
             self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
         else:
-            self.fields['role'].choices = Users._meta.get_field('role').choices
+            # Hech qanday rol tanlanmagan bo'lsa, barcha strukturalarni ko'rsatamiz
             self.fields['struktura'].queryset = Struktura.objects.all()
 
     def clean_password2(self):
@@ -312,6 +310,11 @@ class FoydalanuvchiCreateForm(UserCreationForm):
     
 
 class FoydalanuvchiUpdateForm(UserChangeForm):
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Foydalanuvchi nomi'}),
+        label="Foydalanuvchi nomi"
+    )
     last_name = forms.CharField(
         max_length=255,
         required=False,
@@ -368,19 +371,49 @@ class FoydalanuvchiUpdateForm(UserChangeForm):
         target_role = kwargs.pop('target_role', None)
         super().__init__(*args, **kwargs)
 
-
-
+        # Har doim barcha rollarni ko'rsatamiz
+        self.fields['role'].choices = RoleChoice.choices
+        
+        # AJAX uchun har doim barcha strukturalarni ko'rsatamiz
+        self.fields['struktura'].queryset = Struktura.objects.all()
+        
         if target_role:
-
-            print(f"Initializing UserUpdateForm with target_role: {target_role}")
-            self.fields['role'].choices = [
-                (target_role, dict(Users._meta.get_field('role').choices).get(target_role, target_role))
-            ]
             self.fields['role'].initial = target_role
-            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
-        else:
-            self.fields['role'].choices = Users._meta.get_field('role').choices
-            self.fields['struktura'].queryset = Struktura.objects.all()
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        
+        # Bo'sh joylarni ruxsat berish, faqat unique tekshirish
+        if username:
+            # Faqat bo'sh username tekshirish
+            username = username.strip()  # Boshi va oxiridagi bo'sh joylarni olib tashlash
+            
+            if not username:
+                raise forms.ValidationError("Foydalanuvchi nomi bo'sh bo'lishi mumkin emas!")
+            
+            # Unique tekshirish (update uchun)
+            if self.instance and self.instance.pk:
+                if Users.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+                    raise forms.ValidationError("Bu foydalanuvchi nomi allaqachon mavjud!")
+            else:
+                if Users.objects.filter(username=username).exists():
+                    raise forms.ValidationError("Bu foydalanuvchi nomi allaqachon mavjud!")
+        
+        return username
+
+    def clean_struktura(self):
+        """
+        AJAX orqali tanlangan strukturani tekshirish
+        """
+        struktura = self.cleaned_data.get('struktura')
+        role = self.cleaned_data.get('role')
+        
+        if struktura and role:
+            # Tanlangan struktura tanlangan rolga mos ekanligini tekshiramiz
+            if struktura.role != role:
+                raise forms.ValidationError(f"Tanlangan struktura '{struktura.name}' '{role}' roli uchun emas!")
+        
+        return struktura
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")

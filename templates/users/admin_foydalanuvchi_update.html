@@ -781,46 +781,83 @@
                                     </div>
                                 </div>
 
-                                <!-- User Role Field (renamed from Bo'lim) -->
+                                <!-- User Role Field -->
                                 <div class="mb-4">
-                                    <label for="id_lavozim" class="form-label">
+                                    <label for="id_role" class="form-label">
                                         User Role <span class="text-danger">*</span>
+                                        <small class="text-muted">(Struktura avtomatik yangilanadi)</small>
                                     </label>
                                     <select name="role" 
                                             class="form-select {% if form.role.errors %}is-invalid{% endif %}" 
                                             id="id_role" 
                                             required>
                                         <option value="">Rolni tanlang</option>
-                                        {% for value, label in form.role.field.choices %}
-                                        <option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
+                                        {% if user.role %}
+                                            <option value="{{ user.role }}" selected style="background-color: #e7f3ff;">
+                                                {{ user.get_role_display }} (hozirgi)
+                                            </option>
+                                            <option disabled>──────────</option>
+                                        {% endif %}
+                                        
+                                        <!-- Django formadan barcha rollar -->
+                                        {% for choice_value, choice_label in form.role.field.choices %}
+                                            {% if choice_value and choice_value != user.role %}
+                                                <option value="{{ choice_value }}">{{ choice_label }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                     {% if form.role.errors %}
                                     <div class="invalid-feedback">{{ form.role.errors.0 }}</div>
                                     {% endif %}
+                                    <div class="form-text">
+                                        {% if user.role %}
+                                            <i class="fas fa-user-tag text-info"></i>
+                                            Hozirgi rol: <strong>{{ user.get_role_display }}</strong>. 
+                                            Boshqa rolga o'tkazishingiz mumkin.
+                                        {% else %}
+                                            <i class="fas fa-info-circle text-primary"></i>
+                                            Rol o'zgartirilganda struktura variantlari avtomatik yangilanadi
+                                        {% endif %}
+                                    </div>
                                 </div>
 
-                                <!-- Struktura Field (renamed from Bo'lim) -->
+                                <!-- Struktura Field -->
                                 <div class="mb-4">
                                     <label for="id_struktura" class="form-label">
                                         Struktura <span class="text-danger">*</span>
+                                        <span id="struktura-status" class="badge bg-secondary ms-2" style="display: none;">Yuklanmoqda...</span>
                                     </label>
                                     <select name="struktura" 
                                             class="form-select {% if form.struktura.errors %}is-invalid{% endif %}" 
                                             id="id_struktura" 
                                             required>
                                         <option value="">Strukturani tanlang</option>
+                                        {% if user.struktura %}
+                                            <option value="{{ user.struktura.id }}" selected style="background-color: #e7f3ff;">
+                                                {{ user.struktura.name }} (hozirgi)
+                                            </option>
+                                        {% endif %}
                                         {% for value, label in form.struktura.field.choices %}
-                                        <option value="{{ value }}" {% if form.struktura.value == value %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
+                                            {% if value != user.struktura.id|default:"" %}
+                                                <option value="{{ value }}" {% if form.struktura.value == value %}selected{% endif %}>
+                                                    {{ label }}
+                                                </option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                     {% if form.struktura.errors %}
                                     <div class="invalid-feedback">{{ form.struktura.errors.0 }}</div>
                                     {% endif %}
+                                    <div class="form-text" id="struktura-help">
+                                        {% if user.struktura %}
+                                            <i class="fas fa-building text-info"></i>
+                                            Hozirgi struktura: <strong>{{ user.struktura.name }}</strong>. 
+                                            Rol o'zgartirib yangi struktura tanlashingiz mumkin.
+                                        {% else %}
+                                            <i class="fas fa-building text-success"></i>
+                                            Tanlangan rolga mos strukturalar ko'rsatiladi
+                                        {% endif %}
+                                    </div>
                                 </div>
 
                                 <!-- Password Fields -->
@@ -884,7 +921,7 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                                    <a href="{% url 'user_list' target_role %}" class="btn btn-outline-secondary">
+                                    <a href="{% url 'admin_foydalanuvchi_list' target_role %}" class="btn btn-outline-secondary">
                                         <i class="fas fa-arrow-left me-2"></i> Ortga
                                     </a>
                                     <div>
@@ -936,6 +973,197 @@
             $('.sidebar-menu a').click(function () {
                 $('.sidebar-menu a').removeClass('active');
                 $(this).addClass('active');
+            });
+
+            // Simple role change handler
+            $('#id_role').on('change', function() {
+                const selectedRole = $(this).val();
+                const strukturaSelect = $('#id_struktura');
+                const statusBadge = $('#struktura-status');
+                const helpText = $('#struktura-help');
+                
+                console.log('Role changed to:', selectedRole);
+                
+                if (selectedRole) {
+                    
+                    // AJAX so'rov yuborish
+                    statusBadge.removeClass('bg-success bg-danger bg-warning').addClass('bg-primary').text('Yuklanmoqda...').show();
+                    strukturaSelect.html('<option value="">Yuklanmoqda...</option>');
+                    strukturaSelect.prop('disabled', true);
+                    
+                    $.ajax({
+                        url: '/api/struktura/' + selectedRole + '/',
+                        method: 'GET',
+                        success: function(data) {
+                            strukturaSelect.html('<option value="">Strukturani tanlang</option>');
+                            
+                            if (data.strukturalar && data.strukturalar.length > 0) {
+                                data.strukturalar.forEach(function(struktura) {
+                                    strukturaSelect.append('<option value="' + struktura.id + '">' + struktura.name + '</option>');
+                                });
+                                statusBadge.removeClass('bg-primary').addClass('bg-success').text('Yuklandi');
+                                helpText.html('<i class="fas fa-check text-success"></i> Strukturalar yuklandi');
+                            } else {
+                                strukturaSelect.append('<option value="">Struktura topilmadi</option>');
+                                statusBadge.removeClass('bg-primary').addClass('bg-warning').text('Topilmadi');
+                            }
+                            
+                            strukturaSelect.prop('disabled', false);
+                            setTimeout(function() { statusBadge.fadeOut(); }, 3000);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX Error:', error);
+                            console.error('Status:', status);
+                            console.error('Response:', xhr.responseText);
+                            console.error('URL:', `/api/struktura/${selectedRole}/`);
+                            strukturaSelect.html('<option value="">Xatolik yuz berdi</option>');
+                            strukturaSelect.prop('disabled', false);
+                            
+                            // Status: Xatolik
+                            statusBadge.removeClass('bg-primary bg-success bg-warning').addClass('bg-danger').text('Xatolik');
+                            helpText.html(`<i class="fas fa-times-circle text-danger"></i> Struktura ma'lumotlarini yuklashda xatolik: ${error}`);
+                            
+                            // Fallback: hozirgi qiymatni saqlash
+                            if (currentStrukturaId) {
+                                strukturaSelect.append(`<option value="${currentStrukturaId}" selected>Hozirgi struktura (ID: ${currentStrukturaId})</option>`);
+                            }
+                            
+                            alert('Struktura ma\'lumotlarini yuklashda xatolik yuz berdi. Iltimos, qaytadan urinib ko\'ring.');
+                        }
+                    });
+                } else {
+                    // Rol tanlanmagan bo'lsa, hozirgi strukturani ko'rsatish
+                    const currentStrukturaName = '{{ user.struktura.name|default:"" }}';
+                    if (currentStrukturaId && currentStrukturaName) {
+                        strukturaSelect.html(`
+                            <option value="">Strukturani tanlang</option>
+                            <option value="${currentStrukturaId}" selected style="background-color: #f8f9fa;">${currentStrukturaName} (hozirgi)</option>
+                        `);
+                        helpText.html('<i class="fas fa-info-circle text-info"></i> Hozirgi struktura ko\'rsatildi. Rol tanlasangiz, yangi variantlar ko\'rsatiladi.');
+                    } else {
+                        strukturaSelect.html('<option value="">Avval rol tanlang</option>');
+                        helpText.html('<i class="fas fa-info-circle text-muted"></i> Avval rol tanlang, keyin struktura variantlari ko\'rsatiladi');
+                    }
+                    strukturaSelect.prop('disabled', false);
+                    statusBadge.hide();
+                }
+            });
+
+            // Sahifa yuklanganda dastlabki holatni o'rnatish
+            function initializeForm() {
+                const currentRole = $('#id_role').val();
+                const currentStrukturaId = '{{ form.struktura.value|default:"" }}';
+                const currentStrukturaName = '{{ user.struktura.name|default:"Tanlang" }}';
+                
+                console.log('Initializing form with role:', currentRole, 'structure:', currentStrukturaId, 'name:', currentStrukturaName);
+                
+                // Strukturani hozirgi holatini ko'rsatish
+                const strukturaSelect = $('#id_struktura');
+                const helpText = $('#struktura-help');
+                
+                if (currentStrukturaId && currentStrukturaName) {
+                    // Mavjud strukturani ko'rsatish
+                    strukturaSelect.html(`<option value="${currentStrukturaId}" selected>${currentStrukturaName}</option>`);
+                    strukturaSelect.prop('disabled', false);
+                    helpText.html(`<i class="fas fa-info-circle text-info"></i> Hozirgi struktura: <strong>${currentStrukturaName}</strong>. Rol o'zgartirib yangi struktura tanlashingiz mumkin.`);
+                } else {
+                    strukturaSelect.html('<option value="">Struktura tanlanmagan</option>');
+                    strukturaSelect.prop('disabled', false);
+                    helpText.html('<i class="fas fa-exclamation-triangle text-warning"></i> Struktura tanlanmagan. Rol tanlang va keyin strukturani belgilang.');
+                }
+                
+                if (currentRole) {
+                    // Agar rol mavjud bo'lsa, strukturalar ro'yxatini yuklash
+                    // Lekin hozirgi qiymatni saqlab qolish
+                    $('#id_role').trigger('change');
+                } else {
+                    // Rol yo'q bo'lsa ham struktura fieldini yoqib qo'yish
+                    helpText.html('<i class="fas fa-info-circle text-muted"></i> Rol tanlang, keyin struktura variantlari ko\'rsatiladi. Hozirgi strukturani o\'zgartirishingiz mumkin.');
+                }
+            }
+
+            // Sahifa yuklanganda initialization
+            setTimeout(initializeForm, 100);
+
+            // Parol validatsiyasi
+            function validatePasswords() {
+                const password1 = $('#id_password1').val();
+                const password2 = $('#id_password2').val();
+                const $password2Input = $('#id_password2');
+                
+                if (password1 && password2) {
+                    if (password1 !== password2) {
+                        $password2Input.addClass('is-invalid');
+                        $password2Input.removeClass('is-valid');
+                        
+                        let errorDiv = $password2Input.closest('.input-group').siblings('.invalid-feedback');
+                        if (errorDiv.length === 0) {
+                            errorDiv = $('<div class="invalid-feedback"></div>');
+                            $password2Input.closest('.input-group').after(errorDiv);
+                        }
+                        errorDiv.text('Parollar mos kelmaydi');
+                        return false;
+                    } else {
+                        $password2Input.removeClass('is-invalid');
+                        $password2Input.addClass('is-valid');
+                        return true;
+                    }
+                }
+                return true;
+            }
+
+            // Parol maydonlariga validatsiya qo'shish
+            $('#id_password1, #id_password2').on('input blur', function() {
+                validatePasswords();
+            });
+
+            // Form yuborishda validatsiya va animatsiya
+            $('form').on('submit', function(e) {
+                console.log('=== FORM SUBMIT DEBUG ===');
+                
+                // Form qiymatlarini tekshirish
+                const roleValue = $('#id_role').val();
+                const strukturaValue = $('#id_struktura').val();
+                const usernameValue = $('#id_username').val();
+                
+                console.log('Role value:', roleValue);
+                console.log('Struktura value:', strukturaValue);
+                console.log('Username value:', usernameValue);
+                
+                // Barcha form fieldlarini ko'rsatish
+                const formData = new FormData(this);
+                console.log('=== BARCHA FORM DATA ===');
+                for (let [key, value] of formData.entries()) {
+                    console.log(key + ':', value);
+                }
+                
+                if (!validatePasswords()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                
+                // Form yuborish animatsiyasi
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalText = submitBtn.html();
+                
+                submitBtn.prop('disabled', true);
+                submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i> Yangilanmoqda...');
+                
+                // Form validatsiyasini tekshirish
+                const form = this;
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Xatolik bo'lsa tugmani qayta tiklash
+                    setTimeout(() => {
+                        submitBtn.prop('disabled', false);
+                        submitBtn.html(originalText);
+                    }, 1000);
+                }
+                
+                $(this).addClass('was-validated');
             });
 
             // Parol ko‘rsatish/berkitish

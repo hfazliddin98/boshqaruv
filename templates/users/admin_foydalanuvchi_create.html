@@ -904,7 +904,7 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                                    <a href="{% url 'user_list' target_role %}" class="btn btn-outline-secondary">
+                                    <a href="{% url 'admin_foydalanuvchi_list' target_role %}" class="btn btn-outline-secondary">
                                         <i class="fas fa-arrow-left me-2"></i> Ortga
                                     </a>
                                     <div>
@@ -958,6 +958,46 @@
                 $(this).addClass('active');
             });
 
+            // Role o'zgarishini kuzatish va strukturani yangilash
+            $('#id_role').on('change', function() {
+                const selectedRole = $(this).val();
+                const strukturaSelect = $('#id_struktura');
+                
+                if (selectedRole) {
+                    // Loading ko'rsatish
+                    strukturaSelect.html('<option value="">Yuklanmoqda...</option>');
+                    strukturaSelect.prop('disabled', true);
+                    
+                    // AJAX so'rov yuborish
+                    $.ajax({
+                        url: `/api/struktura/${selectedRole}/`,
+                        method: 'GET',
+                        success: function(data) {
+                            // Strukturani yangilash
+                            strukturaSelect.html('<option value="">Strukturani tanlang</option>');
+                            data.strukturalar.forEach(function(struktura) {
+                                strukturaSelect.append(`<option value="${struktura.id}">${struktura.name}</option>`);
+                            });
+                            strukturaSelect.prop('disabled', false);
+                        },
+                        error: function() {
+                            strukturaSelect.html('<option value="">Xatolik yuz berdi</option>');
+                            strukturaSelect.prop('disabled', false);
+                            alert('Struktura ma\'lumotlarini yuklashda xatolik yuz berdi');
+                        }
+                    });
+                } else {
+                    // Rol tanlanmagan bo'lsa strukturani tozalash
+                    strukturaSelect.html('<option value="">Avval rol tanlang</option>');
+                    strukturaSelect.prop('disabled', true);
+                }
+            });
+
+            // Sahifa yuklanganda rol tanlangan bo'lsa struktura optionlarini yuklash
+            if ($('#id_role').val()) {
+                $('#id_role').trigger('change');
+            }
+
             // Parol validatsiyasi
             function validatePasswords() {
                 const password1 = $('#id_password1').val();
@@ -1008,7 +1048,29 @@
                 if (!validatePasswords()) {
                     e.preventDefault();
                     e.stopPropagation();
+                    return false;
                 }
+                
+                // Form yuborish animatsiyasi
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalText = submitBtn.html();
+                
+                submitBtn.prop('disabled', true);
+                submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i> Saqlanmoqda...');
+                
+                // Form validatsiyasini tekshirish
+                const form = this;
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Xatolik bo'lsa tugmani qayta tiklash
+                    setTimeout(() => {
+                        submitBtn.prop('disabled', false);
+                        submitBtn.html(originalText);
+                    }, 1000);
+                }
+                
                 $(this).addClass('was-validated');
             });
         });

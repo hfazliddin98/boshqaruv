@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ foydalanuvchi.username }} - Topshiriqlar | QO'QON DAVLAT UNIVERSITETI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="{% static 'asosiy/favicon.ico' %}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Asosiy css -->
+    <link rel="stylesheet" href="{% static 'asosiy/home/asosiy.css' %}">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .user-header {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .user-header::before {
+            content: '';
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            display: block;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+            margin-right: 1.5rem;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border-left: 5px solid #dee2e6;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .task-card.completed {
+            border-left-color: #28a745;
+        }
+
+        .task-card.pending {
+            border-left-color: #ffc107;
+        }
+
+        .task-card.overdue {
+            border-left-color: #dc3545;
+        }
+
+        .task-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .task-body {
+            padding: 1.5rem;
+        }
+
+        .task-status {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-overdue {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: inline-block;
+            margin-left: 1rem;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+            color: white;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-completed .stats-number {
+            color: #28a745;
+        }
+
+        .stats-pending .stats-number {
+            color: #ffc107;
+        }
+
+        .stats-overdue .stats-number {
+            color: #dc3545;
+        }
+
+        .stats-total .stats-number {
+            color: #6f42c1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+
+        .container-fluid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- User Header -->
+        <div class="user-header">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar">
+                            {{ foydalanuvchi.first_name|first|default:foydalanuvchi.username|first|upper }}
+                        </div>
+                        <div>
+                            <h2 class="mb-1">{{ foydalanuvchi.username }}</h2>
+                            <p class="text-muted mb-1">{{ foydalanuvchi.first_name }} {{ foydalanuvchi.last_name|default:"" }}</p>
+                            <p class="mb-0">
+                                <span class="badge bg-primary">{{ foydalanuvchi.get_role_display }}</span>
+                                {% if foydalanuvchi.struktura %}
+                                    <span class="badge bg-secondary ms-2">{{ foydalanuvchi.struktura.name }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <a href="javascript:history.back()" class="back-btn">
+                        <i class="fas fa-arrow-left me-2"></i>Orqaga
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card stats-total">
+                    <div class="stats-number">{{ topshiriqlar.count }}</div>
+                    <div class="text-muted">Jami Topshiriqlar</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-completed">
+                    <div class="stats-number">{{ completed_count }}</div>
+                    <div class="text-muted">Bajarilgan</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-pending">
+                    <div class="stats-number">{{ pending_count }}</div>
+                    <div class="text-muted">Jarayonda</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-overdue">
+                    <div class="stats-number">{{ overdue_count }}</div>
+                    <div class="text-muted">Muddati o'tgan</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks List -->
+        <div class="row">
+            <div class="col-12">
+                {% if topshiriqlar %}
+                    {% for topshiriq in topshiriqlar %}
+                    <div class="task-card {% if topshiriq.status == 'completed' %}completed{% elif topshiriq.muddat < today %}overdue{% else %}pending{% endif %}">
+                        <div class="task-header">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="mb-2">{{ topshiriq.nom }}</h5>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-calendar me-2"></i>
+                                        Muddat: {{ topshiriq.muddat|date:"d.m.Y H:i" }}
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <span class="task-status {% if topshiriq.status == 'completed' %}status-completed{% elif topshiriq.muddat < today %}status-overdue{% else %}status-pending{% endif %}">
+                                        {% if topshiriq.status == 'completed' %}
+                                            <i class="fas fa-check me-1"></i>Bajarilgan
+                                        {% elif topshiriq.muddat < today %}
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Muddati o'tgan
+                                        {% else %}
+                                            <i class="fas fa-clock me-1"></i>Jarayonda
+                                        {% endif %}
+                                    </span>
+                                    {% if topshiriq.baho %}
+                                        <span class="score-badge">
+                                            <i class="fas fa-star me-1"></i>{{ topshiriq.baho }} ball
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-body">
+                            <p class="mb-3">{{ topshiriq.tavsif|default:"Tavsif kiritilmagan" }}</p>
+                            <div class="row text-center">
+                                <div class="col-md-4">
+                                    <small class="text-muted d-block">Berilgan vaqt</small>
+                                    <strong>{{ topshiriq.yaratilgan_vaqt|date:"d.m.Y H:i" }}</strong>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted d-block">Topshiriq turi</small>
+                                    <strong>{{ topshiriq.get_tur_display|default:"Oddiy" }}</strong>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted d-block">Javob fayli</small>
+                                    {% if topshiriq.javob_fayl %}
+                                        <a href="{{ topshiriq.javob_fayl.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download me-1"></i>Yuklab olish
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Yuklanmagan</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-tasks"></i>
+                        <h3>Topshiriqlar mavjud emas</h3>
+                        <p class="text-muted">{{ foydalanuvchi.username }} uchun hozircha hech qanday topshiriq berilmagan.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Task cards hover animation
+            $('.task-card').hover(
+                function() {
+                    $(this).find('.task-header').css('background-color', '#f8f9fa');
+                },
+                function() {
+                    $(this).find('.task-header').css('background-color', 'transparent');
+                }
+            );
+
+            // Stats cards animation
+            $('.stats-card').each(function(index) {
+                $(this).css('animation-delay', (index * 0.1) + 's');
+                $(this).addClass('fade-in');
+            });
+
+            // Task cards staggered animation
+            $('.task-card').each(function(index) {
+                $(this).css('animation-delay', (index * 0.1) + 's');
+                $(this).addClass('fade-in');
+            });
+        });
+
+        // Add fade-in animation CSS
+        $('<style>')
+            .prop('type', 'text/css')
+            .html(`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                .fade-in {
+                    animation: fadeInUp 0.6s ease forwards;
+                }
+            `)
+            .appendTo('head');
+    </script>
+</body>
+</html>

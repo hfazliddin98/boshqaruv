@@ -277,16 +277,24 @@ class FoydalanuvchiCreateForm(UserCreationForm):
         target_role = kwargs.pop('target_role', None)
         super().__init__(*args, **kwargs)
 
+        # Struktura fieldini qo'shamiz
+        self.fields['struktura'] = forms.ModelChoiceField(
+            queryset=Struktura.objects.none(),  # Dastlab bo'sh
+            required=False,
+            widget=forms.Select(attrs={'class': 'form-select'}),
+            label="Struktura"
+        )
+
         # Har doim barcha rollarni ko'rsatamiz
         self.fields['role'].choices = RoleChoice.choices
         
         if target_role:
             self.fields['role'].initial = target_role
             # Tanlangan rolga mos strukturalarni ko'rsatamiz
-            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role)
+            self.fields['struktura'].queryset = Struktura.objects.filter(role=target_role, is_active=True)
         else:
-            # Hech qanday rol tanlanmagan bo'lsa, barcha strukturalarni ko'rsatamiz
-            self.fields['struktura'].queryset = Struktura.objects.all()
+            # Hech qanday rol tanlanmagan bo'lsa, barcha faol strukturalarni ko'rsatamiz
+            self.fields['struktura'].queryset = Struktura.objects.filter(is_active=True)
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")

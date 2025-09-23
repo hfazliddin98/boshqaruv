@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import Http404, HttpResponseForbidden, JsonResponse
-from django.contrib import messages
-from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout
+from django.contrib import messages
+from django.http import HttpResponseForbidden
 from users.choices import RoleChoice, ALLOWED_USER_MAP
 from users.models import Struktura, Users
 from users.forms import (
@@ -11,6 +13,7 @@ from users.forms import (
     FoydalanuvchiCreateForm, FoydalanuvchiUpdateForm,
     StrukturaCreateForm, StrukturaUpdateForm
 )
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from topshiriq.models import Topshiriq, TopshiriqJavob
 
 
@@ -313,7 +316,7 @@ def admin_foydalanuvchi_list(request, target_role):
 def admin_foydalanuvchi_create(request, target_role):
 
     if request.method == 'POST':
-        form = FoydalanuvchiCreateForm(request.POST)
+        form = FoydalanuvchiCreateForm(request.POST, target_role=target_role)
         if form.is_valid():
             user = form.save(commit=False)
             user.role = form.cleaned_data['role']
@@ -434,92 +437,42 @@ def komissiya_foydalanuvchi_list(request, target_role):
         xabar_matni = "Siz ushbu sahifani ko'rishga ruxsat bermaysiz."
         return xabar(request, xabar_matni)
 
-    # Barcha foydalanuvchilarni olish (superuser emas)
-    from topshiriq.models import Topshiriq
-    from topshiriq.choices import StatusChoice
-    from django.utils import timezone
-    from django.db.models import Count, Q
     
-    foydalanuvchilar = Users.objects.filter(is_superuser=False).order_by('role', 'first_name', 'last_name')
+    # Filter parametrlari
+    role_filter = request.GET.get('role', '').strip()
     
-    # Har bir foydalanuvchi uchun statistika qo'shish
-    foydalanuvchilar_statistika_bilan = []
-    joriy_vaqt = timezone.now()
+    # Pagination parametrlari
+    page = request.GET.get('page', 1)
+    per_page = 20  # Har sahifada 20 ta foydalanuvchi
     
-    for foydalanuvchi in foydalanuvchilar:
-        # Foydalanuvchiga berilgan barcha topshiriqlar
-        foydalanuvchi_topshiriqlar = Topshiriq.objects.filter(bajaruvchi_user=foydalanuvchi)
+    try:
+        # Barcha foydalanuvchilarni olish
+        foydalanuvchilar = Users.objects.filter(is_superuser=False).order_by('role', 'first_name', 'last_name')
         
-        # Statistikalar
-        jami_topshiriqlar = foydalanuvchi_topshiriqlar.count()
-        bajarilgan_topshiriqlar = foydalanuvchi_topshiriqlar.filter(status=StatusChoice.BAJARILDI).count()
-        kechikkan_topshiriqlar = foydalanuvchi_topshiriqlar.filter(
-            Q(status=StatusChoice.KECHIKDI)
-        ).count()
-        bajarilmagan_topshiriqlar = foydalanuvchi_topshiriqlar.filter(
-            status__in=[StatusChoice.YUBORILDI]
-        ).count()
-        muvaffaqiyatsiz_topshiriqlar = foydalanuvchi_topshiriqlar.filter(status=StatusChoice.BAJARILMADI).count()
+        # Role filter qo'llash
+        if role_filter:
+            foydalanuvchilar = foydalanuvchilar.filter(role=role_filter)
         
-        # Foizlarni hisoblash
-        bajarilish_foizi = round((bajarilgan_topshiriqlar / jami_topshiriqlar * 100), 1) if jami_topshiriqlar > 0 else 0
-        kechikish_foizi = round((kechikkan_topshiriqlar / jami_topshiriqlar * 100), 1) if jami_topshiriqlar > 0 else 0
-        bajarilmaganlik_foizi = round((bajarilmagan_topshiriqlar / jami_topshiriqlar * 100), 1) if jami_topshiriqlar > 0 else 0
+        # Pagination qo'llash
+        paginator = Paginator(foydalanuvchilar, per_page)
         
-        foydalanuvchi_statistika_bilan = {
-            'user': foydalanuvchi,
-            'stats': {
-                'total': jami_topshiriqlar,
-                'completed': bajarilgan_topshiriqlar,
-                'delayed': kechikkan_topshiriqlar,
-                'unfinished': bajarilmagan_topshiriqlar,
-                'failed': muvaffaqiyatsiz_topshiriqlar,
-                'completion_rate': bajarilish_foizi,
-                'delay_rate': kechikish_foizi,
-                'unfinished_rate': bajarilmaganlik_foizi,
-            }
-        }
-        foydalanuvchilar_statistika_bilan.append(foydalanuvchi_statistika_bilan)
-
-    # Umumiy statistikalar
-    jami_barcha_topshiriqlar = sum(foydalanuvchi_data['stats']['total'] for foydalanuvchi_data in foydalanuvchilar_statistika_bilan)
-    jami_bajarilgan_topshiriqlar = sum(foydalanuvchi_data['stats']['completed'] for foydalanuvchi_data in foydalanuvchilar_statistika_bilan)
-    jami_kechikkan_topshiriqlar = sum(foydalanuvchi_data['stats']['delayed'] for foydalanuvchi_data in foydalanuvchilar_statistika_bilan)
-    jami_bajarilmagan_topshiriqlar = sum(foydalanuvchi_data['stats']['unfinished'] for foydalanuvchi_data in foydalanuvchilar_statistika_bilan)
-    
-    # Umumiy foizlarni hisoblash
-    umumiy_bajarilish_foizi = round((jami_bajarilgan_topshiriqlar / jami_barcha_topshiriqlar * 100), 1) if jami_barcha_topshiriqlar > 0 else 0
-    umumiy_kechikish_foizi = round((jami_kechikkan_topshiriqlar / jami_barcha_topshiriqlar * 100), 1) if jami_barcha_topshiriqlar > 0 else 0
-    umumiy_bajarilmaganlik_foizi = round((jami_bajarilmagan_topshiriqlar / jami_barcha_topshiriqlar * 100), 1) if jami_barcha_topshiriqlar > 0 else 0
-    
-    # Samaradorlik bo'yicha statistika
-    ajoyib_foydalanuvchilar = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['stats']['total'] > 0 and foydalanuvchi_data['stats']['completion_rate'] >= 80)
-    yaxshi_foydalanuvchilar = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['stats']['total'] > 0 and 60 <= foydalanuvchi_data['stats']['completion_rate'] < 80)
-    ortacha_foydalanuvchilar = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['stats']['total'] > 0 and 40 <= foydalanuvchi_data['stats']['completion_rate'] < 60)
-    yomon_foydalanuvchilar = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['stats']['total'] > 0 and foydalanuvchi_data['stats']['completion_rate'] < 40)
-    
-    # Rollarga bo'yicha statistika
-    rol_statistikasi = {}
-    for rol_tanlovi in RoleChoice:
-        rol_statistikasi[rol_tanlovi.value] = sum(1 for foydalanuvchi_data in foydalanuvchilar_statistika_bilan if foydalanuvchi_data['user'].role == rol_tanlovi.value)
+        try:
+            foydalanuvchilar_page = paginator.page(page)
+        except PageNotAnInteger:
+            foydalanuvchilar_page = paginator.page(1)
+        except EmptyPage:
+            foydalanuvchilar_page = paginator.page(paginator.num_pages)
+        
+    except Exception as e:
+        print(f"DEBUG: Xatolik yuz berdi: {e}")
+        import traceback
+        traceback.print_exc()
 
     context = {
-        'foydalanuvchilar_malumotlari': foydalanuvchilar_statistika_bilan,
+        'foydalanuvchilar_page': foydalanuvchilar_page,
         'target_role': target_role,
         'RoleChoice': RoleChoice,
-        'total_users': len(foydalanuvchilar_statistika_bilan),
-        'total_all_tasks': jami_barcha_topshiriqlar,
-        'total_completed_tasks': jami_bajarilgan_topshiriqlar,
-        'total_delayed_tasks': jami_kechikkan_topshiriqlar,
-        'total_unfinished_tasks': jami_bajarilmagan_topshiriqlar,
-        'overall_completion_rate': umumiy_bajarilish_foizi,
-        'overall_delay_rate': umumiy_kechikish_foizi,
-        'overall_unfinished_rate': umumiy_bajarilmaganlik_foizi,
-        'excellent_users': ajoyib_foydalanuvchilar,
-        'good_users': yaxshi_foydalanuvchilar,
-        'average_users': ortacha_foydalanuvchilar,
-        'poor_users': yomon_foydalanuvchilar,
-        'role_stats': rol_statistikasi,
+        'role_filter': role_filter,  # Current role filter
     }
     return render(request, 'users/komissiya_foydalanuvchi_list.html', context)
 
@@ -608,3 +561,51 @@ def get_form_data_example(request):
                 })
     
     return JsonResponse({'error': 'Noto\'g\'ri so\'rov'}, status=400)
+
+
+@login_required
+def user_tasks(request, user_id):
+    """Foydalanuvchining barcha topshiriqlari va baholari"""
+    from datetime import datetime
+    from django.utils import timezone
+    
+    foydalanuvchi = get_object_or_404(Users, id=user_id)
+    
+    # Foydalanuvchining barcha topshiriqlarini olish
+    topshiriqlar = Topshiriq.objects.filter(
+        bajaruvchi_user=foydalanuvchi
+    ).order_by('-yaratilgan_vaqt')
+    
+    # Bugungi sana
+    today = timezone.now()
+    
+    # Statistika hisoblash
+    completed_count = topshiriqlar.filter(javob_yuborildi=True).count()
+    pending_count = topshiriqlar.filter(javob_yuborildi=False, muddat__gte=today).count()
+    overdue_count = topshiriqlar.filter(javob_yuborildi=False, muddat__lt=today).count()
+    
+    # Har bir topshiriq uchun javob va baho olish
+    topshiriqlar_data = []
+    for topshiriq in topshiriqlar:
+        try:
+            javob = TopshiriqJavob.objects.get(topshiriq=topshiriq)
+            topshiriq.javob_fayl = javob.javob_fayl
+            topshiriq.baho = javob.baho
+            topshiriq.status = 'completed' if topshiriq.javob_yuborildi else 'pending'
+        except TopshiriqJavob.DoesNotExist:
+            topshiriq.javob_fayl = None
+            topshiriq.baho = None
+            topshiriq.status = 'pending'
+        
+        topshiriqlar_data.append(topshiriq)
+    
+    context = {
+        'foydalanuvchi': foydalanuvchi,
+        'topshiriqlar': topshiriqlar_data,
+        'completed_count': completed_count,
+        'pending_count': pending_count,
+        'overdue_count': overdue_count,
+        'today': today,
+    }
+    
+    return render(request, 'users/user_tasks.html', context)

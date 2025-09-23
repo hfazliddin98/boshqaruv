@@ -710,16 +710,116 @@
                 {% endif %}
             </div>
 
+            <!-- Statistics Cards -->
+            {% if total_users %}
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-start border-primary border-4 shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Jami Foydalanuvchilar</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_users }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-start border-success border-4 shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Faol Foydalanuvchilar</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_users }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                                </div>
+                            </div>        
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-start border-info border-4 shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Sahifa</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Foydalanuvchilar List with Search -->
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">{{target_role|capfirst}}lar ro'yxati</h6>
-                    <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Qidirish..." id="searchInput">
-                        <button class="btn btn-outline-secondary" type="button" id="searchButton">
-                            <i class="fas fa-search"></i>
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            {{target_role|capfirst}}lar ro'yxati 
+                            {% if page_obj.paginator.count %}({{ page_obj.paginator.count }} ta){% endif %}
+                        </h6>
+                        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#searchCollapse" aria-expanded="false">
+                            <i class="fas fa-filter me-1"></i>Filtr
                         </button>
                     </div>
                 </div>
+                
+                <!-- Collapsible Search Form -->
+                <div class="collapse{% if search_query or role_filter %} show{% endif %}" id="searchCollapse">
+                    <div class="card-body border-bottom">
+                        <form method="get" id="searchForm" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="search" class="form-label">Qidiruv</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       value="{{ search_query|default:'' }}" 
+                                       placeholder="Ism, email yoki struktura bo'yicha qidiring...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="role_filter" class="form-label">Rol</label>
+                                <select class="form-select" id="role_filter" name="role_filter">
+                                    <option value="">Barcha rollar</option>
+                                    {% for choice_value, choice_display in role_choices %}
+                                    <option value="{{ choice_value }}" {% if role_filter == choice_value %}selected{% endif %}>
+                                        {{ choice_display }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="page_size" class="form-label">Hajm</label>
+                                <select class="form-select" id="page_size" name="page_size">
+                                    <option value="25" {% if page_size == 25 %}selected{% endif %}>25</option>
+                                    <option value="50" {% if page_size == 50 %}selected{% endif %}>50</option>
+                                    <option value="100" {% if page_size == 100 %}selected{% endif %}>100</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search me-1"></i>Qidirish
+                                </button>
+                                <a href="?" class="btn btn-outline-secondary">
+                                    <i class="fas fa-eraser me-1"></i>Tozalash
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
                 <div class="card-body">
                     <div class="table-responsive" style="height: 70vh;">
                         <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
@@ -766,12 +866,12 @@
                     </div>
 
                     <!-- Pagination -->
-                    {% if prorektor_data.has_other_pages %}
+                    {% if page_obj.has_other_pages %}
                     <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-end mt-3">
-                            {% if prorektor_data.has_previous %}
+                        <ul class="pagination justify-content-center mt-3">
+                            {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ prorektor_data.previous_page_number }}">Oldingi</a>
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Oldingi</a>
                             </li>
                             {% else %}
                             <li class="page-item disabled">
@@ -779,29 +879,41 @@
                             </li>
                             {% endif %}
 
-                            {% for page_num in prorektor_data.paginator.page_range %}
-                                {% if page_num == prorektor_data.number %}
+                            {% for page_num in page_obj.paginator.page_range %}
+                                {% if page_num == page_obj.number %}
                                 <li class="page-item active">
                                     <a class="page-link" href="#">{{ page_num }}</a>
                                 </li>
-                                {% else %}
+                                {% elif page_num > page_obj.number|add:'-3' and page_num < page_obj.number|add:'3' %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_num }}">{{ page_num }}</a>
+                                </li>
+                                {% elif page_num == 1 or page_num == page_obj.paginator.num_pages %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_num }}">{{ page_num }}</a>
                                 </li>
                                 {% endif %}
                             {% endfor %}
 
-                            {% if prorektor_data.has_next %}
+                            {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ prorektor_data.next_page_number }}">Keyingi</a>
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Keyingi</a>
                             </li>
-                            {% else %}
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Keyingi</a>
                             </li>
                             {% endif %}
                         </ul>
                     </nav>
+                    
+                    <!-- Pagination Info -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted">
+                            Sahifa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} - 
+                            Jami {{ page_obj.paginator.count }} ta yozuv
+                        </small>
+                        <small class="text-muted">
+                            {{ page_obj.start_index }}-{{ page_obj.end_index }} ko'rsatilmoqda
+                        </small>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -843,6 +955,25 @@
             $('.sidebar-menu a').click(function () {
                 $('.sidebar-menu a').removeClass('active');
                 $(this).addClass('active');
+            });
+
+            // Debounced search functionality
+            let searchTimeout;
+            $('#search').on('input', function() {
+                clearTimeout(searchTimeout);
+                const searchTerm = $(this).val();
+                
+                searchTimeout = setTimeout(function() {
+                    if (searchTerm.length >= 3 || searchTerm.length === 0) {
+                        // Auto-submit form
+                        $('#search').closest('form').submit();
+                    }
+                }, 500);
+            });
+
+            // Auto-submit on filter changes
+            $('#role_filter, #page_size').on('change', function() {
+                $(this).closest('form').submit();
             });
         });
     </script>

@@ -49,8 +49,35 @@
             cursor: pointer;
             margin-right: 1rem;
             padding: 8px;
+        }
+
+        .sidebar-toggle {
             border-radius: 4px;
             transition: all 0.2s;
+        }
+
+        /* Filter Panel Animation */
+        #filterPanel {
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+        }
+        
+        #filterPanel.d-none {
+            max-height: 0;
+            opacity: 0;
+        }
+        
+        #filterPanel:not(.d-none) {
+            max-height: 200px;
+            opacity: 1;
+        }
+        
+        #filterIcon {
+            transition: transform 0.3s ease;
+        }
+        
+        #filterIcon.rotated {
+            transform: rotate(180deg);
         }
 
         .sidebar-toggle:hover {
@@ -586,7 +613,7 @@
         }
 
         .table td.stats-cell:hover {
-            background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.04)) !important;
+            background-color: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(13, 110, 253, 0.04)) !important;
         }
 
         /* === Tables === */
@@ -932,6 +959,107 @@
             z-index: 1000;
             max-width: 300px;
         }
+
+        /* Action buttons chiroyli ko'rinish */
+        .action-buttons {
+            min-width: 250px;
+        }
+
+        .action-btn {
+            position: relative;
+            overflow: hidden;
+            border-radius: 25px !important;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0.5px;
+            padding: 8px 16px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .action-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Specific colors for action buttons */
+        .btn-info.action-btn {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .btn-info.action-btn:hover {
+            background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.4);
+        }
+
+        .btn-success.action-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success.action-btn:hover {
+            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Responsive action buttons */
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px !important;
+                min-width: auto;
+            }
+            
+            .action-btn {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+            
+            .action-btn span {
+                display: none;
+            }
+            
+            .action-btn i {
+                margin-right: 0 !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .action-buttons {
+                gap: 4px !important;
+            }
+            
+            .action-btn {
+                padding: 4px 8px;
+                border-radius: 15px !important;
+            }
+        }
     </style>
     
 </head>
@@ -958,23 +1086,42 @@
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Foydalanuvchilar ro'yxati</h6>
-                    <div class="d-flex gap-2">
-                        <select class="form-select" id="roleFilter" style="width: 200px;">
-                            <option value="">Barcha rollar</option>
-                            <option value="REKTOR">Rektor</option>
-                            <option value="PROREKTOR">Prorektor</option>
-                            <option value="DEKAN">Dekan</option>
-                            <option value="BOLIM_RAHBARI">Bo'lim rahbari</option>
-                            <option value="BOLIM_BOSHLIGI">Bo'lim boshligi</option>
-                            <option value="ZAM_DEKAN">Zam dekan</option>
-                            <option value="KAFEDRA_MUDIRI">Kafedra mudiri</option>
-                            <option value="TYUTOR">Tyutor</option>
-                            <option value="HODIM">Hodim</option>
-                        </select>
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Qidirish..." id="searchInput">
-                            <button class="btn btn-outline-secondary" type="button" id="searchButton">
-                                <i class="fas fa-search"></i>
+                    
+                    <!-- Filter toggle button -->
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="filterToggle" title="Filterlarni ko'rsatish/yashirish">
+                        <i class="fas fa-filter me-1"></i>Filter
+                        <i class="fas fa-chevron-down ms-1" id="filterIcon"></i>
+                    </button>
+                </div>
+                
+                <!-- Filter Panel - Hidden by default -->
+                <div class="card-header border-top d-none" id="filterPanel">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-4">
+                            <!-- Qidiruv input -->
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control form-control-sm" id="searchInput" 
+                                       placeholder="Qidirish..." 
+                                       value="">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <!-- Status filtri -->
+                            <select class="form-select form-select-sm" id="statusFilter">
+                                <option value="">Status</option>
+                                <option value="active">Faol</option>
+                                <option value="inactive">Nofaol</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <!-- Tozalash button -->
+                            <button type="button" class="btn btn-outline-secondary btn-sm w-100" id="clearFilters" title="Filterlarni tozalash">
+                                <i class="fas fa-times me-1"></i>Tozalash
                             </button>
                         </div>
                     </div>
@@ -988,150 +1135,75 @@
                                     <th>Foydalanuvchi</th>
                                     <th>Role</th>
                                     <th><i class="fas fa-building me-1"></i>Struktura</th>
-                                    <th>Holati</th>
-                                    <th>Jami</th>
-                                    <th>Bajarilgan</th>
-                                    <th>Kechikkan</th>
-                                    <th>Bajarilmagan</th>
-                                    <th>Jami bal</th>
-                                    <th>Samaradorlik</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Amallar</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for foydalanuvchi_malumoti in foydalanuvchilar_malumotlari %}
+                                {% for foydalanuvchi in foydalanuvchilar_page %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="user-avatar me-3">
                                                 <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                    {{ foydalanuvchi_malumoti.user.first_name|first|default:foydalanuvchi_malumoti.user.username|first|upper }}
+                                                    {{ foydalanuvchi.first_name|first|default:foydalanuvchi.username|first|upper }}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div class="fw-bold">{{ foydalanuvchi_malumoti.user.username }}</div>
+                                                <div class="fw-bold">{{ foydalanuvchi.username }}</div>
                                                 <div class="text-muted small">
-                                                    {{ foydalanuvchi_malumoti.user.first_name }} {{ foydalanuvchi_malumoti.user.last_name }}
-                                                    {% if not foydalanuvchi_malumoti.user.first_name and not foydalanuvchi_malumoti.user.last_name %}
+                                                    {{ foydalanuvchi.first_name }} {{ foydalanuvchi.last_name }}
+                                                    {% if not foydalanuvchi.first_name and not foydalanuvchi.last_name %}
                                                     <span class="text-muted">-</span>
                                                     {% endif %}
                                                 </div>
-                                                {% if foydalanuvchi_malumoti.user.email %}
-                                                <div class="text-muted small">{{ foydalanuvchi_malumoti.user.email }}</div>
-                                                {% endif %}
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-{% if foydalanuvchi_malumoti.user.role == 'REKTOR' %}danger{% elif foydalanuvchi_malumoti.user.role == 'PROREKTOR' %}warning{% elif foydalanuvchi_malumoti.user.role == 'DEKAN' %}info{% elif foydalanuvchi_malumoti.user.role == 'KOMISSIYA' %}primary{% else %}secondary{% endif %} bg-opacity-10 text-{% if foydalanuvchi_malumoti.user.role == 'REKTOR' %}danger{% elif foydalanuvchi_malumoti.user.role == 'PROREKTOR' %}warning{% elif foydalanuvchi_malumoti.user.role == 'DEKAN' %}info{% elif foydalanuvchi_malumoti.user.role == 'KOMISSIYA' %}primary{% else %}secondary{% endif %}">
-                                            {{ foydalanuvchi_malumoti.user.get_role_display|default:foydalanuvchi_malumoti.user.role }}
+                                        <span class="text-black" data-role="{{ foydalanuvchi.role }}">
+                                            {{ foydalanuvchi.get_role_display }}
                                         </span>
                                     </td>
                                     <td class="struktura-cell">
-                                        <div class="text-truncate" style="max-width: 150px;" title="{{ foydalanuvchi_malumoti.user.struktura.nomi|default:'Struktura ko\'rsatilmagan' }}">
-                                            {% if foydalanuvchi_malumoti.user.struktura %}
+                                        <div class="text-truncate" style="max-width: 150px;" title="{{ foydalanuvchi.struktura.nomi|default:'Struktura ko\'rsatilmagan' }}">
+                                            {% if foydalanuvchi.struktura %}
                                                 <i class="fas fa-building me-1 text-muted"></i>
-                                                <span>{{ foydalanuvchi_malumoti.user.struktura.name }}</span>
+                                                <span>{{ foydalanuvchi.struktura.name }}</span>
                                             {% else %}
                                                 <i class="fas fa-minus me-1 text-muted"></i>
                                                 <span class="text-muted">Ko'rsatilmagan</span>
                                             {% endif %}
                                         </div>
                                     </td>
-                                    <td>
-                                        {% if foydalanuvchi_malumoti.user.is_active %}
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle me-1"></i>Faol
-                                        </span>
+                                    <td class="text-center">
+                                        {% if foydalanuvchi.is_active %}
+                                            <span class="badge bg-success">Faol</span>
                                         {% else %}
-                                        <span class="badge bg-danger">
-                                            <i class="fas fa-times-circle me-1"></i>Faol emas
-                                        </span>
+                                            <span class="badge bg-secondary">Nofaol</span>
                                         {% endif %}
                                     </td>
                                     <td class="text-center">
-                                        <div class="stat-number" style="font-size: 1.5rem; color: #007bff;">{{ foydalanuvchi_malumoti.stats.total }}</div>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="stats-container stat-completed">
-                                            <div class="stat-number">{{ foydalanuvchi_malumoti.stats.completed }}</div>
-                                            <div class="stat-circle">
-                                                <svg class="progress-ring">
-                                                    <circle class="progress-ring-circle progress-ring-background" cx="17.5" cy="17.5" r="15"></circle>
-                                                    <circle class="progress-ring-circle progress-ring-progress" cx="17.5" cy="17.5" r="15"
-                                                            style="stroke-dashoffset: calc(94 - (94 * {{ foydalanuvchi_malumoti.stats.completion_rate|default:0 }}) / 100);"></circle>
-                                                </svg>
-                                                <span class="stat-text">{{ foydalanuvchi_malumoti.stats.completion_rate|default:0 }}%</span>
-                                            </div>
+                                        <div class="d-flex gap-2 justify-content-center action-buttons">
+                                            <button type="button" class="btn btn-info btn-sm action-btn" 
+                                                    onclick="viewUserTasks('{{ foydalanuvchi.id }}')" 
+                                                    title="Topshiriqlar">
+                                                <i class="fas fa-tasks me-1"></i>
+                                                <span>Topshiriqlar</span>
+                                            </button>
+                                            <button type="button" class="btn btn-success btn-sm action-btn" 
+                                                    onclick="viewUserStats('{{ foydalanuvchi.id }}')" 
+                                                    title="Statistika">
+                                                <i class="fas fa-chart-bar me-1"></i>
+                                                <span>Statistika</span>
+                                            </button>
                                         </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="stats-container stat-delayed">
-                                            <div class="stat-number">{{ foydalanuvchi_malumoti.stats.delayed }}</div>
-                                            <div class="stat-circle">
-                                                <svg class="progress-ring">
-                                                    <circle class="progress-ring-circle progress-ring-background" cx="17.5" cy="17.5" r="15"></circle>
-                                                    <circle class="progress-ring-circle progress-ring-progress" cx="17.5" cy="17.5" r="15"
-                                                            style="stroke-dashoffset: calc(94 - (94 * {{ foydalanuvchi_malumoti.stats.delay_rate|default:0 }}) / 100);"></circle>
-                                                </svg>
-                                                <span class="stat-text">{{ foydalanuvchi_malumoti.stats.delay_rate|default:0 }}%</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="stats-container stat-unfinished">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="stat-number">{{ foydalanuvchi_malumoti.stats.unfinished }}</div>
-                                                {% if foydalanuvchi_malumoti.stats.failed > 0 %}
-                                                <small class="text-muted" style="font-size: 0.8rem;">+{{ foydalanuvchi_malumoti.stats.failed }}</small>
-                                                {% endif %}
-                                            </div>
-                                            <div class="stat-circle">
-                                                <svg class="progress-ring">
-                                                    <circle class="progress-ring-circle progress-ring-background" cx="17.5" cy="17.5" r="15"></circle>
-                                                    <circle class="progress-ring-circle progress-ring-progress" cx="17.5" cy="17.5" r="15"
-                                                            style="stroke-dashoffset: calc(94 - (94 * {{ foydalanuvchi_malumoti.stats.unfinished_rate|default:0 }}) / 100);"></circle>
-                                                </svg>
-                                                <span class="stat-text">{{ foydalanuvchi_malumoti.stats.unfinished_rate|default:0 }}%</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="text-center">
-                                            <strong class="text-primary" style="font-size: 1.2rem;">
-                                                {{ foydalanuvchi_malumoti.stats.total_score|default:0 }}
-                                            </strong>
-                                            <small class="d-block text-muted">ball</small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if foydalanuvchi_malumoti.stats.total > 0 %}
-                                        <div class="text-center">
-                                            {% if foydalanuvchi_malumoti.stats.completion_rate >= 80 %}
-                                            <i class="fas fa-star text-success fa-lg" title="A'lo samaradorlik"></i>
-                                            <small class="d-block text-success">A'lo</small>
-                                            {% elif foydalanuvchi_malumoti.stats.completion_rate >= 60 %}
-                                            <i class="fas fa-thumbs-up text-primary fa-lg" title="Yaxshi samaradorlik"></i>
-                                            <small class="d-block text-primary">Yaxshi</small>
-                                            {% elif foydalanuvchi_malumoti.stats.completion_rate >= 40 %}
-                                            <i class="fas fa-minus-circle text-warning fa-lg" title="O'rta samaradorlik"></i>
-                                            <small class="d-block text-warning">O'rta</small>
-                                            {% else %}
-                                            <i class="fas fa-exclamation-triangle text-danger fa-lg" title="Past samaradorlik"></i>
-                                            <small class="d-block text-danger">Past</small>
-                                            {% endif %}
-                                        </div>
-                                        {% else %}
-                                        <div class="text-center">
-                                            <i class="fas fa-minus text-muted"></i>
-                                            <small class="d-block text-muted">Ma'lumot yo'q</small>
-                                        </div>
-                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="11" class="text-center text-muted py-4">
+                                    <td colspan="6" class="text-center text-muted py-4">
                                         <i class="fas fa-users fa-2x mb-2"></i><br>
                                         Hech qanday foydalanuvchi topilmadi
                                     </td>
@@ -1143,92 +1215,6 @@
                 </div>
             </div>
 
-            <!-- Detailed Breakdown -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-chart-pie me-2"></i>Batafsil Ma'lumot
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="border-left-primary bg-light p-3 rounded">
-                                <h6 class="text-primary">Ish Samaradorligi</h6>
-                                <ul class="list-unstyled mb-0">
-                                    <li><i class="fas fa-star text-success me-2"></i>A'lo samaradorlik: 
-                                        <strong>{{ excellent_users }} ta</strong>
-                                    </li>
-                                    <li><i class="fas fa-thumbs-up text-primary me-2"></i>Yaxshi samaradorlik: 
-                                        <strong>{{ good_users }} ta</strong>
-                                    </li>
-                                    <li><i class="fas fa-minus-circle text-warning me-2"></i>O'rta samaradorlik: 
-                                        <strong>{{ average_users }} ta</strong>
-                                    </li>
-                                    <li><i class="fas fa-exclamation-triangle text-danger me-2"></i>Past samaradorlik: 
-                                        <strong>{{ poor_users }} ta</strong>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="border-left-info bg-light p-3 rounded">
-                                <h6 class="text-info">Rollarga Bo'yicha</h6>
-                                <ul class="list-unstyled mb-0">
-                                    <li>
-                                        <span class="badge bg-danger me-2">REKTOR</span>
-                                        <strong>{{ role_stats.REKTOR|default:0 }} ta</strong>
-                                    </li>
-                                    <li>
-                                        <span class="badge bg-warning me-2">PROREKTOR</span>
-                                        <strong>{{ role_stats.PROREKTOR|default:0 }} ta</strong>
-                                    </li>
-                                    <li>
-                                        <span class="badge bg-info me-2">DEKAN</span>
-                                        <strong>{{ role_stats.DEKAN|default:0 }} ta</strong>
-                                    </li>
-                                    <li>
-                                        <span class="badge bg-primary me-2">KOMISSIYA</span>
-                                        <strong>{{ role_stats.KOMISSIYA|default:0 }} ta</strong>
-                                    </li>
-                                    <li>
-                                        <span class="badge bg-secondary me-2">BOSHQALAR</span>
-                                        <strong>{{ role_stats.HODIM|default:0 }} ta</strong>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="border-left-success bg-light p-3 rounded">
-                                <h6 class="text-success">Umumiy Natija</h6>
-                                <div class="progress mb-2">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                         style="width: {{ overall_completion_rate }}%" 
-                                         aria-valuenow="{{ overall_completion_rate }}" 
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                </div>
-                                <small class="text-muted">
-                                    Umumiy bajarilish foizi: 
-                                    <strong class="text-success">{{ overall_completion_rate }}%</strong>
-                                </small>
-                                <div class="mt-2">
-                                    <small class="d-block">
-                                        <i class="fas fa-clock text-warning me-1"></i>
-                                        Kechikish darajasi: 
-                                        <strong class="text-warning">{{ overall_delay_rate }}%</strong>
-                                    </small>
-                                    <small class="d-block">
-                                        <i class="fas fa-times-circle text-danger me-1"></i>
-                                        Bajarilmagan darajasi: 
-                                        <strong class="text-danger">{{ overall_unfinished_rate }}%</strong>
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 
@@ -1240,6 +1226,33 @@
 
     <script>
         $(document).ready(function () {
+            // Filter toggle functionality
+            $('#filterToggle').click(function() {
+                var filterPanel = $('#filterPanel');
+                var filterIcon = $('#filterIcon');
+                
+                if (filterPanel.hasClass('d-none')) {
+                    filterPanel.removeClass('d-none');
+                    filterIcon.addClass('rotated');
+                } else {
+                    filterPanel.addClass('d-none');
+                    filterIcon.removeClass('rotated');
+                }
+            });
+
+            // Initialize progress rings
+            $('.progress-ring-progress[data-percentage]').each(function() {
+                var percentage = $(this).data('percentage');
+                var offset = 94 - (94 * percentage) / 100;
+                $(this).css('stroke-dashoffset', offset);
+            });
+
+            // Initialize progress bars
+            $('.progress-bar[data-width]').each(function() {
+                var width = $(this).data('width');
+                $(this).css('width', width + '%');
+            });
+
             // Sidebar toggle functionality
             $('#sidebarToggle').click(function () {
                 $('#sidebar').toggleClass('collapsed');
@@ -1271,63 +1284,51 @@
                 $(this).addClass('active');
             });
 
-            // Search and filter functionality
-            function performSearch() {
+            // Combined search and filter functionality
+            function performSearchAndFilter() {
                 var searchValue = $("#searchInput").val().toLowerCase().trim();
-                var roleFilter = $("#roleFilter").val();
+                var statusFilter = $("#statusFilter").val();
                 
-                $("#dataTable tbody tr").filter(function() {
+                $("#dataTable tbody tr").each(function() {
                     var $row = $(this);
-                    var rowText = $row.text().toLowerCase();
-                    var roleCell = $row.find('td:nth-child(3)'); // Role ustuni (3-chi ustun)
-                    var roleText = roleCell.text().trim();
+                    var show = true;
                     
-                    var matchesSearch = rowText.indexOf(searchValue) > -1;
-                    var matchesRole = true;
+                    // Skip empty row
+                    if ($row.find('td').length <= 1) return;
                     
-                    if (roleFilter) {
-                        // Rol bo'yicha filtrlash
-                        if (roleFilter === 'REKTOR') {
-                            matchesRole = roleText.includes('Rektor');
-                        } else if (roleFilter === 'PROREKTOR') {
-                            matchesRole = roleText.includes('Prorektor');
-                        } else if (roleFilter === 'DEKAN') {
-                            matchesRole = roleText.includes('Dekan');
-                        } else if (roleFilter === 'BOLIM_RAHBARI') {
-                            matchesRole = roleText.includes("Bo'lim rahbari");
-                        } else if (roleFilter === 'BOLIM_BOSHLIGI') {
-                            matchesRole = roleText.includes("Bo'lim boshligi");
-                        } else if (roleFilter === 'ZAM_DEKAN') {
-                            matchesRole = roleText.includes('Zam dekan');
-                        } else if (roleFilter === 'KAFEDRA_MUDIRI') {
-                            matchesRole = roleText.includes('Kafedra mudiri');
-                        } else if (roleFilter === 'TYUTOR') {
-                            matchesRole = roleText.includes('Tyutor');
-                        } else if (roleFilter === 'HODIM') {
-                            matchesRole = roleText.includes('Hodim');
+                    // Search filter
+                    if (searchValue) {
+                        var allText = $row.text().toLowerCase();
+                        var matchesSearch = allText.includes(searchValue);
+                        if (!matchesSearch) show = false;
+                    }
+                    
+                    // Status filter
+                    if (statusFilter && show) {
+                        var statusBadge = $row.find('td:eq(4) .badge');
+                        var isActive = statusBadge.hasClass('bg-success');
+                        var isInactive = statusBadge.hasClass('bg-secondary');
+                        
+                        if (statusFilter === 'active' && !isActive) {
+                            show = false;
+                        } else if (statusFilter === 'inactive' && !isInactive) {
+                            show = false;
                         }
                     }
                     
-                    $row.toggle(matchesSearch && matchesRole);
+                    $row.toggle(show);
+                });
+                
+                // Update row numbers
+                var visibleIndex = 1;
+                $("#dataTable tbody tr:visible").each(function() {
+                    if ($(this).find('td').length > 1) {
+                        $(this).find('td:first').text(visibleIndex++);
+                    }
                 });
             }
 
-            $("#searchInput").on("keyup", function(event) {
-                performSearch();
-                // Enter tugmasi bosilganda ham qidiruv amalga oshiriladi
-                if (event.keyCode === 13) {
-                    performSearch();
-                }
-            });
 
-            $("#searchButton").on("click", function() {
-                performSearch();
-            });
-
-            // Rol filtri o'zgarganida
-            $("#roleFilter").on("change", function() {
-                performSearch();
-            });
 
             // Role badges animation
             $(".modern-badge").hover(
@@ -1366,15 +1367,55 @@
                 });
             }, 500);
 
-            // Only progress circle hover effects (no hover for numbers)
-            $(".stat-circle").hover(
-                function() {
-                    // Progress circle hover effect only
-                },
-                function() {
-                    // Reset hover effect only
-                }
-            );
+            // Action functions
+            window.viewUserTasks = function(userId) {
+                // Yangi sahifada foydalanuvchi topshiriqlarini ko'rsatish
+                var baseUrl = window.location.origin;
+                var tasksUrl = `${baseUrl}/user-tasks/${userId}/`;
+                
+                // Yangi tab/window da ochish
+                window.open(tasksUrl, '_blank');
+            };
+            
+            window.viewUserStats = function(userId) {
+                // Foydalanuvchi ma'lumotlarini jadvaldan topish
+                var userRow = $(`button[onclick="viewUserStats('${userId}')"]`).closest('tr');
+                var userName = userRow.find('td:eq(1) .fw-bold').text().trim();
+                var fullName = userRow.find('td:eq(1) .text-muted.small').text().trim();
+                var userRole = userRow.find('td:eq(2) span').text().trim();
+                var userStructure = userRow.find('td:eq(3) span').text().trim();
+                var userStatus = userRow.find('td:eq(4) .badge').text().trim();
+                
+                // Statistika ma'lumotlarini ko'rsatish
+                var statsInfo = `
+🧑‍💼 FOYDALANUVCHI MA'LUMOTLARI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Foydalanuvchi: ${userName}
+📝 Ism Familya: ${fullName || 'Ko\'rsatilmagan'}
+🎭 Lavozim: ${userRole}
+🏢 Struktura: ${userStructure}
+✅ Status: ${userStatus}
+🆔 ID: ${userId}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 STATISTIKA BO'LIMI
+
+📈 Umumiy topshiriqlar: 0 ta
+✅ Bajarilgan: 0 ta
+⏰ Muddati o'tgan: 0 ta
+🔄 Jarayonda: 0 ta
+📊 Samaradorlik: 0%
+
+Bu yerda ${userName} ning batafsil statistikasi ko'rsatiladi.
+                `;
+                
+                alert(statsInfo);
+                
+                // Keyinchalik bu yerda statistika sahifasiga yo'naltirish mumkin
+                // window.location.href = `/statistika/${userId}/`;
+            };
+
 
             // Animated counter effect
             function animateNumbers() {
@@ -1407,23 +1448,39 @@
                     $(this).removeClass("table-active");
                 }
             );
+
+            // Event listeners for search and filter
+            $("#searchInput").on("keyup", function() {
+                performSearchAndFilter();
+            });
+            
+            $("#statusFilter").on("change", function() {
+                performSearchAndFilter();
+            });
+            
+            // Clear filters
+            $("#clearFilters").on("click", function() {
+                $("#searchInput").val('');
+                $("#statusFilter").val('');
+                performSearchAndFilter();
+            });
         });
 
         // Excel Export Function
         function exportToExcel() {
             // Get current filter values
-            var roleFilter = $("#roleFilter").val();
             var searchFilter = $("#searchInput").val();
+            var statusFilter = $("#statusFilter").val();
             
             // Check if any filters are applied
-            var hasFilters = roleFilter || searchFilter;
+            var hasFilters = searchFilter || statusFilter;
             
             // Build filter info
             let filterInfo = '';
             if (hasFilters) {
                 let filterParts = [];
-                if (roleFilter) filterParts.push('Rol: ' + roleFilter);
                 if (searchFilter) filterParts.push('Qidiruv: ' + searchFilter);
+                if (statusFilter) filterParts.push('Status: ' + (statusFilter === 'active' ? 'Faol' : 'Nofaol'));
                 filterInfo = 'Filter: ' + filterParts.join(', ');
             } else {
                 filterInfo = 'Filter: Barcha foydalanuvchilar';
@@ -1438,18 +1495,11 @@
                 ['']
             ];
 
-            // Add general statistics only if no filters are applied
+            // Add basic info only
             if (!hasFilters) {
                 data.push(
-                    ['UMUMIY STATISTIKA'],
-                    ['Jami foydalanuvchilar:', {{ total_users|default:0 }}],
-                    ['A\'lo samaradorlik:', '{{ excellent_users|default:0 }} ta'],
-                    ['Yaxshi samaradorlik:', '{{ good_users|default:0 }} ta'],
-                    ['O\'rta samaradorlik:', '{{ average_users|default:0 }} ta'],
-                    ['Past samaradorlik:', '{{ poor_users|default:0 }} ta'],
-                    ['Umumiy bajarilish foizi:', '{{ overall_completion_rate|default:0 }}%'],
-                    ['Umumiy kechikish foizi:', '{{ overall_delay_rate|default:0 }}%'],
-                    ['Umumiy bajarilmagan foizi:', '{{ overall_unfinished_rate|default:0 }}%'],
+                    ['UMUMIY MA\'LUMOT'],
+                    ['Jami foydalanuvchilar:', '{{ total_users|default:0 }} ta'],
                     ['']
                 );
             }
@@ -1457,7 +1507,7 @@
             // Add table header
             data.push(
                 [hasFilters ? 'FILTERLANGAN FOYDALANUVCHILAR RO\'YXATI' : 'FOYDALANUVCHILAR RO\'YXATI'],
-                ['#', 'Foydalanuvchi', 'Ism Familiya', 'Rol', 'Struktura', 'Holati', 'Jami', 'Bajarilgan', 'Kechikkan', 'Bajarilmagan', 'Jami Ball', 'Samaradorlik']
+                ['#', 'Foydalanuvchi', 'Ism Familiya', 'Rol', 'Struktura', 'Status']
             );
 
             // Get visible table rows
@@ -1470,13 +1520,7 @@
                         $row.find('td:eq(1) .text-muted.small').first().text().trim() || '-', // Full name
                         $row.find('td:eq(2) .badge').text().trim() || '-', // Role
                         $row.find('td:eq(3) span').text().trim() || 'Ko\'rsatilmagan', // Structure
-                        $row.find('td:eq(4) .badge').text().trim() || '-', // Status
-                        $row.find('td:eq(5) .stat-number').text().trim() || '0', // Total
-                        $row.find('td:eq(6) .stat-number').text().trim() || '0', // Completed
-                        $row.find('td:eq(7) .stat-number').text().trim() || '0', // Delayed
-                        $row.find('td:eq(8) .stat-number').text().trim() || '0', // Unfinished
-                        $row.find('td:eq(9) strong').text().trim() || '0', // Total score
-                        $row.find('td:eq(10) small').text().trim() || 'Ma\'lumot yo\'q' // Efficiency
+                        $row.find('td:eq(4) .badge').text().trim() || '-' // Status
                     ];
                     data.push(rowData);
                 }
@@ -1526,7 +1570,7 @@
 
             // Generate filename
             var filename = 'Foydalanuvchilar_Hisoboti_' + new Date().toISOString().slice(0, 10);
-            if (roleFilter) filename += '_' + roleFilter;
+            if (statusFilter) filename += '_' + statusFilter;
             filename += '.xlsx';
 
             // Save the file

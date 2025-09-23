@@ -49,8 +49,17 @@ class Users(AbstractUser):
     def __str__(self):
         return self.username
     
+
     class Meta:
         verbose_name = 'Foydalanuvchi'
         verbose_name_plural = 'Foydalanuvchilar'
         ordering = ['-date_joined']
+        indexes = [
+            models.Index(fields=['role']),
+            models.Index(fields=['is_active']),
+            models.Index(fields=['date_joined']),
+            models.Index(fields=['username']),
+            models.Index(fields=['role', 'is_active']),
+            models.Index(fields=['struktura', 'role']),
+        ]
 

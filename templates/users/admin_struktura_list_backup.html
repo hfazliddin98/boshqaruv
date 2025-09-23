@@ -1,0 +1,1405 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QO'QON DAVLAT UNIVERSITETI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="{% static 'asosiy/favicon.ico' %}">
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet">
+    <!-- Asosiy css -->
+    <link rel="stylesheet" href="{% static 'asosiy/home/asosiy.css' %}">
+
+    <style>
+        .menu-header {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 1rem 1.5rem 0.5rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* === Main Content === */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: margin-left 0.3s;
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* === Toggle Button === */
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-right: 1rem;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* === Card Styles - Ultra Modern === */
+        .card {
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-body {
+            padding: 1.25rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Modern Icon Circles - Smaller */
+        .icon-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-circle::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+            transform: rotate(-45deg);
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .icon-circle::before {
+            transform: rotate(45deg);
+        }
+
+        .card:hover .icon-circle {
+            transform: rotate(5deg) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-circle i {
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 3;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .icon-circle i {
+            transform: scale(1.1);
+        }
+
+        /* Modern gradients for different roles */
+        .bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+        .bg-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; }
+        .bg-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important; }
+        .bg-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
+        .bg-danger { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%) !important; }
+
+        /* Modern buttons - Smaller */
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Specific button colors */
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .btn-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+        /* Modern text styles - Smaller */
+        .text-xs {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .h5 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Smaller paragraph text */
+        .card-body p {
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+
+        /* Animated number counter */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .h5 {
+            animation: countUp 0.8s ease;
+        }
+
+        /* Glass effect for cards */
+        .border-left-primary,
+        .border-left-success,
+        .border-left-info,
+        .border-left-warning,
+        .border-left-danger {
+            border-left: none !important;
+            position: relative;
+        }
+
+        /* Hover effects for statistics */
+        .card-body:hover .text-xs {
+            color: #667eea !important;
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Additional modern effects */
+        .card-hover-active {
+            transform: translateY(-8px) scale(1.01) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .card-info {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-footer-action {
+            margin-top: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Loading button states */
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Pulse animation for numbers */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .counter-number {
+            animation: pulse 2s infinite;
+        }
+
+        /* Gradient text for headings */
+        .main-content h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        /* Floating particles background effect */
+        .main-content::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Responsive improvements - SM size optimized */
+        @media (max-width: 768px) {
+            .icon-circle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .icon-circle i {
+                font-size: 1rem;
+            }
+            
+            .h5 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+            }
+
+            .text-xs {
+                font-size: 0.6rem;
+            }
+
+            .card-body p {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 0.85rem;
+            }
+
+            .icon-circle {
+                width: 35px;
+                height: 35px;
+            }
+
+            .icon-circle i {
+                font-size: 0.9rem;
+            }
+
+            .h5 {
+                font-size: 1.3rem;
+            }
+
+            .main-content h1 {
+                font-size: 1.3rem;
+            }
+
+            .btn {
+                font-size: 0.6rem;
+                padding: 5px 10px;
+            }
+
+            .card-body p {
+                font-size: 0.7rem;
+                line-height: 1.2;
+            }
+        }
+
+        /* === Tables === */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #212529;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        .table-row-highlight {
+            background-color: rgba(13, 110, 253, 0.08) !important;
+            transform: scale(1.01);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .table-responsive {
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.125);
+        }
+
+        /* === Buttons === */
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            font-size: 12px;
+            padding: 0.375rem 0.75rem;
+        }
+
+        /* === Badges === */
+        .badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        /* === Form Styles === */
+        .form-control,
+        .form-select {
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ced4da;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        /* Search section spacing */
+        .card-body.pb-0 {
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .card-body.pt-0 {
+            padding-top: 0.5rem !important;
+        }
+        
+        .card-body.pb-1 {
+            padding-bottom: 0.75rem !important;
+        }
+        
+        .card-body.pt-1 {
+            padding-top: 0.75rem !important;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .form-control-lg {
+            padding: 0.75rem 1.25rem;
+            font-size: 1.1rem;
+        }
+
+        /* === Input groups === */
+        .input-group .form-control:not(:first-child) {
+            border-left: none;
+        }
+
+        .input-group .btn {
+            border-left: none;
+        }
+
+        /* === Gradients and Utilities === */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        }
+
+        .file-upload-area {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bg-light-hover:hover,
+        .file-upload-area:hover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05) !important;
+        }
+
+        .border-dashed {
+            border-style: dashed !important;
+        }
+
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* === File List Styles === */
+        .list-group {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 0.375rem;
+        }
+
+        .list-group-item {
+            padding: 0.75rem 1.25rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .list-group-item:hover {
+            border-left-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+
+        /* === Shadow Utilities === */
+        .shadow-sm {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+
+        .shadow {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* === Text utilities === */
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .font-weight-bold {
+            font-weight: 600 !important;
+        }
+
+        .font-weight-normal {
+            font-weight: 400 !important;
+        }
+
+        /* === Pagination === */
+        .pagination {
+            margin: 0;
+        }
+
+        .pagination .page-link {
+            color: var(--primary-color);
+            border-color: #dee2e6;
+            border-radius: 6px;
+            margin: 0 2px;
+            font-size: 14px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        /* === Container Overrides === */
+        .container, 
+        .container-fluid {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* === Animation utilities === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* === Loading states === */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        /* === Custom scrollbar === */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+                z-index: 1050;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .card-body .row>div {
+                margin-bottom: 1.5rem;
+            }
+            
+            .table-responsive {
+                font-size: 12px;
+            }
+            
+            .btn {
+                font-size: 12px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .input-group {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand span.d-none.d-sm-inline {
+                display: none !important;
+            }
+            
+            .card-header h6 {
+                font-size: 14px;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem 0.25rem;
+                font-size: 12px;
+            }
+            
+            .badge {
+                font-size: 10px;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+    </style>
+    
+</head>
+
+<body>
+    <!-- Navbar -->
+    {% include "asosiy/navbar.html" %}
+
+    <!-- Sidebar -->
+    {% include "asosiy/sidebar.html" %}
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Tashkilot Tuzilmasi</h1>
+                <a href="{% url 'admin_struktura_create' target_role %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Yangi struktura qo'shish
+                </a>
+            </div> 
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Jami Strukturalar
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 counter-number">
+                                        {{ statistics.total_structures }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-primary text-white">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Faol Strukturalar
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 counter-number">
+                                        {{ statistics.active_structures }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-success text-white">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Lavozimlar
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 counter-number">
+                                        {{ statistics.role_count }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-info text-white">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        O'rtacha Foydalanuvchilar
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 counter-number">
+                                        {{ statistics.avg_users_per_structure|floatformat:1 }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon-circle bg-warning text-white">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Form -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-search me-2"></i>Qidiruv va Filtrlash
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="GET" id="searchForm" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Struktura nomi</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       value="{{ request.GET.search }}" placeholder="Struktura nomini kiriting..."
+                                       autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="role" class="form-label">Lavozim</label>
+                            <select class="form-select" id="role" name="role">
+                                <option value="">Barcha lavozimlar</option>
+                                {% for role_choice in role_choices %}
+                                    <option value="{{ role_choice.0 }}" 
+                                            {% if request.GET.role == role_choice.0 %}selected{% endif %}>
+                                        {{ role_choice.1 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="is_active" class="form-label">Holat</label>
+                            <select class="form-select" id="is_active" name="is_active">
+                                <option value="">Barchasi</option>
+                                <option value="true" {% if request.GET.is_active == 'true' %}selected{% endif %}>Faol</option>
+                                <option value="false" {% if request.GET.is_active == 'false' %}selected{% endif %}>Faol emas</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="per_page" class="form-label">Sahifada</label>
+                            <select class="form-select" id="per_page" name="per_page">
+                                <option value="25" {% if request.GET.per_page == '25' %}selected{% endif %}>25</option>
+                                <option value="50" {% if request.GET.per_page == '50' %}selected{% endif %}>50</option>
+                                <option value="100" {% if request.GET.per_page == '100' %}selected{% endif %}>100</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-1">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Quick filters -->
+                    <div class="mt-3">
+                        <span class="text-muted me-2">Tezkor filtrlar:</span>
+                        <a href="?is_active=true" class="btn btn-sm btn-outline-success me-2">
+                            <i class="fas fa-check-circle me-1"></i>Faol
+                        </a>
+                        <a href="?role=Rektor" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-crown me-1"></i>Rektor
+                        </a>
+                        <a href="?role=Dekan" class="btn btn-sm btn-outline-warning me-2">
+                            <i class="fas fa-graduation-cap me-1"></i>Dekan
+                        </a>
+                        <a href="?" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Tozalash
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        Struktura ro'yxati 
+                        <span class="badge bg-secondary ms-2">{{ total_structures }} ta</span>
+                    </h6>
+                </div>
+                
+                <!-- Search and Filter Section -->
+                <div class="card-body pb-0">
+                    <form method="GET" class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="search" value="{{ search_query }}" 
+                                   placeholder="Qidirish (struktura nomi...)" id="searchInput">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="role_filter">
+                                <option value="">Barcha rollar</option>
+                                {% for role_key, role_name in role_choices %}
+                                    <option value="{{ role_key }}" {% if role_filter == role_key %}selected{% endif %}>
+                                        {{ role_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" name="page_size">
+                                <option value="25" {% if page_size == 25 %}selected{% endif %}>25 ta</option>
+                                <option value="50" {% if page_size == 50 %}selected{% endif %}>50 ta</option>
+                                <option value="100" {% if page_size == 100 %}selected{% endif %}>100 ta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="btn-group" role="group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Qidirish
+                                </button>
+                                <a href="?" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo"></i> Tozalash
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="card-body pt-1">
+                    <div class="table-responsive" style="height: 70vh;">
+                        <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Struktura nomi</th>
+                                    <th>Lavozim/Rol</th>
+                                    <th>Yaratilgan sana</th>
+                                    <th>Holati</th>
+                                    <th>Amallar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for struktura in strukturalar %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-circle bg-primary text-white me-2">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                            <strong>{{ struktura.name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if struktura.role == 'Admin' %}
+                                            <span class="badge bg-danger">{{ struktura.get_role_display }}</span>
+                                        {% elif struktura.role == 'Rektor' %}
+                                            <span class="badge bg-primary">{{ struktura.get_role_display }}</span>
+                                        {% elif struktura.role == 'Prorektor' %}
+                                            <span class="badge bg-success">{{ struktura.get_role_display }}</span>
+                                        {% elif struktura.role == 'Dekan' %}
+                                            <span class="badge bg-warning">{{ struktura.get_role_display }}</span>
+                                        {% elif struktura.role == 'Kafedra mudiri' %}
+                                            <span class="badge bg-info">{{ struktura.get_role_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ struktura.get_role_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{ struktura.created_at|date:"d.m.Y" }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if struktura.is_active %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Faol
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times me-1"></i>Faol emas
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'admin_struktura_update' target_role struktura.id %}" class="btn btn-sm btn-warning" title="Tahrirlash">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="fas fa-building fa-3x mb-3 text-muted"></i>
+                                        <br>
+                                        Hech qanday struktura topilmadi
+                                        <br>
+                                        <a href="#" class="btn btn-primary btn-sm mt-2">
+                                            <i class="fas fa-plus me-1"></i> Birinchi strukturani qo'shing
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Enhanced Pagination -->
+                    {% if strukturalar.has_other_pages %}
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div class="pagination-info">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Sahifa {{ strukturalar.number }} / {{ strukturalar.paginator.num_pages }} 
+                                (Jami {{ strukturalar.paginator.count }} ta yozuv)
+                            </small>
+                        </div>
+                        
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination mb-0">
+                                {% if strukturalar.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}" 
+                                           title="Birinchi sahifa">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ strukturalar.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}" 
+                                           title="Oldingi sahifa">
+                                            <i class="fas fa-angle-left"></i> Oldingi
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link"><i class="fas fa-angle-left"></i> Oldingi</span>
+                                    </li>
+                                {% endif %}
+
+                                <!-- Smart pagination range -->
+                                {% for page_num in strukturalar.paginator.page_range %}
+                                    {% if page_num == strukturalar.number %}
+                                        <li class="page-item active">
+                                            <span class="page-link">
+                                                {{ page_num }}
+                                                <span class="sr-only">(current)</span>
+                                            </span>
+                                        </li>
+                                    {% elif page_num >= strukturalar.number|add:'-3' and page_num <= strukturalar.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                    {% elif page_num == 1 or page_num == strukturalar.paginator.num_pages %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                    {% elif page_num == strukturalar.number|add:'-4' or page_num == strukturalar.number|add:'4' %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if strukturalar.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ strukturalar.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}" 
+                                           title="Keyingi sahifa">
+                                            Keyingi <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ strukturalar.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.is_active %}&is_active={{ request.GET.is_active }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}" 
+                                           title="Oxirgi sahifa">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Keyingi <i class="fas fa-angle-right"></i></span>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+
+                        <!-- Jump to page -->
+                        <div class="d-flex align-items-center">
+                            <small class="text-muted me-2">Sahifaga o'tish:</small>
+                            <select class="form-select form-select-sm" id="jumpToPage" style="width: auto;">
+                                {% for page_num in strukturalar.paginator.page_range %}
+                                    <option value="{{ page_num }}" {% if page_num == strukturalar.number %}selected{% endif %}>
+                                        {{ page_num }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Jami {{ strukturalar.paginator.count }} ta yozuv
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Sidebar toggle functionality
+            $('#sidebarToggle').click(function () {
+                $('#sidebar').toggleClass('collapsed');
+                $('#mainContent').toggleClass('expanded');
+
+                // For mobile view
+                if ($(window).width() < 992) {
+                    $('#sidebar').toggleClass('show');
+                }
+            });
+
+            // Close sidebar when clicking outside on mobile
+            $(document).click(function (e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('#sidebar').length && !$(e.target).is('#sidebarToggle')) {
+                        $('#sidebar').removeClass('show');
+                    }
+                }
+            });
+
+            // Prevent closing when clicking inside sidebar
+            $('#sidebar').click(function (e) {
+                e.stopPropagation();
+            });
+
+            // Active menu item highlight
+            $('.sidebar-menu a').click(function () {
+                $('.sidebar-menu a').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            // Enhanced search functionality with debouncing
+            let searchTimeout;
+            $('#search').on('input', function() {
+                clearTimeout(searchTimeout);
+                const query = $(this).val();
+                
+                searchTimeout = setTimeout(function() {
+                    if (query.length >= 2 || query.length === 0) {
+                        performSearch();
+                    }
+                }, 300); // 300ms debounce
+            });
+
+            // Clear search
+            $('#clearSearch').click(function() {
+                $('#search').val('');
+                performSearch();
+            });
+
+            // Auto-submit form on select changes
+            $('#role, #is_active, #per_page').change(function() {
+                $('#searchForm').submit();
+            });
+
+            // Performance: Add loading states
+            $('#searchForm').submit(function() {
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+            });
+
+            // Performance: Lazy load images and heavy content
+            function lazyLoadContent() {
+                // Add intersection observer for better performance
+                if ('IntersectionObserver' in window) {
+                    const images = document.querySelectorAll('img[data-src]');
+                    const imageObserver = new IntersectionObserver((entries, observer) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const img = entry.target;
+                                img.src = img.dataset.src;
+                                img.classList.remove('lazy');
+                                imageObserver.unobserve(img);
+                            }
+                        });
+                    });
+
+                    images.forEach(img => imageObserver.observe(img));
+                }
+            }
+
+            // Initialize lazy loading
+            lazyLoadContent();
+
+            // Card hover effects for statistics
+            $('.card').hover(
+                function() { $(this).addClass('card-hover-active'); },
+                function() { $(this).removeClass('card-hover-active'); }
+            );
+
+            // Number counter animation for statistics
+            function animateCounters() {
+                $('.counter-number').each(function() {
+                    const $this = $(this);
+                    const countTo = parseInt($this.text());
+                    
+                    $({ countNum: 0 }).animate({
+                        countNum: countTo
+                    }, {
+                        duration: 1000,
+                        easing: 'linear',
+                        step: function() {
+                            $this.text(Math.floor(this.countNum));
+                        },
+                        complete: function() {
+                            $this.text(countTo);
+                        }
+                    });
+                });
+            }
+
+            // Trigger counter animation on page load
+            setTimeout(animateCounters, 500);
+
+            // Enhanced table interactions
+            $('#dataTable tbody tr').hover(
+                function() { $(this).addClass('table-row-highlight'); },
+                function() { $(this).removeClass('table-row-highlight'); }
+            );
+
+            // Enhanced pagination with keyboard navigation
+            $(document).keydown(function(e) {
+                if (e.ctrlKey) {
+                    switch(e.which) {
+                        case 37: // Left arrow
+                            const prevLink = $('.pagination .page-item:not(.disabled) .page-link:contains("Oldingi")');
+                            if (prevLink.length) {
+                                window.location.href = prevLink.attr('href');
+                            }
+                            break;
+                        case 39: // Right arrow
+                            const nextLink = $('.pagination .page-item:not(.disabled) .page-link:contains("Keyingi")');
+                            if (nextLink.length) {
+                                window.location.href = nextLink.attr('href');
+                            }
+                            break;
+                    }
+                }
+            });
+
+            // Performance optimization: Virtual scrolling for large datasets
+            function initVirtualScrolling() {
+                const tableContainer = $('.table-responsive');
+                const tableRows = $('#dataTable tbody tr');
+                
+                if (tableRows.length > 100) {
+                    // Implement virtual scrolling for better performance
+                    const rowHeight = 50; // Approximate row height
+                    const containerHeight = tableContainer.height();
+                    const visibleRows = Math.ceil(containerHeight / rowHeight);
+                    
+                    tableContainer.scroll(function() {
+                        const scrollTop = $(this).scrollTop();
+                        const startIndex = Math.floor(scrollTop / rowHeight);
+                        const endIndex = Math.min(startIndex + visibleRows + 5, tableRows.length);
+                        
+                        tableRows.hide();
+                        tableRows.slice(startIndex, endIndex).show();
+                    });
+                }
+            }
+
+            // Initialize virtual scrolling if needed
+            initVirtualScrolling();
+
+            // Form validation and enhancement
+            $('#searchForm input, #searchForm select').on('focus', function() {
+                $(this).parent().addClass('focused');
+            }).on('blur', function() {
+                $(this).parent().removeClass('focused');
+            });
+
+            // Auto-save search preferences
+            function saveSearchPreferences() {
+                const preferences = {
+                    search: $('#search').val(),
+                    role: $('#role').val(),
+                    is_active: $('#is_active').val(),
+                    per_page: $('#per_page').val()
+                };
+                localStorage.setItem('struktura_search_prefs', JSON.stringify(preferences));
+            }
+
+            // Load saved preferences
+            function loadSearchPreferences() {
+                const saved = localStorage.getItem('struktura_search_prefs');
+                if (saved) {
+                    const prefs = JSON.parse(saved);
+                    $('#per_page').val(prefs.per_page || '25');
+                }
+            }
+
+            // Initialize preferences
+            loadSearchPreferences();
+
+            // Save preferences on form change
+            $('#searchForm input, #searchForm select').change(saveSearchPreferences);
+
+            // Jump to page functionality
+            $('#jumpToPage').change(function() {
+                const selectedPage = $(this).val();
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('page', selectedPage);
+                window.location.href = currentUrl.toString();
+            });
+        });
+
+        // Performance helper functions
+        function performSearch() {
+            const formData = $('#searchForm').serialize();
+            
+            // Show loading state
+            $('.table-responsive').addClass('loading');
+            
+            // In a real implementation, you'd make an AJAX call here
+            // For now, just submit the form
+            if (formData !== window.lastSearchData) {
+                window.lastSearchData = formData;
+                $('#searchForm').submit();
+            }
+        }
+
+        // Confirm delete function
+        function confirmDelete(strukturaName) {
+            if (confirm(`"${strukturaName}" strukturasini o'chirishni xohlaysizmi?`)) {
+                // Bu yerda delete requestini yuborasiz
+                alert('O\'chirish funksiyasi hali ishlab chiqilmagan');
+            }
+        }
+
+        // Export functions
+        function exportToExcel() {
+            // Implementation for Excel export
+            alert('Excel export funksiyasi ishlab chiqilmoqda...');
+        }
+
+        function exportToPDF() {
+            // Implementation for PDF export
+            alert('PDF export funksiyasi ishlab chiqilmoqda...');
+        }
+
+        // Print function
+        function printTable() {
+            window.print();
+        }
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            // Monitor page load performance
+            if ('performance' in window) {
+                const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+                console.log('Page load time:', loadTime + 'ms');
+            }
+        });
+    </script>
+</body>
+</html>

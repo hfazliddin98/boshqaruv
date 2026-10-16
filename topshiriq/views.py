@@ -89,7 +89,7 @@ def topshiriq_create(request, target_role):
                 return render(request, 'asosiy/xabar.html', {
                     'xatolik_turi': 'Muvaffaqiyat',
                     'xabar_matni': f"'{task.title}' topshirig'i muvaffaqiyatli yaratildi va bajaruvchiga xabar yuborildi!",
-                })
+                 })
             except Exception as e:
                 # Xabar yuborishda xato bo'lsa ham topshiriq yaratildi
                 return render(request, 'asosiy/xabar.html', {

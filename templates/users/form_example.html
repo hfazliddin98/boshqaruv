@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Form Ma'lumotlarini Olish Namunasi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .selected-data {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Foydalanuvchi Ma'lumotlari Formi</h4>
+                </div>
+                <div class="card-body">
+                    <form id="user-form" method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Username -->
+                        <div class="form-group">
+                            <label for="id_username">Foydalanuvchi nomi:</label>
+                            <input type="text" class="form-control" id="id_username" name="username" required>
+                        </div>
+                        
+                        <!-- Role Select -->
+                        <div class="form-group">
+                            <label for="id_role">Rol tanlang:</label>
+                            <select class="form-select" id="id_role" name="role" required>
+                                <option value="">---------</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Rektor">Rektor</option>
+                                <option value="Prorektor">Prorektor</option>
+                                <option value="Dekan">Dekan</option>
+                                <option value="Bolim_rahbari">Bo'lim rahbari</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Struktura Select (avtomatik yangilanadi) -->
+                        <div class="form-group">
+                            <label for="id_struktura">Struktura tanlang:</label>
+                            <select class="form-select" id="id_struktura" name="struktura">
+                                <option value="">Avval rol tanlang</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Active Checkbox -->
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="id_is_active" name="is_active" checked>
+                                <label class="form-check-label" for="id_is_active">
+                                    Aktiv foydalanuvchi
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Multiple Select Namunasi -->
+                        <div class="form-group">
+                            <label for="id_permissions">Ruxsatlar (ko'p tanlash mumkin):</label>
+                            <select class="form-select" id="id_permissions" name="permissions" multiple size="4">
+                                <option value="read">O'qish</option>
+                                <option value="write">Yozish</option>
+                                <option value="delete">O'chirish</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                            <small class="form-text text-muted">Ctrl tugmasini bosib ushlab, bir nechta tanlov qiling</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Saqlash</button>
+                            <button type="button" class="btn btn-secondary" onclick="showCurrentData()">Joriy ma'lumotlarni ko'rsatish</button>
+                            <button type="button" class="btn btn-info" onclick="validateAndShow()">Validatsiya qilish</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Tanlangan Ma'lumotlar</h5>
+                </div>
+                <div class="card-body">
+                    <div id="selected-data" class="selected-data">
+                        <p><strong>Username:</strong> <span id="display-username">-</span></p>
+                        <p><strong>Rol:</strong> <span id="display-role">-</span></p>
+                        <p><strong>Struktura:</strong> <span id="display-struktura">-</span></p>
+                        <p><strong>Aktiv:</strong> <span id="display-active">-</span></p>
+                        <p><strong>Ruxsatlar:</strong> <span id="display-permissions">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/form_handlers.js' %}"></script>
+<script>
+// Form ma'lumotlarini real-time kuzatish
+document.addEventListener('DOMContentLoaded', function() {
+    // Barcha input elementlarni kuzatish
+    const form = document.getElementById('user-form');
+    const inputs = form.querySelectorAll('input, select');
+    
+    inputs.forEach(input => {
+        input.addEventListener('change', updateDisplay);
+        input.addEventListener('input', updateDisplay);
+    });
+    
+    // Role o'zgarishi kuzatish
+    const roleSelect = document.getElementById('id_role');
+    roleSelect.addEventListener('change', function() {
+        const selectedRole = this.value;
+        if (selectedRole) {
+            updateStrukturaOptions(selectedRole);
+        } else {
+            // Strukturani tozalash
+            const strukturaSelect = document.getElementById('id_struktura');
+            strukturaSelect.innerHTML = '<option value="">Avval rol tanlang</option>';
+        }
+        updateDisplay();
+    });
+});
+
+// Ma'lumotlarni real-time yangilash
+function updateDisplay() {
+    // Username
+    const username = document.getElementById('id_username').value;
+    document.getElementById('display-username').textContent = username || '-';
+    
+    // Role
+    const roleSelect = document.getElementById('id_role');
+    const selectedRole = roleSelect.value;
+    const roleText = selectedRole ? roleSelect.options[roleSelect.selectedIndex].text : '-';
+    document.getElementById('display-role').textContent = roleText;
+    
+    // Struktura
+    const strukturaSelect = document.getElementById('id_struktura');
+    const selectedStruktura = strukturaSelect.value;
+    const strukturaText = selectedStraktura ? strukturaSelect.options[strukturaSelect.selectedIndex].text : '-';
+    document.getElementById('display-struktura').textContent = strukturaText;
+    
+    // Active checkbox
+    const isActive = document.getElementById('id_is_active').checked;
+    document.getElementById('display-active').textContent = isActive ? 'Ha' : 'Yo\'q';
+    
+    // Multiple select - ruxsatlar
+    const permissionsSelect = document.getElementById('id_permissions');
+    const selectedPermissions = Array.from(permissionsSelect.selectedOptions).map(option => option.text);
+    document.getElementById('display-permissions').textContent = selectedPermissions.length > 0 ? selectedPermissions.join(', ') : '-';
+}
+
+// Struktura variantlarini AJAX orqali yangilash
+function updateStrukturaOptions(selectedRole) {
+    const strukturaSelect = document.getElementById('id_struktura');
+    
+    // Loading ko'rsatish
+    strukturaSelect.innerHTML = '<option value="">Yuklanmoqda...</option>';
+    
+    // AJAX so'rov
+    fetch(`/api/struktura/${selectedRole}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Eski variantlarni tozalash
+            strukturaSelect.innerHTML = '<option value="">Struktura tanlang</option>';
+            
+            // Yangi variantlarni qo'shish
+            data.strukturalar.forEach(struktura => {
+                const option = new Option(struktura.name, struktura.id);
+                strukturaSelect.add(option);
+            });
+        })
+        .catch(error => {
+            console.error('Xatolik:', error);
+            strukturaSelect.innerHTML = '<option value="">Xatolik yuz berdi</option>';
+        });
+}
+
+// Joriy ma'lumotlarni ko'rsatish
+function showCurrentData() {
+    const formData = getAllFormData();
+    alert('Joriy form ma\'lumotlari:\n' + JSON.stringify(formData, null, 2));
+}
+
+// Validatsiya va ko'rsatish
+function validateAndShow() {
+    if (validateForm()) {
+        alert('Form to\'g\'ri to\'ldirilgan!');
+        showCurrentData();
+    }
+}
+
+// Form yuborish (AJAX)
+document.getElementById('user-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+        return;
+    }
+    
+    const formData = new FormData(this);
+    
+    fetch('/api/form-data-example/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Ma\'lumotlar muvaffaqiyatli saqlandi!');
+            console.log('Saqlangan ma\'lumotlar:', data.data);
+        } else {
+            alert('Xatolik: ' + JSON.stringify(data.errors));
+        }
+    })
+    .catch(error => {
+        console.error('Xatolik:', error);
+        alert('Server bilan bog\'lanishda xatolik yuz berdi');
+    });
+});
+</script>
+{% endblock %}

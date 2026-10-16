@@ -3,7 +3,8 @@ from users.views import home, kirish, chiqish
 from users.views import user_list, user_create, user_update
 from users.views import admin_foydalanuvchi_list, admin_foydalanuvchi_create, admin_foydalanuvchi_update
 from users.views import admin_struktura_list, admin_struktura_create, admin_struktura_update
-from users.views import komissiya_foydalanuvchi_list
+from users.views import komissiya_foydalanuvchi_list, user_tasks
+from users.views import get_struktura_by_role
 
 
 
@@ -30,4 +31,10 @@ urlpatterns = [
 
     # komissiya
     path('komissiya_foydalanuvchi_list/<str:target_role>/', komissiya_foydalanuvchi_list, name='komissiya_foydalanuvchi_list'),
+    
+    # user tasks
+    path('user-tasks/<uuid:user_id>/', user_tasks, name='user_tasks'),
+
+    # API endpoints
+    path('api/struktura/<str:role>/', get_struktura_by_role, name='get_struktura_by_role'),
 ]
